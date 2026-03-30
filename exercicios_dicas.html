@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercícios de Programação</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161d;
+    --surface2: #1a1e28;
+    --border: #252a38;
+    --text: #e2e8f4;
+    --muted: #6b7591;
+    --c-java: #f89820;
+    --c-python: #4b8bbe;
+    --c-lang: #5c9cdb;
+    --c-logic: #a78bfa;
+    --accent: #38e07b;
+    --danger: #f87171;
+    --code-bg: #090b10;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0d0f14 0%, #131829 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 200px;
+    background: radial-gradient(ellipse, rgba(56,224,123,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header h1 {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #e2e8f4 30%, #38e07b);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  header p { color: var(--muted); margin-top: .5rem; font-size: .95rem; }
+
+  /* NAV TABS */
+  nav {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    justify-content: center;
+    padding: 1.5rem 2rem 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .tab-btn {
+    padding: .45rem 1.1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); border-color: #3a4055; }
+  .tab-btn.active { color: #0d0f14; background: var(--accent); border-color: var(--accent); }
+  .tab-btn.java.active  { background: var(--c-java);  border-color: var(--c-java); }
+  .tab-btn.python.active{ background: var(--c-python); border-color: var(--c-python);}
+  .tab-btn.c-lang.active{ background: var(--c-lang);  border-color: var(--c-lang); }
+  .tab-btn.logic.active { background: var(--c-logic);  border-color: var(--c-logic);}
+
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .section { display: none; animation: fadeIn .3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none;} }
+
+  /* SECTION HEADER */
+  .sec-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .lang-badge {
+    padding: .3rem .9rem;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .badge-java   { background: rgba(248,152,32,.15); color: var(--c-java); }
+  .badge-python { background: rgba(75,139,190,.15);  color: var(--c-python); }
+  .badge-c      { background: rgba(92,156,219,.15);  color: var(--c-lang); }
+  .badge-logic  { background: rgba(167,139,250,.15); color: var(--c-logic); }
+
+  .sec-header h2 { font-size: 1.5rem; font-weight: 700; }
+
+  /* TOPIC BLOCKS */
+  .topic {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .topic-header {
+    padding: 1rem 1.5rem;
+    background: var(--surface2);
+    display: flex; align-items: center; gap: .7rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .topic-num {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: grid; place-items: center;
+    font-size: .75rem; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .num-java   { background: rgba(248,152,32,.2); color: var(--c-java); }
+  .num-python { background: rgba(75,139,190,.2); color: var(--c-python); }
+  .num-c      { background: rgba(92,156,219,.2); color: var(--c-lang); }
+  .num-logic  { background: rgba(167,139,250,.2);color: var(--c-logic);}
+
+  .topic-header h3 { font-size: 1rem; font-weight: 700; }
+  .topic-header span { font-size: .8rem; color: var(--muted); margin-left: auto; }
+
+  .topic-body { padding: 1.5rem; }
+  .topic-body p { color: #aab3cc; font-size: .9rem; margin-bottom: 1rem; line-height: 1.7; }
+
+  /* CODE BLOCKS */
+  .code-label {
+    font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: .4rem; margin-top: 1rem;
+  }
+  .code-label:first-child { margin-top: 0; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid #1e2232;
+    border-radius: 8px;
+    padding: 1.2rem;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem;
+    line-height: 1.7;
+    color: #c9d1e0;
+    margin-bottom: .8rem;
+  }
+  .kw  { color: #c792ea; }
+  .fn  { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .cm  { color: #546e7a; font-style: italic; }
+  .tp  { color: #ffcb6b; }
+  .op  { color: #89ddff; }
+
+  /* EXERCISES */
+  .exercises { margin-top: 1.5rem; }
+  .exercises h4 {
+    font-size: .8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); margin-bottom: .8rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .exercises h4::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--border);
+  }
+  .exercise-item {
+    background: var(--code-bg);
+    border: 1px solid #1e2232;
+    border-left: 3px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: .7rem;
+    font-size: .88rem;
+    color: #aab3cc;
+    line-height: 1.6;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  .exercise-item:hover { border-left-color: var(--accent); }
+  .exercise-item strong { color: var(--text); display: block; margin-bottom: .3rem; }
+
+  .hint-btn {
+    margin-top: .5rem;
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    padding: .3rem .8rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .hint-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .hint-content {
+    display: none;
+    margin-top: .7rem;
+    padding: .8rem;
+    background: rgba(56,224,123,.05);
+    border: 1px solid rgba(56,224,123,.15);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem;
+    color: #7de8a4;
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+  .hint-content.visible { display: block; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: .8rem;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Exemplos &amp; Exercícios de Programação</h1>
+  <p>Baseado nos materiais das aulas · C · Java · Python · Lógica</p>
+</header>
+
+<nav>
+  <button class="tab-btn c-lang active" onclick="showSection('c-basico')">C — Básico (Módulos 1–4)</button>
+  <button class="tab-btn c-lang" onclick="showSection('c-avancado')">C — Avançado (Ponteiros)</button>
+  <button class="tab-btn java" onclick="showSection('java-basico')">Java — Básico</button>
+  <button class="tab-btn java" onclick="showSection('java-oop')">Java — Classes &amp; OOP</button>
+  <button class="tab-btn python" onclick="showSection('python-basico')">Python — Básico</button>
+  <button class="tab-btn python" onclick="showSection('python-dados')">Python — Dados</button>
+  <button class="tab-btn logic" onclick="showSection('logica')">Lógica &amp; Fluxograma</button>
+</nav>
+
+<main>
+
+<!-- ==================== C BÁSICO ==================== -->
+<div id="c-basico" class="section active">
+  <div class="sec-header">
+    <span class="lang-badge badge-c">Linguagem C</span>
+    <h2>Módulos 1–4: Variáveis, E/S, Controle, Funções</h2>
+  </div>
+
+  <!-- Tópico 1: Variáveis e Tipos -->
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-c">01</div>
+      <h3>Variáveis e Tipos de Dados</h3>
+      <span>int · float · double · char</span>
+    </div>
+    <div class="topic-body">
+      <p>Em C todo dado precisa de um tipo declarado. O compilador usa isso para reservar o espaço correto na memória. Veja os 4 tipos primitivos mais usados:</p>
+      <div class="code-label">Exemplo Completo</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Tipos inteiros</span>
+    <span class="tp">int</span>    idade    <span class="op">=</span> <span class="num">20</span>;
+    <span class="tp">short</span>  ano      <span class="op">=</span> <span class="num">2024</span>;
+    <span class="tp">long</span>   populacao<span class="op">=</span> <span class="num">8000000000L</span>;
+
+    <span class="cm">// Tipos reais</span>
+    <span class="tp">float</span>  preco    <span class="op">=</span> <span class="num">19.99f</span>;
+    <span class="tp">double</span> pi       <span class="op">=</span> <span class="num">3.14159265358979</span>;
+
+    <span class="cm">// Caractere</span>
+    <span class="tp">char</span>   inicial  <span class="op">=</span> <span class="str">'A'</span>;
+
+    <span class="cm">// Constante (não pode ser alterada)</span>
+    <span class="kw">const</span> <span class="tp">int</span> MAX <span class="op">=</span> <span class="num">100</span>;
+
+    <span class="fn">printf</span>(<span class="str">"Idade: %d\n"</span>, idade);
+    <span class="fn">printf</span>(<span class="str">"Preco: %.2f\n"</span>, preco);
+    <span class="fn">printf</span>(<span class="str">"Pi:    %.5lf\n"</span>, pi);
+    <span class="fn">printf</span>(<span class="str">"Letra: %c\n"</span>, inicial);
+
+    <span class="cm">// Casting: forçar conversão de tipo</span>
+    <span class="tp">int</span> a <span class="op">=</span> <span class="num">7</span>, b <span class="op">=</span> <span class="num">2</span>;
+    <span class="tp">double</span> resultado <span class="op">=</span> (<span class="tp">double</span>)a <span class="op">/</span> b; <span class="cm">// 3.5 (não 3)</span>
+    <span class="fn">printf</span>(<span class="str">"7/2 = %.1lf\n"</span>, resultado);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Ficha do Aluno</strong>
+          Declare variáveis para armazenar: nome (string com char[]), matrícula (int), coeficiente (double) e situação (char: 'A' = ativo). Exiba tudo formatado com printf.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">char nome[50] = "Maria";
+int matricula = 12345;
+double cr = 8.75;
+char situacao = 'A';
+printf("Nome: %s | Mat: %d | CR: %.2lf | Sit: %c\n",
+       nome, matricula, cr, situacao);</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Divisão Inteira vs Real</strong>
+          Leia dois inteiros com scanf. Calcule e exiba: (a) a divisão inteira, (b) o resto, (c) a divisão real usando casting.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int x, y;
+scanf("%d %d", &x, &y);
+printf("Divisão inteira: %d\n", x / y);
+printf("Resto: %d\n", x % y);
+printf("Divisão real: %.2lf\n", (double)x / y);</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Calculadora de IMC</strong>
+          Leia peso (float) e altura (float). Calcule o IMC = peso / (altura * altura). Use const para definir os limites de classificação (18.5 e 25.0).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">const float ABAIXO = 18.5f;
+const float NORMAL = 25.0f;
+float peso, altura;
+scanf("%f %f", &peso, &altura);
+float imc = peso / (altura * altura);
+printf("IMC: %.2f\n", imc);</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tópico 2: printf / scanf -->
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-c">02</div>
+      <h3>Entrada e Saída — printf / scanf</h3>
+      <span>%d · %f · %s · %c · \n \t</span>
+    </div>
+    <div class="topic-body">
+      <p>printf formata e exibe dados; scanf lê dados do teclado. O <code>&amp;</code> é obrigatório no scanf para variáveis simples (endereço de memória).</p>
+      <div class="code-label">Exemplo — Múltiplas variáveis</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">char</span> nome[<span class="num">50</span>];
+    <span class="tp">int</span>  idade;
+    <span class="tp">float</span> salario;
+
+    <span class="fn">printf</span>(<span class="str">"Digite seu nome: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%49s"</span>, nome);     <span class="cm">// lê até espaço</span>
+
+    <span class="fn">printf</span>(<span class="str">"Digite sua idade: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, <span class="op">&amp;</span>idade);
+
+    <span class="fn">printf</span>(<span class="str">"Digite seu salário: "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%f"</span>, <span class="op">&amp;</span>salario);
+
+    <span class="fn">printf</span>(<span class="str">"\n--- Relatório ---\n"</span>);
+    <span class="fn">printf</span>(<span class="str">"Nome:    %-20s\n"</span>, nome);   <span class="cm">// alinhado à esquerda</span>
+    <span class="fn">printf</span>(<span class="str">"Idade:   %3d anos\n"</span>, idade);
+    <span class="fn">printf</span>(<span class="str">"Salário: R$ %8.2f\n"</span>, salario);
+
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Tabela de Temperaturas</strong>
+          Leia 3 temperaturas (float). Exiba-as formatadas numa tabela com 2 casas decimais e largura fixa de 8 caracteres cada.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">float t1, t2, t3;
+scanf("%f %f %f", &t1, &t2, &t3);
+printf("| %8.2f | %8.2f | %8.2f |\n", t1, t2, t3);</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Leitura de Nota com Conceito</strong>
+          Leia o nome do aluno (string) e sua nota (float). Exiba o conceito: A (>=9), B (>=7), C (>=5), F (abaixo de 5).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">// Use scanf("%s", nome) e compare a nota
+// com uma série de if/else if para o conceito</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Converter Segundos</strong>
+          Leia um valor inteiro de segundos. Exiba no formato HH:MM:SS usando divisão inteira e módulo.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int total;
+scanf("%d", &total);
+int h = total / 3600;
+int m = (total % 3600) / 60;
+int s = total % 60;
+printf("%02d:%02d:%02d\n", h, m, s);</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tópico 3: Estruturas de Controle -->
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-c">03</div>
+      <h3>Estruturas de Controle</h3>
+      <span>if · else · switch · for · while · do-while</span>
+    </div>
+    <div class="topic-body">
+      <p>Estruturas de controle determinam o fluxo do programa. Combinar condicionais com laços é a base de toda lógica de programação.</p>
+      <div class="code-label">Exemplo — Todos os laços</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// FOR: sabe quantas vezes vai repetir</span>
+    <span class="fn">printf</span>(<span class="str">"Tabuada do 7:\n"</span>);
+    <span class="kw">for</span> (<span class="tp">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> <span class="num">10</span>; i<span class="op">++</span>) {
+        <span class="fn">printf</span>(<span class="str">"7 x %2d = %2d\n"</span>, i, <span class="num">7</span><span class="op">*</span>i);
+    }
+
+    <span class="cm">// WHILE: enquanto condição for verdadeira</span>
+    <span class="tp">int</span> n <span class="op">=</span> <span class="num">1</span>;
+    <span class="fn">printf</span>(<span class="str">"\nPotências de 2: "</span>);
+    <span class="kw">while</span> (n <span class="op">&lt;=</span> <span class="num">1024</span>) {
+        <span class="fn">printf</span>(<span class="str">"%d "</span>, n);
+        n <span class="op">*=</span> <span class="num">2</span>;
+    }
+
+    <span class="cm">// DO-WHILE: executa ao menos 1 vez</span>
+    <span class="tp">int</span> op;
+    <span class="kw">do</span> {
+        <span class="fn">printf</span>(<span class="str">"\n\nMenu: 1-Jogar 2-Sair: "</span>);
+        <span class="fn">scanf</span>(<span class="str">"%d"</span>, <span class="op">&amp;</span>op);
+    } <span class="kw">while</span> (op <span class="op">!=</span> <span class="num">1</span> <span class="op">&amp;&amp;</span> op <span class="op">!=</span> <span class="num">2</span>);
+
+    <span class="cm">// SWITCH: múltiplos casos</span>
+    <span class="kw">switch</span> (op) {
+        <span class="kw">case</span> <span class="num">1</span>: <span class="fn">printf</span>(<span class="str">"Jogando!\n"</span>); <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="num">2</span>: <span class="fn">printf</span>(<span class="str">"Saindo!\n"</span>);  <span class="kw">break</span>;
+        <span class="kw">default</span>:<span class="fn">printf</span>(<span class="str">"Inválido!\n"</span>);
+    }
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — FizzBuzz</strong>
+          Use um for de 1 a 50. Imprima "Fizz" se divisível por 3, "Buzz" se por 5, "FizzBuzz" se por ambos, ou o número caso contrário.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">for (int i = 1; i <= 50; i++) {
+    if (i % 15 == 0)     printf("FizzBuzz\n");
+    else if (i % 3 == 0) printf("Fizz\n");
+    else if (i % 5 == 0) printf("Buzz\n");
+    else                 printf("%d\n", i);
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Adivinhe o Número</strong>
+          Defina um número secreto (ex: 42). Leia chutes do usuário em um do-while. Diga se é maior, menor ou acertou. Conte tentativas.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">const int SECRETO = 42;
+int chute, tentativas = 0;
+do {
+    printf("Chute: "); scanf("%d", &chute);
+    tentativas++;
+    if (chute < SECRETO) printf("Maior!\n");
+    else if (chute > SECRETO) printf("Menor!\n");
+} while (chute != SECRETO);
+printf("Acertou em %d tentativas!\n", tentativas);</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Triângulo de Asteriscos</strong>
+          Leia um inteiro N. Imprima um triângulo de asteriscos com N linhas usando laços aninhados (for dentro de for).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">for (int i = 1; i <= N; i++) {
+    for (int j = 0; j < i; j++)
+        printf("* ");
+    printf("\n");
+}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tópico 4: Funções e Recursão -->
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-c">04</div>
+      <h3>Funções e Recursão</h3>
+      <span>protótipo · parâmetros · retorno · recursão</span>
+    </div>
+    <div class="topic-body">
+      <p>Funções dividem o problema em partes reutilizáveis. Recursão é quando uma função chama a si mesma — sempre precisa de um caso base para parar.</p>
+      <div class="code-label">Exemplo — Funções + Recursão</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="cm">// Protótipos (declaração antecipada)</span>
+<span class="tp">float</span> <span class="fn">media</span>(<span class="tp">float</span> a, <span class="tp">float</span> b, <span class="tp">float</span> c);
+<span class="tp">int</span>   <span class="fn">fatorial</span>(<span class="tp">int</span> n);
+<span class="tp">int</span>   <span class="fn">fibonacci</span>(<span class="tp">int</span> n);
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="fn">printf</span>(<span class="str">"Média: %.2f\n"</span>, <span class="fn">media</span>(<span class="num">7.0f</span>, <span class="num">8.5f</span>, <span class="num">9.0f</span>));
+    <span class="fn">printf</span>(<span class="str">"5! = %d\n"</span>,     <span class="fn">fatorial</span>(<span class="num">5</span>));
+    <span class="fn">printf</span>(<span class="str">"Fib(8) = %d\n"</span>, <span class="fn">fibonacci</span>(<span class="num">8</span>));
+    <span class="kw">return</span> <span class="num">0</span>;
+}
+
+<span class="tp">float</span> <span class="fn">media</span>(<span class="tp">float</span> a, <span class="tp">float</span> b, <span class="tp">float</span> c) {
+    <span class="kw">return</span> (a <span class="op">+</span> b <span class="op">+</span> c) <span class="op">/</span> <span class="num">3.0f</span>;
+}
+
+<span class="cm">// Recursão: n! = n * (n-1)!  | caso base: 0! = 1</span>
+<span class="tp">int</span> <span class="fn">fatorial</span>(<span class="tp">int</span> n) {
+    <span class="kw">if</span> (n <span class="op">==</span> <span class="num">0</span>) <span class="kw">return</span> <span class="num">1</span>;      <span class="cm">// caso base</span>
+    <span class="kw">return</span> n <span class="op">*</span> <span class="fn">fatorial</span>(n <span class="op">-</span> <span class="num">1</span>); <span class="cm">// chamada recursiva</span>
+}
+
+<span class="cm">// Recursão: fib(n) = fib(n-1) + fib(n-2)</span>
+<span class="tp">int</span> <span class="fn">fibonacci</span>(<span class="tp">int</span> n) {
+    <span class="kw">if</span> (n <span class="op">&lt;=</span> <span class="num">1</span>) <span class="kw">return</span> n;
+    <span class="kw">return</span> <span class="fn">fibonacci</span>(n<span class="op">-</span><span class="num">1</span>) <span class="op">+</span> <span class="fn">fibonacci</span>(n<span class="op">-</span><span class="num">2</span>);
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Verificar Primo</strong>
+          Escreva a função <code>int ehPrimo(int n)</code> que retorna 1 se n for primo e 0 caso contrário. Teste na main com os números de 2 a 30.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int ehPrimo(int n) {
+    if (n < 2) return 0;
+    for (int i = 2; i * i <= n; i++)
+        if (n % i == 0) return 0;
+    return 1;
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Potência Recursiva</strong>
+          Implemente <code>double potencia(double base, int exp)</code> recursivamente. Caso base: exp == 0 retorna 1. Teste com potencia(2, 10).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">double potencia(double base, int exp) {
+    if (exp == 0) return 1;
+    return base * potencia(base, exp - 1);
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Maior de Três</strong>
+          Crie a função <code>int maiorDeTres(int a, int b, int c)</code> que retorna o maior valor. Use apenas if/else, sem usar a biblioteca math.h.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int maiorDeTres(int a, int b, int c) {
+    int maior = a;
+    if (b > maior) maior = b;
+    if (c > maior) maior = c;
+    return maior;
+}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== C AVANÇADO ==================== -->
+<div id="c-avancado" class="section">
+  <div class="sec-header">
+    <span class="lang-badge badge-c">C Avançado</span>
+    <h2>Ponteiros, Memória Dinâmica e Arquivos</h2>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-c">01</div>
+      <h3>Ponteiros — Fundamentos</h3>
+      <span>&amp; · * · aritmética de ponteiros</span>
+    </div>
+    <div class="topic-body">
+      <p>Ponteiros armazenam endereços de memória. O operador <code>&amp;</code> obtém o endereço; o operador <code>*</code> acessa o valor no endereço (desreferência).</p>
+      <div class="code-label">Exemplo — Anatomia do ponteiro</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> x <span class="op">=</span> <span class="num">42</span>;
+    <span class="tp">int</span> <span class="op">*</span>p <span class="op">=</span> <span class="op">&amp;</span>x;     <span class="cm">// p aponta para x</span>
+
+    <span class="fn">printf</span>(<span class="str">"Valor de x:       %d\n"</span>, x);
+    <span class="fn">printf</span>(<span class="str">"Endereço de x:    %p\n"</span>, (<span class="tp">void</span><span class="op">*</span>)<span class="op">&amp;</span>x);
+    <span class="fn">printf</span>(<span class="str">"Valor de p:       %p\n"</span>, (<span class="tp">void</span><span class="op">*</span>)p);
+    <span class="fn">printf</span>(<span class="str">"*p (conteúdo):   %d\n"</span>, <span class="op">*</span>p);
+
+    <span class="op">*</span>p <span class="op">=</span> <span class="num">100</span>;  <span class="cm">// muda x através do ponteiro</span>
+    <span class="fn">printf</span>(<span class="str">"x após *p=100: %d\n"</span>, x);
+
+    <span class="cm">// Aritmética de ponteiros em array</span>
+    <span class="tp">int</span> arr[] <span class="op">=</span> {<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>};
+    <span class="tp">int</span> <span class="op">*</span>ptr <span class="op">=</span> arr;
+    <span class="kw">for</span> (<span class="tp">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> <span class="num">4</span>; i<span class="op">++</span>) {
+        <span class="fn">printf</span>(<span class="str">"arr[%d] = %d\n"</span>, i, <span class="op">*</span>(ptr <span class="op">+</span> i));
+    }
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Swap com ponteiros</strong>
+          Escreva <code>void trocar(int *a, int *b)</code> que troca os valores de duas variáveis passadas por referência. Teste na main.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">void trocar(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+// Chamada: trocar(&x, &y);</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Máximo e mínimo por referência</strong>
+          Crie <code>void minMax(int *arr, int n, int *min, int *max)</code> que percorre o array e armazena o menor e maior valor nos ponteiros min e max.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">void minMax(int *arr, int n, int *min, int *max) {
+    *min = *max = arr[0];
+    for (int i = 1; i < n; i++) {
+        if (arr[i] < *min) *min = arr[i];
+        if (arr[i] > *max) *max = arr[i];
+    }
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Percorrer string com ponteiro</strong>
+          Declare <code>char str[] = "Hello"</code>. Use um ponteiro char* para percorrer a string e contar quantas vogais ela tem, sem usar índice de array.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">char str[] = "Hello World";
+char *p = str;
+int vogais = 0;
+while (*p != '\0') {
+    char c = *p;
+    if (c=='a'||c=='e'||c=='i'||c=='o'||c=='u') vogais++;
+    p++;
+}
+printf("Vogais: %d\n", vogais);</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-c">02</div>
+      <h3>Alocação Dinâmica de Memória</h3>
+      <span>malloc · calloc · realloc · free</span>
+    </div>
+    <div class="topic-body">
+      <p>Memória dinâmica é alocada no Heap em tempo de execução. Sempre valide o retorno de malloc e libere com free() para evitar memory leak.</p>
+      <div class="code-label">Exemplo — Vetor dinâmico</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="tp">int</span> n;
+    <span class="fn">printf</span>(<span class="str">"Quantos números? "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, <span class="op">&amp;</span>n);
+
+    <span class="cm">// Alocar no heap</span>
+    <span class="tp">int</span> <span class="op">*</span>arr <span class="op">=</span> (<span class="tp">int</span><span class="op">*</span>) <span class="fn">malloc</span>(n <span class="op">*</span> <span class="kw">sizeof</span>(<span class="tp">int</span>));
+    <span class="kw">if</span> (arr <span class="op">==</span> <span class="kw">NULL</span>) { <span class="fn">exit</span>(<span class="num">1</span>); } <span class="cm">// erro</span>
+
+    <span class="kw">for</span> (<span class="tp">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> n; i<span class="op">++</span>) {
+        <span class="fn">scanf</span>(<span class="str">"%d"</span>, <span class="op">&amp;</span>arr[i]);
+    }
+
+    <span class="cm">// Expandir para o dobro</span>
+    <span class="tp">int</span> <span class="op">*</span>temp <span class="op">=</span> (<span class="tp">int</span><span class="op">*</span>) <span class="fn">realloc</span>(arr, <span class="num">2</span><span class="op">*</span>n <span class="op">*</span> <span class="kw">sizeof</span>(<span class="tp">int</span>));
+    <span class="kw">if</span> (temp <span class="op">!=</span> <span class="kw">NULL</span>) arr <span class="op">=</span> temp;
+
+    <span class="cm">// Liberar memória</span>
+    <span class="fn">free</span>(arr);
+    arr <span class="op">=</span> <span class="kw">NULL</span>; <span class="cm">// boa prática</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Média dinâmica</strong>
+          Leia N, aloque um array dinâmico, preencha com os valores do usuário e calcule a média. Não se esqueça do free().
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int n; scanf("%d", &n);
+float *v = (float*) malloc(n * sizeof(float));
+float soma = 0;
+for (int i = 0; i < n; i++) {
+    scanf("%f", &v[i]);
+    soma += v[i];
+}
+printf("Média: %.2f\n", soma / n);
+free(v); v = NULL;</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Inverter array dinâmico</strong>
+          Aloque um array dinâmico de N inteiros, leia os valores e imprima o array invertido sem usar outro array auxiliar. Use dois ponteiros (um no início, outro no fim).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">// Técnica de dois ponteiros
+int *inicio = arr, *fim = arr + n - 1;
+while (inicio < fim) {
+    int tmp = *inicio;
+    *inicio++ = *fim;
+    *fim-- = tmp;
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Struct com alocação dinâmica</strong>
+          Crie uma struct Aluno {char nome[50]; float nota;}. Aloque N alunos dinamicamente, leia os dados e exiba os que passaram (nota >= 6).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">struct Aluno *turma = malloc(n * sizeof(struct Aluno));
+for (int i = 0; i < n; i++) {
+    scanf("%s %f", turma[i].nome, &turma[i].nota);
+}
+// percorrer e filtrar aprovados</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-c">03</div>
+      <h3>Arquivos em C</h3>
+      <span>fopen · fprintf · fscanf · fread · fwrite · fclose</span>
+    </div>
+    <div class="topic-body">
+      <div class="code-label">Exemplo — Escrever e ler arquivo texto</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;stdlib.h&gt;</span>
+
+<span class="kw">typedef struct</span> { <span class="tp">char</span> nome[<span class="num">50</span>]; <span class="tp">int</span> nota; } Aluno;
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="cm">// Escrita</span>
+    <span class="tp">FILE</span> <span class="op">*</span>arq <span class="op">=</span> <span class="fn">fopen</span>(<span class="str">"alunos.txt"</span>, <span class="str">"w"</span>);
+    <span class="kw">if</span> (!arq) { <span class="fn">perror</span>(<span class="str">"Erro"</span>); <span class="kw">return</span> <span class="num">1</span>; }
+    <span class="fn">fprintf</span>(arq, <span class="str">"Ana 95\n"</span>);
+    <span class="fn">fprintf</span>(arq, <span class="str">"Bruno 72\n"</span>);
+    <span class="fn">fclose</span>(arq);
+
+    <span class="cm">// Leitura</span>
+    arq <span class="op">=</span> <span class="fn">fopen</span>(<span class="str">"alunos.txt"</span>, <span class="str">"r"</span>);
+    Aluno a;
+    <span class="kw">while</span> (<span class="fn">fscanf</span>(arq, <span class="str">"%s %d"</span>, a.nome, <span class="op">&amp;</span>a.nota) <span class="op">==</span> <span class="num">2</span>) {
+        <span class="fn">printf</span>(<span class="str">"%-10s: %d\n"</span>, a.nome, a.nota);
+    }
+    <span class="fn">fclose</span>(arq);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Agenda em arquivo</strong>
+          Crie um programa que leia N contatos (nome e telefone) do teclado e salve em "agenda.txt". Depois reabra e leia o arquivo, imprimindo todos os contatos.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">// Modos: "w" para escrita, "r" para leitura
+// Use fprintf para escrever, fscanf para ler
+// Sempre feche o arquivo antes de reabrir</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Contar palavras em arquivo</strong>
+          Abra um arquivo texto existente em modo "r". Use fgets para ler linha por linha e conte quantas palavras há no arquivo (divididas por espaços).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">char linha[256];
+int palavras = 0;
+while (fgets(linha, 256, arq) != NULL) {
+    char *token = strtok(linha, " \t\n");
+    while (token != NULL) {
+        palavras++;
+        token = strtok(NULL, " \t\n");
+    }
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Tamanho do arquivo</strong>
+          Abra qualquer arquivo binário, use fseek(arq, 0, SEEK_END) e ftell() para descobrir e imprimir seu tamanho em bytes.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">FILE *arq = fopen("arquivo.bin", "rb");
+fseek(arq, 0, SEEK_END);
+long tamanho = ftell(arq);
+printf("Tamanho: %ld bytes\n", tamanho);
+rewind(arq);
+fclose(arq);</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== JAVA BÁSICO ==================== -->
+<div id="java-basico" class="section">
+  <div class="sec-header">
+    <span class="lang-badge badge-java">Java</span>
+    <h2>Fundamentos — Variáveis, Condicionais, Loops, Arrays</h2>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-java">01</div>
+      <h3>Variáveis, Tipos e Entrada de Dados</h3>
+      <span>int · double · String · Scanner</span>
+    </div>
+    <div class="topic-body">
+<pre><span class="kw">import</span> java.util.Scanner;
+
+<span class="kw">public class</span> <span class="tp">Variaveis</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        Scanner sc <span class="op">=</span> <span class="kw">new</span> Scanner(System.in);
+
+        <span class="cm">// Tipos primitivos</span>
+        <span class="tp">int</span>     idade   <span class="op">=</span> <span class="num">20</span>;
+        <span class="tp">double</span>  altura  <span class="op">=</span> <span class="num">1.75</span>;
+        <span class="tp">boolean</span> ativo   <span class="op">=</span> <span class="kw">true</span>;
+        <span class="tp">char</span>    letra   <span class="op">=</span> <span class="str">'A'</span>;
+
+        <span class="cm">// String é uma classe, não primitivo</span>
+        String nome <span class="op">=</span> <span class="str">"Ana"</span>;
+
+        <span class="cm">// Lendo dados do usuário</span>
+        System.out.print(<span class="str">"Digite seu nome: "</span>);
+        String input <span class="op">=</span> sc.nextLine();
+        System.out.println(<span class="str">"Olá, "</span> <span class="op">+</span> input <span class="op">+</span> <span class="str">"!"</span>);
+
+        <span class="cm">// Formatação com printf</span>
+        System.out.printf(<span class="str">"Altura: %.2f m%n"</span>, altura);
+
+        sc.close();
+    }
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Calculadora de salário</strong>
+          Leia o nome do funcionário, horas trabalhadas (int) e valor por hora (double). Calcule e exiba o salário bruto, o desconto de 11% de INSS e o salário líquido.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">double bruto = horas * valorHora;
+double inss = bruto * 0.11;
+double liquido = bruto - inss;
+System.out.printf("Líquido: R$ %.2f%n", liquido);</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Conversor de temperatura</strong>
+          Leia uma temperatura em Celsius e converta para Fahrenheit (F = C * 9/5 + 32) e Kelvin (K = C + 273.15). Exiba os três valores.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">double celsius = sc.nextDouble();
+double fahrenheit = celsius * 9.0/5 + 32;
+double kelvin = celsius + 273.15;
+System.out.printf("°F: %.2f | K: %.2f%n", fahrenheit, kelvin);</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Verificar palíndromo</strong>
+          Leia uma palavra. Inverta-a com StringBuilder e compare. Informe se é ou não um palíndromo (ex: "arara", "radar").
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">String palavra = sc.next().toLowerCase();
+String invertida = new StringBuilder(palavra).reverse().toString();
+boolean palindromo = palavra.equals(invertida);
+System.out.println(palindromo ? "É palíndromo!" : "Não é.");</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-java">02</div>
+      <h3>Condicionais, Loops e Métodos</h3>
+      <span>if · for · while · static methods</span>
+    </div>
+    <div class="topic-body">
+<pre><span class="kw">public class</span> <span class="tp">Exemplos</span> {
+
+    <span class="cm">// Método estático — classificar nota</span>
+    <span class="kw">public static</span> String <span class="fn">classificar</span>(<span class="tp">double</span> nota) {
+        <span class="kw">if</span>      (nota <span class="op">&gt;=</span> <span class="num">9.0</span>) <span class="kw">return</span> <span class="str">"A"</span>;
+        <span class="kw">else if</span> (nota <span class="op">&gt;=</span> <span class="num">7.0</span>) <span class="kw">return</span> <span class="str">"B"</span>;
+        <span class="kw">else if</span> (nota <span class="op">&gt;=</span> <span class="num">5.0</span>) <span class="kw">return</span> <span class="str">"C"</span>;
+        <span class="kw">else</span>                   <span class="kw">return</span> <span class="str">"F"</span>;
+    }
+
+    <span class="cm">// Método: somar array</span>
+    <span class="kw">public static int</span> <span class="fn">somar</span>(<span class="tp">int</span>[] arr) {
+        <span class="tp">int</span> soma <span class="op">=</span> <span class="num">0</span>;
+        <span class="kw">for</span> (<span class="tp">int</span> v : arr) soma <span class="op">+=</span> v; <span class="cm">// for-each</span>
+        <span class="kw">return</span> soma;
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        <span class="tp">int</span>[] nums <span class="op">=</span> {<span class="num">5</span>, <span class="num">10</span>, <span class="num">15</span>, <span class="num">20</span>};
+        System.out.println(<span class="str">"Soma: "</span> <span class="op">+</span> <span class="fn">somar</span>(nums));
+        System.out.println(<span class="str">"Nota 8.5 = "</span> <span class="op">+</span> <span class="fn">classificar</span>(<span class="num">8.5</span>));
+
+        <span class="cm">// While com acumulador</span>
+        <span class="tp">int</span> soma <span class="op">=</span> <span class="num">0</span>, i <span class="op">=</span> <span class="num">1</span>;
+        <span class="kw">while</span> (i <span class="op">&lt;=</span> <span class="num">100</span>) { soma <span class="op">+=</span> i<span class="op">++</span>; }
+        System.out.println(<span class="str">"Soma 1-100: "</span> <span class="op">+</span> soma);
+    }
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Tabuada com método</strong>
+          Crie o método <code>static void tabuada(int n)</code> que imprime a tabuada de n de 1 a 10. Chame-o para os números 3, 7 e 9.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">public static void tabuada(int n) {
+    for (int i = 1; i <= 10; i++)
+        System.out.printf("%d x %2d = %2d%n", n, i, n*i);
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Média e aprovação</strong>
+          Leia 5 notas em um array. Calcule a média. Crie o método <code>static String situacao(double media)</code> que retorna "Aprovado", "Recuperação" ou "Reprovado".
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">public static String situacao(double media) {
+    if (media >= 7) return "Aprovado";
+    if (media >= 5) return "Recuperação";
+    return "Reprovado";
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Números primos com método</strong>
+          Crie <code>static boolean ehPrimo(int n)</code>. No main, use um for para imprimir todos os primos de 2 até 100.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">public static boolean ehPrimo(int n) {
+    if (n < 2) return false;
+    for (int i = 2; i * i <= n; i++)
+        if (n % i == 0) return false;
+    return true;
+}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== JAVA OOP ==================== -->
+<div id="java-oop" class="section">
+  <div class="sec-header">
+    <span class="lang-badge badge-java">Java OOP</span>
+    <h2>Classes, Construtores e Métodos</h2>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-java">01</div>
+      <h3>Classes e Objetos</h3>
+      <span>atributos · métodos · new · this</span>
+    </div>
+    <div class="topic-body">
+<pre><span class="kw">public class</span> <span class="tp">ContaBancaria</span> {
+    <span class="cm">// Atributos (estado do objeto)</span>
+    <span class="kw">private</span> String titular;
+    <span class="kw">private</span> <span class="tp">double</span> saldo;
+    <span class="kw">private</span> <span class="tp">int</span>    numero;
+
+    <span class="cm">// Construtor</span>
+    <span class="kw">public</span> <span class="fn">ContaBancaria</span>(String titular, <span class="tp">int</span> numero) {
+        <span class="kw">this</span>.titular <span class="op">=</span> titular;
+        <span class="kw">this</span>.numero  <span class="op">=</span> numero;
+        <span class="kw">this</span>.saldo   <span class="op">=</span> <span class="num">0.0</span>;
+    }
+
+    <span class="cm">// Métodos (comportamento)</span>
+    <span class="kw">public void</span> <span class="fn">depositar</span>(<span class="tp">double</span> valor) {
+        <span class="kw">if</span> (valor <span class="op">&gt;</span> <span class="num">0</span>) saldo <span class="op">+=</span> valor;
+    }
+
+    <span class="kw">public boolean</span> <span class="fn">sacar</span>(<span class="tp">double</span> valor) {
+        <span class="kw">if</span> (valor <span class="op">&gt;</span> <span class="num">0</span> <span class="op">&amp;&amp;</span> valor <span class="op">&lt;=</span> saldo) {
+            saldo <span class="op">-=</span> valor;
+            <span class="kw">return true</span>;
+        }
+        <span class="kw">return false</span>; <span class="cm">// saldo insuficiente</span>
+    }
+
+    <span class="kw">public void</span> <span class="fn">exibirExtrato</span>() {
+        System.out.printf(
+            <span class="str">"Conta: %d | Titular: %s | Saldo: R$ %.2f%n"</span>,
+            numero, titular, saldo);
+    }
+
+    <span class="cm">// Getters</span>
+    <span class="kw">public double</span> <span class="fn">getSaldo</span>()   { <span class="kw">return</span> saldo; }
+    <span class="kw">public</span> String <span class="fn">getTitular</span>() { <span class="kw">return</span> titular; }
+}</pre>
+      <div class="code-label">Usando a classe</div>
+<pre><span class="kw">public class</span> <span class="tp">Main</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        ContaBancaria c1 <span class="op">=</span> <span class="kw">new</span> <span class="fn">ContaBancaria</span>(<span class="str">"Ana"</span>, <span class="num">1001</span>);
+        c1.<span class="fn">depositar</span>(<span class="num">1500.0</span>);
+        c1.<span class="fn">depositar</span>(<span class="num">500.0</span>);
+        <span class="tp">boolean</span> ok <span class="op">=</span> c1.<span class="fn">sacar</span>(<span class="num">200.0</span>);
+        System.out.println(<span class="str">"Saque: "</span> <span class="op">+</span> (ok ? <span class="str">"OK"</span> : <span class="str">"Falhou"</span>));
+        c1.<span class="fn">exibirExtrato</span>();
+    }
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Classe Produto</strong>
+          Crie a classe <code>Produto</code> com atributos: nome (String), preco (double), estoque (int). Métodos: <code>vender(int qtd)</code> que reduz o estoque e retorna false se não houver quantidade suficiente.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">public boolean vender(int qtd) {
+    if (qtd <= estoque) {
+        estoque -= qtd;
+        return true;
+    }
+    return false;
+}</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Classe Retangulo</strong>
+          Crie <code>Retangulo</code> com largura e altura. Métodos: <code>area()</code>, <code>perimetro()</code> e <code>ehQuadrado()</code> (retorna boolean).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">public double area() { return largura * altura; }
+public double perimetro() { return 2*(largura+altura); }
+public boolean ehQuadrado() { return largura == altura; }</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Array de objetos</strong>
+          Crie 5 objetos <code>Produto</code> num array. Implemente um método estático que receba o array e retorne o produto com o maior preço.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">public static Produto maisCarO(Produto[] produtos) {
+    Produto maior = produtos[0];
+    for (Produto p : produtos)
+        if (p.getPreco() > maior.getPreco()) maior = p;
+    return maior;
+}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PYTHON BÁSICO ==================== -->
+<div id="python-basico" class="section">
+  <div class="sec-header">
+    <span class="lang-badge badge-python">Python</span>
+    <h2>Sintaxe, Coleções e Estruturas de Controle</h2>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-python">01</div>
+      <h3>Variáveis, Tipos e Entrada de Dados</h3>
+      <span>int · float · str · bool · input()</span>
+    </div>
+    <div class="topic-body">
+      <p>Python usa tipagem dinâmica — você não declara o tipo, o interpretador deduz. O tipo pode mudar durante a execução.</p>
+<pre><span class="cm"># Tipagem dinâmica: sem declaração explícita</span>
+nome   <span class="op">=</span> <span class="str">"Ana"</span>       <span class="cm"># str</span>
+idade  <span class="op">=</span> <span class="num">25</span>          <span class="cm"># int</span>
+altura <span class="op">=</span> <span class="num">1.68</span>        <span class="cm"># float</span>
+ativo  <span class="op">=</span> <span class="kw">True</span>        <span class="cm"># bool</span>
+
+<span class="cm"># Verificar tipo</span>
+<span class="fn">print</span>(<span class="fn">type</span>(nome))    <span class="cm"># &lt;class 'str'&gt;</span>
+
+<span class="cm"># Entrada do usuário (sempre retorna string)</span>
+entrada <span class="op">=</span> <span class="fn">input</span>(<span class="str">"Digite algo: "</span>)
+numero  <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Digite um número: "</span>))
+decimal <span class="op">=</span> <span class="fn">float</span>(<span class="fn">input</span>(<span class="str">"Digite um decimal: "</span>))
+
+<span class="cm"># f-string — interpolação moderna</span>
+<span class="fn">print</span>(<span class="str">f"Olá, <span class="op">{nome}</span>! Você tem <span class="op">{idade}</span> anos."</span>)
+<span class="fn">print</span>(<span class="str">f"Altura: <span class="op">{altura:.2f}</span> m"</span>)
+
+<span class="cm"># Múltipla atribuição</span>
+x, y, z <span class="op">=</span> <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>
+a, b <span class="op">=</span> b, a  <span class="cm"># troca sem variável auxiliar!</span></pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Calculadora de média ponderada</strong>
+          Leia 3 notas e seus pesos respectivos. Calcule a média ponderada e informe se o aluno foi aprovado (média >= 6).
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">n1, p1 = float(input("Nota 1: ")), float(input("Peso 1: "))
+n2, p2 = float(input("Nota 2: ")), float(input("Peso 2: "))
+n3, p3 = float(input("Nota 3: ")), float(input("Peso 3: "))
+media = (n1*p1 + n2*p2 + n3*p3) / (p1+p2+p3)
+print(f"Média: {media:.2f} — {'Aprovado' if media>=6 else 'Reprovado'}")</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — FizzBuzz Pythônico</strong>
+          Use um for com range(1, 51) e list comprehension ou ternário para resolver o FizzBuzz de forma "pythônica" em apenas 2-3 linhas.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">for i in range(1, 51):
+    print("FizzBuzz" if i%15==0 else "Fizz" if i%3==0
+          else "Buzz" if i%5==0 else i)</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Gerador de senha</strong>
+          Leia o nome do usuário e seu ano de nascimento. Gere uma "senha" concatenando os 3 primeiros caracteres do nome (maiúsculos) + "@" + (ano invertido). Ex: ANA + @ + 5991.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">nome = input("Nome: ")
+ano = input("Ano de nascimento: ")
+senha = nome[:3].upper() + "@" + ano[::-1]
+print(f"Senha: {senha}")</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-python">02</div>
+      <h3>Listas, Dicionários e Loops</h3>
+      <span>list · dict · tuple · set · for · while</span>
+    </div>
+    <div class="topic-body">
+<pre><span class="cm"># LISTAS — mutáveis, ordenadas</span>
+notas <span class="op">=</span> [<span class="num">8.5</span>, <span class="num">7.0</span>, <span class="num">9.2</span>, <span class="num">6.8</span>]
+notas.<span class="fn">append</span>(<span class="num">10.0</span>)         <span class="cm"># adiciona no fim</span>
+notas.<span class="fn">insert</span>(<span class="num">0</span>, <span class="num">5.0</span>)       <span class="cm"># insere na posição 0</span>
+notas.<span class="fn">sort</span>(reverse<span class="op">=</span><span class="kw">True</span>)   <span class="cm"># ordena decrescente</span>
+media <span class="op">=</span> <span class="fn">sum</span>(notas) <span class="op">/</span> <span class="fn">len</span>(notas)
+
+<span class="cm"># List comprehension</span>
+aprovados <span class="op">=</span> [n <span class="kw">for</span> n <span class="kw">in</span> notas <span class="kw">if</span> n <span class="op">&gt;=</span> <span class="num">6</span>]
+
+<span class="cm"># DICIONÁRIOS — chave:valor</span>
+aluno <span class="op">=</span> {
+    <span class="str">"nome"</span>: <span class="str">"João"</span>,
+    <span class="str">"notas"</span>: [<span class="num">8</span>, <span class="num">9</span>, <span class="num">7</span>],
+    <span class="str">"ativo"</span>: <span class="kw">True</span>
+}
+<span class="fn">print</span>(aluno[<span class="str">"nome"</span>])          <span class="cm"># acessar</span>
+aluno[<span class="str">"turma"</span>] <span class="op">=</span> <span class="str">"A1"</span>        <span class="cm"># adicionar</span>
+
+<span class="cm"># Iterando com enumerate</span>
+<span class="kw">for</span> i, nota <span class="kw">in</span> <span class="fn">enumerate</span>(notas):
+    <span class="fn">print</span>(<span class="str">f"  [{i}] {nota}"</span>)
+
+<span class="cm"># Iterando dicionário</span>
+<span class="kw">for</span> chave, valor <span class="kw">in</span> aluno.<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="str">f"  {chave}: {valor}"</span>)</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Agenda de contatos (dicionário)</strong>
+          Crie um dicionário {nome: telefone}. Implemente um menu: (1) Adicionar, (2) Buscar, (3) Listar todos, (4) Sair. Use um while para manter o menu ativo.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">agenda = {}
+while True:
+    op = input("1-Add 2-Buscar 3-Listar 4-Sair: ")
+    if op == "1":
+        n = input("Nome: "); t = input("Tel: ")
+        agenda[n] = t
+    elif op == "2":
+        n = input("Buscar: ")
+        print(agenda.get(n, "Não encontrado"))
+    elif op == "3":
+        for k, v in agenda.items(): print(f"{k}: {v}")
+    elif op == "4": break</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Análise de texto</strong>
+          Leia uma frase. Calcule: número de palavras, número de vogais, a palavra mais longa. Use métodos de string como split() e max().
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">frase = input("Frase: ").lower()
+palavras = frase.split()
+vogais = sum(1 for c in frase if c in "aeiou")
+maior = max(palavras, key=len)
+print(f"Palavras: {len(palavras)}, Vogais: {vogais}, Maior: {maior}")</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Matriz 3x3</strong>
+          Leia uma matriz 3x3 (lista de listas). Calcule a soma de cada linha, cada coluna e a diagonal principal.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">matriz = [[int(x) for x in input(f"Linha {i+1}: ").split()] for i in range(3)]
+for i, linha in enumerate(matriz):
+    print(f"Soma linha {i}: {sum(linha)}")
+diag = sum(matriz[i][i] for i in range(3))
+print(f"Diagonal: {diag}")</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PYTHON DADOS ==================== -->
+<div id="python-dados" class="section">
+  <div class="sec-header">
+    <span class="lang-badge badge-python">Python</span>
+    <h2>Funções, Arquivos e Persistência</h2>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-python">01</div>
+      <h3>Funções com Parâmetros Flexíveis</h3>
+      <span>def · default · *args · **kwargs · lambda</span>
+    </div>
+    <div class="topic-body">
+<pre><span class="cm"># Parâmetros com valor padrão</span>
+<span class="kw">def</span> <span class="fn">saudar</span>(nome, saudacao<span class="op">=</span><span class="str">"Olá"</span>, pontuacao<span class="op">=</span><span class="str">"!"</span>):
+    <span class="kw">return</span> <span class="str">f"<span class="op">{saudacao}</span>, <span class="op">{nome}</span><span class="op">{pontuacao}</span>"</span>
+
+<span class="fn">print</span>(<span class="fn">saudar</span>(<span class="str">"Ana"</span>))                   <span class="cm"># Olá, Ana!</span>
+<span class="fn">print</span>(<span class="fn">saudar</span>(<span class="str">"Bruno"</span>, <span class="str">"Bom dia"</span>))      <span class="cm"># Bom dia, Bruno!</span>
+<span class="fn">print</span>(<span class="fn">saudar</span>(nome<span class="op">=</span><span class="str">"Carol"</span>, pontuacao<span class="op">=</span><span class="str">"."</span>))
+
+<span class="cm"># *args — número variável de argumentos</span>
+<span class="kw">def</span> <span class="fn">media</span>(<span class="op">*</span>notas):
+    <span class="kw">return</span> <span class="fn">sum</span>(notas) <span class="op">/</span> <span class="fn">len</span>(notas)
+
+<span class="fn">print</span>(<span class="fn">media</span>(<span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>))           <span class="cm"># 8.0</span>
+<span class="fn">print</span>(<span class="fn">media</span>(<span class="num">6</span>, <span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>, <span class="num">10</span>))   <span class="cm"># 8.0</span>
+
+<span class="cm"># Lambda — função anônima de uma linha</span>
+quadrado <span class="op">=</span> <span class="kw">lambda</span> x: x <span class="op">**</span> <span class="num">2</span>
+nums <span class="op">=</span> [<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">1</span>, <span class="num">5</span>]
+nums.<span class="fn">sort</span>(key<span class="op">=</span><span class="kw">lambda</span> x: <span class="op">-</span>x)  <span class="cm"># ordena decrescente</span>
+
+<span class="cm"># Função que retorna função (closure)</span>
+<span class="kw">def</span> <span class="fn">multiplicador</span>(fator):
+    <span class="kw">return</span> <span class="kw">lambda</span> x: x <span class="op">*</span> fator
+
+dobro  <span class="op">=</span> <span class="fn">multiplicador</span>(<span class="num">2</span>)
+triplo <span class="op">=</span> <span class="fn">multiplicador</span>(<span class="num">3</span>)
+<span class="fn">print</span>(<span class="fn">dobro</span>(<span class="num">5</span>))   <span class="cm"># 10</span>
+<span class="fn">print</span>(<span class="fn">triplo</span>(<span class="num">5</span>)) <span class="cm"># 15</span></pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Calculadora funcional</strong>
+          Crie funções para as 4 operações. Depois crie <code>calcular(op, a, b)</code> que recebe o nome da operação ("soma", "sub", "mul", "div") e os dois números.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">ops = {"soma": lambda a,b: a+b, "sub": lambda a,b: a-b,
+       "mul": lambda a,b: a*b, "div": lambda a,b: a/b if b!=0 else "Erro"}
+
+def calcular(op, a, b):
+    return ops.get(op, lambda a,b: "Op inválida")(a, b)</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Filtrar e transformar lista</strong>
+          Dada uma lista de números, use filter() e map() (ou list comprehensions) para: (a) filtrar apenas os pares, (b) elevar cada par ao quadrado.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">nums = [1, 2, 3, 4, 5, 6, 7, 8]
+pares = list(filter(lambda x: x%2==0, nums))
+quadrados = list(map(lambda x: x**2, pares))
+# Ou: quadrados = [x**2 for x in nums if x%2==0]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-python">02</div>
+      <h3>Persistência: TXT, JSON e CSV</h3>
+      <span>open · with · json · csv</span>
+    </div>
+    <div class="topic-body">
+<pre><span class="kw">import</span> json
+<span class="kw">import</span> csv
+
+<span class="cm">## ── ARQUIVO TEXTO ──────────────────────────</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"log.txt"</span>, <span class="str">"w"</span>, encoding<span class="op">=</span><span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(<span class="str">"Linha 1\nLinha 2\nLinha 3\n"</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"log.txt"</span>, <span class="str">"r"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> linha <span class="kw">in</span> f:
+        <span class="fn">print</span>(linha.<span class="fn">strip</span>())
+
+<span class="cm">## ── JSON ────────────────────────────────────</span>
+dados <span class="op">=</span> {<span class="str">"nome"</span>: <span class="str">"Ana"</span>, <span class="str">"notas"</span>: [<span class="num">8</span>, <span class="num">9</span>, <span class="num">10</span>]}
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"dados.json"</span>, <span class="str">"w"</span>) <span class="kw">as</span> f:
+    json.<span class="fn">dump</span>(dados, f, indent<span class="op">=</span><span class="num">4</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"dados.json"</span>) <span class="kw">as</span> f:
+    carregado <span class="op">=</span> json.<span class="fn">load</span>(f)
+    <span class="fn">print</span>(carregado[<span class="str">"nome"</span>])
+
+<span class="cm">## ── CSV ─────────────────────────────────────</span>
+alunos <span class="op">=</span> [[<span class="str">"Nome"</span>, <span class="str">"Nota"</span>], [<span class="str">"Ana"</span>, <span class="num">9</span>], [<span class="str">"Bruno"</span>, <span class="num">7</span>]]
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"alunos.csv"</span>, <span class="str">"w"</span>, newline<span class="op">=</span><span class="str">""</span>) <span class="kw">as</span> f:
+    csv.<span class="fn">writer</span>(f).<span class="fn">writerows</span>(alunos)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"alunos.csv"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> row <span class="kw">in</span> csv.<span class="fn">DictReader</span>(f):
+        <span class="fn">print</span>(<span class="str">f"<span class="op">{row['Nome']}</span>: <span class="op">{row['Nota']}</span>"</span>)</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Gerenciador de tarefas com JSON</strong>
+          Crie um sistema que salva tarefas em "tarefas.json". Cada tarefa tem: id, descrição e status ("pendente"/"concluída"). Implemente: adicionar, concluir (muda status), listar, salvar e carregar.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">def salvar(tarefas):
+    with open("tarefas.json", "w") as f:
+        json.dump(tarefas, f, indent=2, ensure_ascii=False)
+
+def carregar():
+    try:
+        with open("tarefas.json") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Relatório CSV</strong>
+          Crie uma lista de dicionários com pelo menos 5 alunos (nome, nota1, nota2, nota3). Calcule a média de cada um e salve em "relatorio.csv" com as colunas: Nome, Média, Situação.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">with open("relatorio.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=["Nome","Média","Situação"])
+    writer.writeheader()
+    for a in alunos:
+        media = (a["n1"]+a["n2"]+a["n3"])/3
+        writer.writerow({"Nome":a["nome"], "Média":f"{media:.1f}",
+                         "Situação":"Aprovado" if media>=6 else "Reprovado"})</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LÓGICA ==================== -->
+<div id="logica" class="section">
+  <div class="sec-header">
+    <span class="lang-badge badge-logic">Lógica</span>
+    <h2>Tabela Verdade, Teste de Mesa e Fluxograma</h2>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-logic">01</div>
+      <h3>Tabela Verdade — AND, OR, NOT</h3>
+      <span>&amp;&amp; · || · ! · combinações</span>
+    </div>
+    <div class="topic-body">
+      <p>Operadores lógicos combinam condições booleanas. Entender a tabela verdade é essencial para escrever condicionais corretas.</p>
+      <div class="code-label">Tabela Verdade Implementada em C</div>
+<pre><span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+
+<span class="tp">int</span> <span class="fn">main</span>() {
+    <span class="fn">printf</span>(<span class="str">"A  B  | AND | OR  | NOT_A\n"</span>);
+    <span class="fn">printf</span>(<span class="str">"------+-----+-----+------\n"</span>);
+
+    <span class="kw">for</span> (<span class="tp">int</span> A <span class="op">=</span> <span class="num">0</span>; A <span class="op">&lt;=</span> <span class="num">1</span>; A<span class="op">++</span>) {
+        <span class="kw">for</span> (<span class="tp">int</span> B <span class="op">=</span> <span class="num">0</span>; B <span class="op">&lt;=</span> <span class="num">1</span>; B<span class="op">++</span>) {
+            <span class="fn">printf</span>(<span class="str">"%d  %d  |  %d  |  %d  |   %d\n"</span>,
+                A, B,
+                A <span class="op">&amp;&amp;</span> B,   <span class="cm">// AND</span>
+                A <span class="op">||</span> B,   <span class="cm">// OR</span>
+                <span class="op">!</span>A        <span class="cm">// NOT A</span>
+            );
+        }
+    }
+
+    <span class="cm">// Expressão complexa com precedência</span>
+    <span class="tp">int</span> x <span class="op">=</span> <span class="num">5</span>, y <span class="op">=</span> <span class="num">10</span>, z <span class="op">=</span> <span class="num">3</span>;
+    <span class="tp">int</span> resultado <span class="op">=</span> (x <span class="op">&gt;</span> z) <span class="op">&amp;&amp;</span> (y <span class="op">&lt;</span> <span class="num">20</span>) <span class="op">||</span> (<span class="op">!</span>(z <span class="op">==</span> <span class="num">3</span>));
+    <span class="fn">printf</span>(<span class="str">"Resultado: %d\n"</span>, resultado);  <span class="cm">// 1</span>
+    <span class="kw">return</span> <span class="num">0</span>;
+}</pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Verificar triângulo</strong>
+          Leia 3 lados. Um triângulo é válido quando CADA lado é menor que a soma dos outros dois. Use AND (&&) para combinar as 3 condições numa única expressão.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int valido = (a < b+c) && (b < a+c) && (c < a+b);
+if (valido) printf("Triângulo válido!\n");</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Validar login</strong>
+          Defina usuário="admin" e senha="1234". Leia os dados do usuário. Informe "Acesso permitido" se usuário E senha estiverem corretos, "Usuário incorreto", "Senha incorreta" ou "Ambos incorretos" nos demais casos.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int usuario_ok = strcmp(user_input, "admin") == 0;
+int senha_ok   = strcmp(pass_input, "1234") == 0;
+if (usuario_ok && senha_ok) printf("Acesso permitido\n");
+else if (!usuario_ok && !senha_ok) printf("Ambos incorretos\n");
+else if (!usuario_ok) printf("Usuário incorreto\n");
+else printf("Senha incorreta\n");</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Tabela verdade de 3 variáveis</strong>
+          Gere automaticamente com 3 laços for aninhados a tabela verdade de (A AND B) OR (NOT C) para todas as 8 combinações de A, B e C.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">for (int A=0; A<=1; A++)
+  for (int B=0; B<=1; B++)
+    for (int C=0; C<=1; C++)
+      printf("%d %d %d | %d\n", A,B,C, (A&&B)||(!C));</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic">
+    <div class="topic-header">
+      <div class="topic-num num-logic">02</div>
+      <h3>Teste de Mesa</h3>
+      <span>rastrear variáveis passo a passo</span>
+    </div>
+    <div class="topic-body">
+      <p>O teste de mesa é simular manualmente a execução de um código, anotando o valor de cada variável a cada passo. Essencial para depurar algoritmos antes de executá-los.</p>
+      <div class="code-label">Código para rastrear</div>
+<pre><span class="cm">// Faça o teste de mesa deste código manualmente</span>
+<span class="tp">int</span> a <span class="op">=</span> <span class="num">1</span>, b <span class="op">=</span> <span class="num">2</span>, c <span class="op">=</span> <span class="num">0</span>;
+
+<span class="kw">while</span> (a <span class="op">&lt;</span> <span class="num">5</span>) {
+    c <span class="op">=</span> a <span class="op">+</span> b;
+    a <span class="op">=</span> b;
+    b <span class="op">=</span> c;
+    <span class="fn">printf</span>(<span class="str">"%d "</span>, c);
+}
+
+<span class="cm">/*
+Passo | a | b | c | Saída
+------+---+---+---+-------
+Início| 1 | 2 | 0 |
+  1   | 2 | 3 | 3 | 3
+  2   | 3 | 5 | 5 | 5
+  3   | 5 | 8 | 8 | 8
+Fim (a >= 5)
+Saída: 3 5 8  → Fibonacci!
+*/</span></pre>
+      <div class="exercises">
+        <h4>Exercícios</h4>
+        <div class="exercise-item">
+          <strong>🧩 Ex 1 — Trace o código</strong>
+          Faça o teste de mesa do código abaixo SEM executar. Escreva numa tabela o valor de i, soma e o que é impresso em cada iteração:
+          <br><br><code>int soma=0; for(int i=1; i&lt;=4; i++) { soma += i*i; } printf("%d", soma);</code>
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver resposta</button>
+          <div class="hint-content">i=1: soma = 0 + 1 = 1
+i=2: soma = 1 + 4 = 5
+i=3: soma = 5 + 9 = 14
+i=4: soma = 14 + 16 = 30
+Saída: 30  (soma dos quadrados de 1 a 4)</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 2 — Encontrar o bug</strong>
+          O código abaixo deveria calcular o fatorial de 5, mas está errado. Faça o teste de mesa para encontrar o bug:
+          <br><br><code>int f=0; for(int i=1; i&lt;=5; i++) { f *= i; } printf("%d", f);</code>
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver resposta</button>
+          <div class="hint-content">BUG: f inicializado com 0 (deveria ser 1)
+0*1=0, 0*2=0 ... sempre resulta em 0!
+Correção: int f = 1; (não 0)</div>
+        </div>
+        <div class="exercise-item">
+          <strong>🧩 Ex 3 — Implementar do teste de mesa</strong>
+          Dado o algoritmo da busca linear: percorrer um array buscando um valor. Escreva o código em C e depois faça o teste de mesa buscando o valor 30 no array {10, 20, 30, 40, 50}.
+          <br><button class="hint-btn" onclick="toggleHint(this)">💡 Ver dica</button>
+          <div class="hint-content">int arr[] = {10,20,30,40,50}, alvo = 30, n = 5;
+for (int i = 0; i < n; i++) {
+    if (arr[i] == alvo) {
+        printf("Encontrado em i=%d\n", i);
+        break;
+    }
+}
+// Mesa: i=0: 10≠30 | i=1: 20≠30 | i=2: 30==30 → imprime "i=2"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  Exercícios baseados nos materiais de aula · C · Java · Python · Lógica de Programação
+</footer>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+function toggleHint(btn) {
+  const hint = btn.nextElementSibling;
+  const isVisible = hint.classList.contains('visible');
+  hint.classList.toggle('visible');
+  btn.textContent = isVisible ? '💡 Ver dica' : '🙈 Esconder dica';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C básico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Caderno quadriculado de dia, lousa à noite.
+   Layout: trilha de aulas à esquerda; a folha da aula à direita, com a linha vermelha de margem do caderno. */
+:root {
+  --papel: #f5f7fb;
+  --grade: #e1e7f0;
+  --tinta: #1c2a4a;
+  --lapis: #556079;
+  --margem: #d24b45;
+  --caneta: #2b56c9;
+  --marca: #ffe27a;
+  --painel: #ffffff;
+  --borda: #cfd7e4;
+  --term-bg: #1b2130;
+  --term-txt: #d9e1ef;
+  --term-in: #ffd66b;
+  --ok: #23855a;
+
+  --k-kw: #a3336d; --k-str: #2c7a4b; --k-num: #b4561a; --k-com: #758099;
+  --k-fn: #2b56c9; --k-cls: #8a6400; --k-op: #4a5570;
+
+  --f-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-codigo: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #1d2925; --grade: #26342f; --tinta: #e4ebe3; --lapis: #a2afa7;
+    --margem: #e5867c; --caneta: #8fb9f3; --marca: #e9d27c; --painel: #24322d;
+    --borda: #3a4b45; --term-bg: #111815; --term-txt: #d6e0da; --term-in: #f0d47a; --ok: #7fd3a5;
+    --k-kw: #f0a6c4; --k-str: #a8db9a; --k-num: #f4b47a; --k-com: #8d9c94;
+    --k-fn: #9dc3f7; --k-cls: #e9d27c; --k-op: #b9c6be;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #1d2925; --grade: #26342f; --tinta: #e4ebe3; --lapis: #a2afa7;
+  --margem: #e5867c; --caneta: #8fb9f3; --marca: #e9d27c; --painel: #24322d;
+  --borda: #3a4b45; --term-bg: #111815; --term-txt: #d6e0da; --term-in: #f0d47a; --ok: #7fd3a5;
+  --k-kw: #f0a6c4; --k-str: #a8db9a; --k-num: #f4b47a; --k-com: #8d9c94;
+  --k-fn: #9dc3f7; --k-cls: #e9d27c; --k-op: #b9c6be;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--papel);
+  background-image:
+    linear-gradient(var(--grade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--tinta);
+  font: 17px/1.6 var(--f-texto);
+}
+a { color: var(--caneta); }
+:focus-visible { outline: 3px solid var(--caneta); outline-offset: 2px; border-radius: 4px; }
+code, pre { font-family: var(--f-codigo); }
+:not(pre) > code {
+  font-size: .86em; padding: .08em .35em; border-radius: 4px;
+  background: color-mix(in srgb, var(--painel) 70%, var(--grade));
+  border: 1px solid var(--borda);
+  white-space: nowrap;
+}
+h1, h2, h3 { font-family: var(--f-titulo); line-height: 1.15; text-wrap: balance; margin: 0; }
+
+/* ---------- estrutura ---------- */
+.app {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 280px minmax(0, 1fr);
+  gap: 0; min-height: 100vh;
+}
+.trilha {
+  position: sticky; top: 0; align-self: start;
+  height: 100vh; overflow-y: auto;
+  padding: 28px 20px 40px 24px;
+  border-right: 1px solid var(--borda);
+  background: color-mix(in srgb, var(--papel) 88%, transparent);
+}
+.marca-site {
+  display: block; text-decoration: none; color: var(--tinta);
+  font: 800 1.35rem/1.1 var(--f-titulo); margin-bottom: 4px;
+}
+.progresso-geral { font-size: .86rem; color: var(--lapis); margin: 0 0 22px; }
+.barra { height: 6px; border-radius: 3px; background: var(--grade); margin-top: 6px; overflow: hidden; }
+.barra > span { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+
+.modulo-nome {
+  font: 600 .95rem var(--f-titulo); margin: 18px 0 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pino { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.pino-logica { background: #8b6fd6; } .pino-c { background: #4a7fc4; }
+.pino-java { background: #d9822b; } .pino-python { background: #3c9a6e; }
+
+.trilha ol { list-style: none; margin: 0; padding: 0; }
+.trilha li a {
+  display: grid; grid-template-columns: 1.6em 1fr auto; gap: 6px; align-items: baseline;
+  padding: 5px 8px; border-radius: 6px; text-decoration: none;
+  color: var(--tinta); font-size: .92rem; line-height: 1.3;
+}
+.trilha li a:hover { background: var(--grade); }
+.trilha li a[aria-current="page"] { background: var(--tinta); color: var(--papel); }
+.trilha .n { color: var(--lapis); font-variant-numeric: tabular-nums; font-size: .82rem; }
+.trilha a[aria-current="page"] .n, .trilha a[aria-current="page"] .fr { color: inherit; opacity: .75; }
+.trilha .fr { font-size: .78rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.trilha .fr.completo { color: var(--ok); font-weight: 700; }
+
+.abrir-trilha { display: none; }
+
+.folha {
+  border-left: 2px solid var(--margem);
+  margin-left: 40px;
+  padding: 40px clamp(20px, 4vw, 56px) 80px;
+  min-width: 0;
+}
+.conteudo { max-width: 760px; }
+
+/* ---------- textos da aula ---------- */
+.contexto { color: var(--lapis); font-size: .95rem; margin: 0 0 8px; }
+.folha h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -.02em; }
+.resumo { font-size: 1.15rem; color: var(--lapis); margin: 12px 0 0; max-width: 60ch; }
+.bloco { margin-top: 48px; }
+.bloco > h2 { font-size: 1.45rem; font-weight: 800; margin-bottom: 14px; }
+.prosa p, .prosa li { max-width: 66ch; }
+.prosa p { margin: 0 0 14px; }
+.prosa ul, .prosa ol { padding-left: 1.3em; margin: 0 0 14px; }
+.prosa li { margin-bottom: 6px; }
+ol.passos { counter-reset: p; list-style: none; padding: 0; }
+ol.passos li { counter-increment: p; position: relative; padding-left: 2.2em; }
+ol.passos li::before {
+  content: counter(p); position: absolute; left: 0; top: .05em;
+  width: 1.55em; height: 1.55em; border-radius: 50%;
+  border: 1.5px solid var(--tinta); display: grid; place-items: center;
+  font: 700 .8rem var(--f-titulo);
+}
+
+.rolar { overflow-x: auto; margin: 6px 0 18px; }
+.tabela { border-collapse: collapse; width: 100%; font-size: .93rem; background: var(--painel); }
+.tabela th, .tabela td { text-align: left; padding: 8px 12px; border: 1px solid var(--borda); vertical-align: top; }
+.tabela th { font-family: var(--f-titulo); font-weight: 600; background: color-mix(in srgb, var(--painel) 80%, var(--grade)); }
+.tabela code { white-space: pre; }
+
+/* ---------- código e terminal ---------- */
+.exemplo { margin: 0 0 32px; }
+.exemplo h3 { font-size: 1.12rem; font-weight: 600; margin: 0 0 10px; }
+.codigo {
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  overflow: hidden;
+}
+.codigo-topo {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 6px 8px 6px 14px; border-bottom: 1px solid var(--borda);
+  font: .8rem var(--f-codigo); color: var(--lapis);
+}
+.codigo pre { margin: 0; padding: 14px 16px; overflow-x: auto; font-size: .85rem; line-height: 1.6; tab-size: 4; }
+.botao {
+  font: 600 .85rem var(--f-texto); color: var(--tinta);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 6px;
+  padding: 5px 12px; cursor: pointer;
+}
+.botao:hover { border-color: var(--tinta); }
+.botao[aria-pressed="true"], .botao.ativo { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.botao:disabled { opacity: .45; cursor: default; }
+
+.terminal {
+  margin-top: 0; background: var(--term-bg); color: var(--term-txt);
+  border-radius: 0 0 10px 10px; padding: 14px 16px 16px;
+  font: .84rem/1.55 var(--f-codigo); white-space: pre; overflow-x: auto;
+  position: relative;
+}
+.terminal::before {
+  content: "Saída ao executar"; display: block; margin-bottom: 8px;
+  font: .76rem var(--f-texto); color: color-mix(in srgb, var(--term-txt) 60%, transparent);
+}
+.terminal .in { color: var(--term-in); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.codigo + .terminal { border-top: 0; }
+.codigo:has(+ .terminal) { border-radius: 10px 10px 0 0; }
+.nota { font-size: .93rem; color: var(--lapis); margin: 10px 0 0; max-width: 66ch; }
+
+/* tokens do Prism */
+.token.comment, .token.prolog { color: var(--k-com); font-style: italic; }
+.token.keyword, .token.boolean, .token.macro, .token.directive-hash, .token.directive { color: var(--k-kw); }
+.token.string, .token.char, .token.template-string { color: var(--k-str); }
+.token.number { color: var(--k-num); }
+.token.function { color: var(--k-fn); }
+.token.class-name, .token.builtin { color: var(--k-cls); }
+.token.operator, .token.punctuation { color: var(--k-op); }
+.token.macro .token.string { color: var(--k-str); }
+
+/* ---------- pegadinhas e lembrar ---------- */
+.pegadinhas { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.pegadinhas li {
+  padding: 12px 16px; background: var(--painel);
+  border: 1px solid var(--borda); border-left: 4px solid var(--margem); border-radius: 0 8px 8px 0;
+  max-width: 70ch;
+}
+.lembrar {
+  background: var(--marca); color: #2a2410; border-radius: 3px;
+  padding: 18px 22px 18px; transform: rotate(-.4deg);
+  box-shadow: 0 1px 0 rgba(0,0,0,.08), 0 8px 18px -12px rgba(0,0,0,.35);
+  max-width: 560px;
+}
+.lembrar h2 { font-size: 1.15rem; margin: 0 0 8px; color: inherit; }
+.lembrar ul { margin: 0; padding-left: 1.2em; }
+.lembrar li { margin-bottom: 4px; }
+.lembrar code { background: rgba(255,255,255,.5); border-color: rgba(0,0,0,.15); color: inherit; }
+
+/* ---------- exercícios ---------- */
+.exercicios { display: grid; gap: 18px; }
+.exercicio {
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  padding: 18px 20px;
+}
+.exercicio.feito { border-color: var(--ok); box-shadow: inset 4px 0 0 var(--ok); }
+.ex-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.exercicio h3 { font-size: 1.1rem; font-weight: 600; }
+.exercicio p { margin: 8px 0 0; max-width: 66ch; }
+.feito-check { display: flex; align-items: center; gap: 6px; font-size: .88rem; color: var(--lapis); white-space: nowrap; cursor: pointer; }
+.feito-check input { width: 18px; height: 18px; accent-color: var(--ok); margin: 0; }
+.ex-trecho { margin-top: 12px; }
+.ex-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.revelar { margin-top: 12px; }
+.revelar[hidden] { display: none; }
+.dica {
+  padding: 10px 14px; border-radius: 6px;
+  background: color-mix(in srgb, var(--marca) 35%, var(--painel));
+  border: 1px dashed color-mix(in srgb, var(--marca) 60%, var(--tinta));
+}
+.dica strong { font-family: var(--f-titulo); }
+
+/* ---------- teste de mesa interativo ---------- */
+.mesa {
+  margin: 8px 0 24px; border: 1.5px solid var(--tinta); border-radius: 12px;
+  background: var(--painel); overflow: hidden;
+}
+.mesa-corpo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.mesa-codigo { border-right: 1px solid var(--borda); padding: 12px 0; overflow-x: auto; }
+.mesa-codigo .ln {
+  display: grid; grid-template-columns: 2.4em 1fr; font: .84rem/1.75 var(--f-codigo);
+  padding-right: 14px; white-space: pre;
+}
+.mesa-codigo .ln code { background: none; border: 0; padding: 0; font-size: inherit; white-space: pre; border-radius: 0; }
+.mesa-codigo .ln .num { color: var(--lapis); text-align: right; padding-right: 12px; user-select: none; }
+.mesa-codigo .ln.atual { background: color-mix(in srgb, var(--marca) 55%, transparent); }
+.mesa-codigo .ln.atual .num { color: var(--tinta); font-weight: 700; }
+.mesa-lado { padding: 14px 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.mesa-tab { border-collapse: collapse; width: 100%; font: .85rem var(--f-codigo); font-variant-numeric: tabular-nums; }
+.mesa-tab th, .mesa-tab td { border-bottom: 1px solid var(--borda); padding: 4px 8px; text-align: center; }
+.mesa-tab th { font-family: var(--f-codigo); font-weight: 600; border-bottom: 1.5px solid var(--tinta); }
+.mesa-tab td.passo { color: var(--lapis); text-align: left; width: 3.5em; }
+.mesa-tab tr.atual td { background: color-mix(in srgb, var(--marca) 45%, transparent); }
+.mesa-tab td.mudou { font-weight: 700; }
+.mesa-tab-wrap { max-height: 230px; overflow: auto; }
+.mesa-saida { font: .84rem var(--f-codigo); background: var(--term-bg); color: var(--term-txt); padding: 8px 10px; border-radius: 6px; min-height: 2.4em; white-space: pre-wrap; }
+.mesa-saida::before { content: "Saída: "; color: color-mix(in srgb, var(--term-txt) 55%, transparent); }
+.mesa-nota { margin: 0; font-size: .95rem; min-height: 3em; }
+.mesa-controles {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; border-top: 1px solid var(--borda);
+  background: color-mix(in srgb, var(--painel) 85%, var(--grade));
+}
+.mesa-controles .contador { margin-left: auto; font-size: .88rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+
+/* ---------- tabela verdade interativa ---------- */
+.verdade { margin: 8px 0 24px; display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: center;
+  padding: 16px 18px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; }
+.verdade .entradas { display: flex; gap: 10px; }
+.chave {
+  font: 700 1rem var(--f-codigo); min-width: 4.6em; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  border: 1.5px solid var(--tinta); background: var(--painel); color: var(--tinta);
+}
+.chave[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.verdade dl { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 22px; margin: 0; }
+.verdade dt { font: .85rem var(--f-codigo); color: var(--lapis); }
+.verdade dd { margin: 0; font: 700 1.2rem var(--f-codigo); }
+.verdade dd.v1 { color: var(--ok); } .verdade dd.v0 { color: var(--margem); }
+
+/* ---------- fluxograma ---------- */
+.fluxo-par { margin: 6px 0 18px; }
+.fluxo { width: 100%; max-width: 330px; height: auto; display: block; }
+.f-forma { fill: var(--painel); stroke: var(--tinta); stroke-width: 1.6; }
+.f-dec { fill: color-mix(in srgb, var(--marca) 45%, var(--painel)); }
+.f-linha { stroke: var(--tinta); stroke-width: 1.6; fill: none; }
+.f-seta { fill: var(--tinta); }
+.f-txt { fill: var(--tinta); font: 13px var(--f-codigo); text-anchor: middle; }
+.f-rot { fill: var(--lapis); font: 12px var(--f-texto); text-anchor: middle; }
+
+/* ---------- início ---------- */
+.inicio-modulos { display: grid; gap: 28px; margin-top: 18px; }
+.inicio-modulo h3 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.inicio-modulo ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+.inicio-modulo li a {
+  display: grid; grid-template-columns: 2em 1fr auto; gap: 8px; align-items: baseline;
+  padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--tinta);
+}
+.inicio-modulo li a:hover { background: var(--painel); }
+.inicio-modulo .n { color: var(--lapis); font-variant-numeric: tabular-nums; }
+.inicio-modulo .t { font-weight: 700; }
+.inicio-modulo .r { display: block; font-weight: 400; color: var(--lapis); font-size: .93rem; }
+.inicio-modulo .fr { font-size: .85rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.inicio-modulo .fr.completo { color: var(--ok); font-weight: 700; }
+.selo { font-size: .93rem; color: var(--lapis); margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--borda); max-width: 66ch; }
+
+/* ---------- navegação entre aulas ---------- */
+.navegar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 56px; }
+.navegar a {
+  display: block; padding: 14px 16px; border: 1px solid var(--borda); border-radius: 10px;
+  background: var(--painel); text-decoration: none; color: var(--tinta);
+}
+.navegar a:hover { border-color: var(--tinta); }
+.navegar small { display: block; color: var(--lapis); font-size: .85rem; }
+.navegar strong { font-family: var(--f-titulo); font-weight: 600; }
+.navegar .prox { text-align: right; grid-column: 2; }
+
+.aviso { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: var(--tinta); color: var(--papel); padding: 8px 16px; border-radius: 8px; font-size: .9rem;
+  opacity: 0; pointer-events: none; transition: opacity .2s; }
+.aviso.ver { opacity: 1; }
+
+.pino-c-basico { background: #4a7fc4; } .pino-c-avancado { background: #2c4f8a; }
+.mesa-tab thead th { position: sticky; top: 0; background: var(--painel); z-index: 1; }
+.trilha .modulo-nome.outros { margin-top: 26px; color: var(--lapis); }
+.outros-cadernos a { grid-template-columns: 1.6em 1fr auto !important; }
+.outros-cadernos .pino { justify-self: center; align-self: center; }
+.contexto a { color: inherit; }
+.ficha { display: flex; flex-wrap: wrap; gap: 10px 36px; margin: 24px 0 0; }
+.ficha dt { font-size: .85rem; color: var(--lapis); }
+.ficha dd { margin: 0; font-weight: 700; }
+.cadernos { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.cartao-caderno {
+  display: grid; grid-template-columns: 2.2em 1fr auto; gap: 12px; align-items: start;
+  padding: 16px 18px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  text-decoration: none; color: var(--tinta);
+}
+.cartao-caderno:hover { border-color: var(--tinta); }
+.cc-n { font: 800 1.5rem/1 var(--f-titulo); color: var(--lapis); font-variant-numeric: tabular-nums; }
+.cc-corpo { display: grid; gap: 4px; }
+.cc-nome { font: 600 1.2rem var(--f-titulo); display: flex; align-items: center; gap: 8px; }
+.cc-desc { max-width: 60ch; }
+.cc-meta { font-size: .9rem; color: var(--lapis); }
+.cc-aulas { font-size: .88rem; color: var(--lapis); }
+.cartao-caderno .fr { font-size: .9rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.cartao-caderno .fr.completo { color: var(--ok); font-weight: 700; }
+
+.pino-logica { background: #8b6fd6; }
+.explica { margin-top: 14px; padding: 14px 18px; border-radius: 8px; background: var(--painel); border: 1px solid var(--borda); }
+.explica h4 { margin: 0 0 8px; font: 600 1rem var(--f-titulo); }
+.explica ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.explica li { max-width: 68ch; }
+.nivel { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+  font: 600 .74rem var(--f-texto); border: 1px solid currentColor; }
+.nivel-1 { color: var(--ok); } .nivel-2 { color: var(--caneta); } .nivel-3 { color: var(--margem); }
+.prosa h3 { font-size: 1.15rem; font-weight: 600; margin: 26px 0 10px; }
+
+/* ---------- telas menores ---------- */
+@media (max-width: 920px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .trilha {
+    position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--borda);
+    padding: 14px 16px; background: var(--papel);
+  }
+  .trilha .progresso-geral { margin-bottom: 8px; }
+  .abrir-trilha { display: inline-block; }
+  .trilha:not(.aberta) .lista-modulos { display: none; }
+  .folha { margin-left: 14px; padding: 28px 16px 64px 18px; }
+  .mesa-corpo { grid-template-columns: minmax(0, 1fr); }
+  .mesa-codigo { border-right: 0; border-bottom: 1px solid var(--borda); }
+}
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .navegar { grid-template-columns: 1fr; }
+  .navegar .prox { grid-column: 1; }
+  .ex-topo { flex-direction: column; gap: 8px; }
+  .lembrar { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="trilha" id="trilha" aria-label="Aulas">
+    <a class="marca-site" href="#inicio">C básico</a>
+    <p class="progresso-geral"><span id="prog-txt"></span><span class="barra" aria-hidden="true"><span id="prog-barra"></span></span></p>
+    <button class="botao abrir-trilha" id="abrir-trilha" aria-expanded="false" aria-controls="lista-modulos">Ver a lista</button>
+    <div class="lista-modulos" id="lista-modulos"></div>
+  </nav>
+  <main class="folha" id="folha" tabindex="-1">
+    <div class="conteudo" id="conteudo"></div>
+  </main>
+</div>
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>
+const AULAS = [{"id": "c-primeiro-programa", "titulo": "Seu primeiro programa em C", "resumo": "A estrutura de um programa, como compilar e executar, e como ler as mensagens de erro.", "ideia": "\n<p>C é uma linguagem <strong>compilada<\/strong>. Você escreve o código-fonte num arquivo de texto (por exemplo, <code>ola.c<\/code>), e um programa chamado <strong>compilador<\/strong> traduz esse texto para a linguagem da máquina, gerando um executável. Só depois disso dá para rodar.<\/p>\n<p>Pense numa receita escrita em português que precisa ser traduzida para um cozinheiro que só fala japonês. O compilador é o tradutor. Se a receita tiver um erro de escrita grave, ele se recusa a traduzir e diz em que linha está o problema.<\/p>\n<h3>Compilando e executando<\/h3>\n<p>Com o compilador gcc instalado, no terminal:<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Comando<\/th><th>Faz<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>gcc ola.c -o ola<\/code><\/td><td>compila <code>ola.c<\/code> e gera o executável <code>ola<\/code> (no Windows, <code>ola.exe<\/code>)<\/td><\/tr>\n    <tr><td><code>./ola<\/code><\/td><td>executa no Linux e no macOS<\/td><\/tr>\n    <tr><td><code>ola<\/code><\/td><td>executa no Windows<\/td><\/tr>\n    <tr><td><code>gcc -Wall ola.c -o ola<\/code><\/td><td>compila mostrando avisos (<em>warnings<\/em>). Use sempre: os avisos apontam erros antes que eles virem problema.<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>Se você usa uma IDE como Code::Blocks, Dev-C++ ou VS Code, o botão \"Compilar e executar\" faz esses dois passos por você.<\/p>\n<h3>As peças de todo programa em C<\/h3>\n<ul>\n  <li><code>#include &lt;stdio.h&gt;<\/code> traz as funções de entrada e saída, como <code>printf<\/code> e <code>scanf<\/code>. Sem ele, o compilador não sabe o que é <code>printf<\/code>.<\/li>\n  <li><code>int main(void)<\/code> é onde o programa começa. Todo programa em C tem exatamente um <code>main<\/code>.<\/li>\n  <li>As <strong>chaves<\/strong> <code>{ }<\/code> marcam o começo e o fim de um bloco de código.<\/li>\n  <li>Cada instrução termina com <strong>ponto e vírgula<\/strong>.<\/li>\n  <li><code>return 0;<\/code> avisa ao sistema que o programa terminou sem erros.<\/li>\n  <li><strong>Comentários<\/strong> são ignorados pelo compilador: <code>// até o fim da linha<\/code> ou <code>/* entre estes símbolos */<\/code>.<\/li>\n<\/ul>\n", "exemplos": [{"lang": "c", "titulo": "Olá, mundo", "codigo": "#include <stdio.h>\n\nint main(void) {\n    printf(\"Olá, mundo!\\n\");\n    printf(\"Este é meu primeiro programa em C.\\n\");\n    return 0;\n}", "explica": ["Linha 1: inclui a biblioteca de entrada e saída padrão (<em>standard input/output<\/em>).", "Linha 3: começa a função <code>main<\/code>. <code>int<\/code> diz que ela devolve um número inteiro ao sistema; <code>void<\/code> diz que ela não recebe nada.", "Linhas 4 e 5: <code>printf<\/code> mostra o texto entre aspas. O <code>\\n<\/code> é uma quebra de linha. Sem ele, o texto seguinte sairia grudado na mesma linha.", "Linha 6: <code>return 0<\/code> indica sucesso."], "saida": "Olá, mundo!\nEste é meu primeiro programa em C.\n"}, {"lang": "c", "titulo": "Sequências de escape e comentários", "codigo": "#include <stdio.h>\n\n/* Este programa mostra os caracteres especiais\n   mais usados dentro do printf. */\nint main(void) {\n    printf(\"Linha 1\\nLinha 2\\n\");          // \\n quebra a linha\n    printf(\"Nome:\\tAna\\n\");               // \\t é uma tabulação\n    printf(\"Ela disse: \\\"oi\\\"\\n\");        // \\\" coloca aspas no texto\n    printf(\"Caminho: C:\\\\aulas\\\\c\\n\");    // \\\\ mostra uma barra invertida\n    printf(\"100%% concluído\\n\");          // %% mostra o símbolo %\n    return 0;\n}", "saida": "Linha 1\nLinha 2\nNome:\tAna\nEla disse: \"oi\"\nCaminho: C:\\aulas\\c\n100% concluído\n"}], "pegadinhas": ["Esquecer o ponto e vírgula. O compilador costuma acusar o erro na linha <em>seguinte<\/em>, porque só percebe a falta quando encontra a próxima instrução. Olhe também a linha anterior à indicada.", "Usar aspas \"curvas\" copiadas do Word ou do WhatsApp (“ ”). O C só entende as aspas retas: <code>\"<\/code>.", "C diferencia maiúsculas de minúsculas: <code>Printf<\/code> e <code>Main<\/code> não existem.", "Editar o código e executar o executável antigo, sem compilar de novo. Toda mudança no .c exige uma nova compilação.", "Ler só a primeira mensagem de erro. Na verdade, corrija só ela e compile de novo: um único erro costuma gerar vários outros em cascata."], "lembrar": ["Escrever, compilar, executar. Mudou o código? Compile de novo.", "Todo programa: #include, int main(void), chaves, ponto e vírgula, return 0.", "Leia a mensagem de erro: ela diz o arquivo, a linha e o motivo."], "exercicios": [{"nivel": 1, "titulo": "Cartão de apresentação", "enunciado": "Escreva um programa que mostre seu nome, seu curso e sua cidade, cada um em uma linha, dentro de uma moldura feita com asteriscos.", "dica": "Vários printf, um por linha. Use espaços para alinhar a moldura.", "lang": "c", "solucao": "#include <stdio.h>\n\nint main(void) {\n    printf(\"****************************\\n\");\n    printf(\"*  Nome:   Ana Souza       *\\n\");\n    printf(\"*  Curso:  Sistemas        *\\n\");\n    printf(\"*  Cidade: Recife          *\\n\");\n    printf(\"****************************\\n\");\n    return 0;\n}"}, {"nivel": 1, "titulo": "Ache os erros", "enunciado": "Este programa tem 4 erros e não compila. Encontre todos:", "trecho": "#include <stdio.h>\n\nint Main(void) {\n    printf(\"Bem-vindo ao curso\\n\")\n    printf(\"Bons estudos!\\n);\n    return 0;\n", "dica": "Olhe com atenção: maiúsculas, ponto e vírgula, aspas e chaves.", "lang": "texto", "solucao": "1. Main com M maiúsculo: o certo é main.\n2. Falta o ; no fim do primeiro printf.\n3. No segundo printf, falta fechar as aspas: \"Bons estudos!\\n\"\n4. Falta a chave } que fecha o main, depois do return 0;"}, {"nivel": 2, "titulo": "Tabela com tabulação", "enunciado": "Mostre uma pequena tabela com 3 produtos e seus preços, usando \\t para alinhar as colunas e um cabeçalho \"Produto\" e \"Preço\".", "dica": "printf(\"Produto\\tPreço\\n\"); e depois uma linha para cada produto.", "lang": "c", "solucao": "#include <stdio.h>\n\nint main(void) {\n    printf(\"Produto\\t\\tPreço\\n\");\n    printf(\"-------\\t\\t-----\\n\");\n    printf(\"Caderno\\t\\tR$ 18,90\\n\");\n    printf(\"Caneta\\t\\tR$ 3,50\\n\");\n    printf(\"Mochila\\t\\tR$ 129,90\\n\");\n    return 0;\n}"}]}, {"id": "c-variaveis", "modulo": "c-basico", "titulo": "Variáveis e tipos", "resumo": "Caixas com nome e tamanho: int, double, char e as conversões entre eles.", "ideia": "\n<p>Uma variável é uma caixa na memória com um nome e um tipo. O tipo diz o tamanho da caixa e o que cabe nela. Em C você sempre declara o tipo antes de usar.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Tipo<\/th><th>Guarda<\/th><th>Exemplo<\/th><th>No printf<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>int<\/code><\/td><td>número inteiro<\/td><td><code>int idade = 20;<\/code><\/td><td><code>%d<\/code><\/td><\/tr>\n    <tr><td><code>double<\/code><\/td><td>número com vírgula (mais preciso)<\/td><td><code>double pi = 3.14159;<\/code><\/td><td><code>%f<\/code> ou <code>%.2f<\/code><\/td><\/tr>\n    <tr><td><code>float<\/code><\/td><td>número com vírgula (menos preciso)<\/td><td><code>float preco = 19.99f;<\/code><\/td><td><code>%f<\/code><\/td><\/tr>\n    <tr><td><code>char<\/code><\/td><td>um único caractere<\/td><td><code>char letra = 'A';<\/code><\/td><td><code>%c<\/code><\/td><\/tr>\n    <tr><td><code>char[]<\/code><\/td><td>texto (vetor de char)<\/td><td><code>char nome[50] = \"Ana\";<\/code><\/td><td><code>%s<\/code><\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>No código, o número com vírgula se escreve com ponto: <code>3.14<\/code>, nunca <code>3,14<\/code>. Prefira <code>double<\/code> a <code>float<\/code>: é o padrão das contas em C e erra menos.<\/p>\n", "exemplos": [{"lang": "c", "titulo": "Declarando e mostrando", "codigo": "#include <stdio.h>\n\nint main(void) {\n    int    idade   = 20;\n    double altura  = 1.75;\n    char   turma   = 'B';\n    char   nome[50] = \"Ana\";\n    const double TAXA = 0.11;   // const: não pode mudar depois\n\n    printf(\"Nome: %s\\n\", nome);\n    printf(\"Idade: %d anos\\n\", idade);\n    printf(\"Altura: %.2f m\\n\", altura);\n    printf(\"Turma: %c\\n\", turma);\n    printf(\"Desconto: %.0f%%\\n\", TAXA * 100);   // %% imprime o símbolo %\n    return 0;\n}", "saida": "Nome: Ana\nIdade: 20 anos\nAltura: 1.75 m\nTurma: B\nDesconto: 11%\n"}, {"lang": "c", "titulo": "A divisão que surpreende", "codigo": "#include <stdio.h>\n\nint main(void) {\n    int a = 7, b = 2;\n\n    printf(\"7 / 2 com int:     %d\\n\", a / b);           // corta a parte decimal\n    printf(\"7 %% 2 (resto):     %d\\n\", a % b);\n    printf(\"7 / 2 com cast:    %.1f\\n\", (double) a / b);\n    printf(\"7.0 / 2:           %.1f\\n\", 7.0 / 2);\n    return 0;\n}", "nota": "Quando os dois lados da divisão são int, o resultado também é int e a parte decimal some. Basta um dos lados ser double para a conta ser feita com vírgula.", "saida": "7 / 2 com int:     3\n7 % 2 (resto):     1\n7 / 2 com cast:    3.5\n7.0 / 2:           3.5\n"}], "pegadinhas": ["<code>(double)(a / b)<\/code> não resolve: a divisão inteira já aconteceu dentro dos parênteses. O cast tem que vir antes: <code>(double)a / b<\/code>.", "<code>'A'<\/code> com aspas simples é um caractere. <code>\"A\"<\/code> com aspas duplas é um texto. Não são a mesma coisa.", "Variável declarada e não inicializada contém lixo. Dê um valor inicial sempre que puder."], "lembrar": ["int para contar, double para medir.", "Divisão entre inteiros descarta a parte decimal.", "Nomes de variáveis dizem o que guardam: <code>totalAlunos<\/code>, não <code>x<\/code>."], "exercicios": [{"titulo": "Ficha do aluno", "enunciado": "Crie variáveis para nome, matrícula, coeficiente de rendimento e situação ('A' para ativo, 'T' para trancado). Mostre tudo numa linha.", "dica": "Use char[] para o nome, int para matrícula, double para o coeficiente e char para a situação.", "lang": "c", "solucao": "#include <stdio.h>\n\nint main(void) {\n    char   nome[50]  = \"Maria Souza\";\n    int    matricula = 20251234;\n    double cr        = 8.75;\n    char   situacao  = 'A';\n\n    printf(\"Nome: %s | Matrícula: %d | CR: %.2f | Situação: %c\\n\",\n           nome, matricula, cr, situacao);\n    return 0;\n}"}, {"titulo": "Divisão inteira e real", "enunciado": "Leia dois inteiros e mostre a divisão inteira, o resto e a divisão com casas decimais. Não deixe o programa dividir por zero.", "dica": "Teste se o divisor é 0 antes de dividir. Para a divisão real, use (double) antes do primeiro número.", "lang": "c", "teste": "17 5", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int x, y;\n    printf(\"Digite dois inteiros: \");\n    scanf(\"%d %d\", &x, &y);\n\n    if (y == 0) {\n        printf(\"Não dá para dividir por zero.\\n\");\n        return 1;\n    }\n    printf(\"Divisão inteira: %d\\n\", x / y);\n    printf(\"Resto: %d\\n\", x % y);\n    printf(\"Divisão real: %.2f\\n\", (double) x / y);\n    return 0;\n}"}, {"titulo": "Calculadora de IMC", "enunciado": "Leia peso (kg) e altura (m). Calcule IMC = peso / (altura × altura) e mostre com 1 casa decimal. Guarde os limites 18.5 e 25.0 em constantes.", "dica": "const double ABAIXO = 18.5; e const double ACIMA = 25.0; Depois compare com if/else.", "lang": "c", "teste": "70 1.75", "solucao": "#include <stdio.h>\n\nint main(void) {\n    const double ABAIXO = 18.5;\n    const double ACIMA  = 25.0;\n    double peso, altura;\n\n    printf(\"Peso (kg) e altura (m): \");\n    scanf(\"%lf %lf\", &peso, &altura);\n\n    double imc = peso / (altura * altura);\n    printf(\"IMC: %.1f\\n\", imc);\n\n    if (imc < ABAIXO)     printf(\"Abaixo do peso\\n\");\n    else if (imc < ACIMA) printf(\"Peso normal\\n\");\n    else                  printf(\"Acima do peso\\n\");\n    return 0;\n}"}]}, {"id": "c-operadores", "titulo": "Operadores e expressões", "resumo": "Contas, atalhos como ++ e +=, precedência, conversão de tipos e a biblioteca math.h.", "ideia": "\n<p>Uma <strong>expressão<\/strong> é qualquer coisa que o C consegue calcular e transformar num valor: <code>2 + 3<\/code>, <code>preco * 0.9<\/code>, <code>idade &gt;= 18<\/code>. Esta aula reúne todos os operadores que você vai usar no dia a dia.<\/p>\n<h3>Aritméticos<\/h3>\n<p><code>+<\/code> <code>-<\/code> <code>*<\/code> <code>/<\/code> e <code>%<\/code> (resto). Lembre: se os dois lados da divisão são <code>int<\/code>, o resultado é <code>int<\/code> e a parte decimal é descartada. <code>%<\/code> só funciona com inteiros.<\/p>\n<h3>Atribuição composta<\/h3>\n<p>Atalhos para \"pegue o valor atual, faça uma conta e guarde de volta\":<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Atalho<\/th><th>É o mesmo que<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>x += 5;<\/code><\/td><td><code>x = x + 5;<\/code><\/td><\/tr>\n    <tr><td><code>x -= 2;<\/code><\/td><td><code>x = x - 2;<\/code><\/td><\/tr>\n    <tr><td><code>x *= 3;<\/code><\/td><td><code>x = x * 3;<\/code><\/td><\/tr>\n    <tr><td><code>x /= 2;<\/code><\/td><td><code>x = x / 2;<\/code><\/td><\/tr>\n    <tr><td><code>x++;<\/code><\/td><td><code>x = x + 1;<\/code><\/td><\/tr>\n    <tr><td><code>x--;<\/code><\/td><td><code>x = x - 1;<\/code><\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>Relacionais e lógicos<\/h3>\n<p>Comparações devolvem 1 (verdadeiro) ou 0 (falso): <code>==<\/code> igual, <code>!=<\/code> diferente, <code>&lt;<\/code>, <code>&lt;=<\/code>, <code>&gt;<\/code>, <code>&gt;=<\/code>. E elas se combinam com <code>&amp;&amp;<\/code> (e), <code>||<\/code> (ou) e <code>!<\/code> (não).<\/p>\n<h3>Precedência: quem é calculado primeiro<\/h3>\n<ol>\n  <li>Parênteses<\/li>\n  <li><code>!<\/code>, <code>++<\/code>, <code>--<\/code>, conversões de tipo<\/li>\n  <li><code>*<\/code> <code>/<\/code> <code>%<\/code><\/li>\n  <li><code>+<\/code> <code>-<\/code><\/li>\n  <li><code>&lt;<\/code> <code>&lt;=<\/code> <code>&gt;<\/code> <code>&gt;=<\/code><\/li>\n  <li><code>==<\/code> <code>!=<\/code><\/li>\n  <li><code>&amp;&amp;<\/code><\/li>\n  <li><code>||<\/code><\/li>\n  <li><code>=<\/code> <code>+=<\/code> <code>-=<\/code> e as outras atribuições, por último<\/li>\n<\/ol>\n<p>Ninguém decora essa lista inteira. A regra prática: <strong>se você precisou pensar, coloque parênteses<\/strong>.<\/p>\n<h3>Conversão de tipos (cast)<\/h3>\n<p>Para forçar uma conta a ser feita com vírgula, converta um dos lados: <code>(double) soma / quantidade<\/code>. Ao contrário, guardar um <code>double<\/code> num <code>int<\/code> corta a parte decimal sem arredondar: <code>int x = 9.99;<\/code> guarda 9.<\/p>\n<h3>math.h<\/h3>\n<p>A biblioteca <code>math.h<\/code> traz funções matemáticas prontas. No Linux, compile com <code>-lm<\/code> no final: <code>gcc prog.c -o prog -lm<\/code>.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Função<\/th><th>Calcula<\/th><th>Exemplo<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>sqrt(x)<\/code><\/td><td>raiz quadrada<\/td><td><code>sqrt(16)<\/code> = 4<\/td><\/tr>\n    <tr><td><code>pow(b, e)<\/code><\/td><td>potência<\/td><td><code>pow(2, 10)<\/code> = 1024<\/td><\/tr>\n    <tr><td><code>fabs(x)<\/code><\/td><td>valor absoluto<\/td><td><code>fabs(-3.5)<\/code> = 3.5<\/td><\/tr>\n    <tr><td><code>round(x)<\/code>, <code>floor(x)<\/code>, <code>ceil(x)<\/code><\/td><td>arredonda, para baixo, para cima<\/td><td><code>ceil(2.1)<\/code> = 3<\/td><\/tr>\n  <\/tbody>\n<\/table>\n", "exemplos": [{"lang": "c", "titulo": "Atalhos, cast e math.h", "codigo": "#include <stdio.h>\n#include <math.h>\n\nint main(void) {\n    int pontos = 10;\n    pontos += 5;      // 15\n    pontos *= 2;      // 30\n    pontos--;         // 29\n    printf(\"Pontos: %d\\n\", pontos);\n\n    int soma = 17, quantidade = 4;\n    printf(\"Média errada: %d\\n\", soma / quantidade);\n    printf(\"Média certa: %.2f\\n\", (double) soma / quantidade);\n\n    int truncado = 9.99;   // a parte decimal é cortada\n    printf(\"int x = 9.99 guarda %d\\n\", truncado);\n\n    double catetoA = 3, catetoB = 4;\n    double hipotenusa = sqrt(pow(catetoA, 2) + pow(catetoB, 2));\n    printf(\"Hipotenusa: %.1f\\n\", hipotenusa);\n    printf(\"ceil(2.1) = %.0f, floor(2.9) = %.0f, round(2.5) = %.0f\\n\",\n           ceil(2.1), floor(2.9), round(2.5));\n    return 0;\n}", "explica": ["<code>pontos += 5<\/code> lê-se \"pontos recebe pontos mais 5\". Os atalhos não fazem nada que a forma longa não faça, só economizam digitação.", "<code>(double) soma / quantidade<\/code>: o cast transforma <code>soma<\/code> em 17.0 antes da divisão, então a conta é feita com vírgula.", "<code>sqrt(pow(catetoA, 2) + pow(catetoB, 2))<\/code> é o teorema de Pitágoras. As funções podem ser usadas dentro de outras funções.", "<code>%.0f<\/code> mostra um double sem casas decimais."], "saida": "Pontos: 29\nMédia errada: 4\nMédia certa: 4.25\nint x = 9.99 guarda 9\nHipotenusa: 5.0\nceil(2.1) = 3, floor(2.9) = 2, round(2.5) = 3\n"}, {"lang": "c", "titulo": "x++ e ++x: a diferença", "codigo": "#include <stdio.h>\n\nint main(void) {\n    int a = 5;\n    int b = a++;   // primeiro usa (b = 5), depois soma (a = 6)\n    printf(\"a = %d, b = %d\\n\", a, b);\n\n    int c = 5;\n    int d = ++c;   // primeiro soma (c = 6), depois usa (d = 6)\n    printf(\"c = %d, d = %d\\n\", c, d);\n    return 0;\n}", "nota": "Sozinhos numa linha (x++; ou ++x;) os dois fazem o mesmo. A diferença só aparece quando o resultado é usado na mesma expressão. Evite misturar ++ com outras contas: fica difícil de ler.", "saida": "a = 6, b = 5\nc = 6, d = 6\n"}], "pegadinhas": ["<code>%<\/code> com double não compila. Para o resto de números reais existe a função <code>fmod<\/code> da math.h.", "Esquecer o <code>-lm<\/code> ao compilar no Linux gera o erro <em>undefined reference to 'sqrt'<\/em>.", "<code>^<\/code> não é potência em C! <code>2 ^ 3<\/code> dá 1 (é uma operação com bits). Use <code>pow(2, 3)<\/code>.", "Comparar números double com <code>==<\/code> pode falhar: <code>0.1 + 0.2 == 0.3<\/code> é falso, por causa de arredondamentos internos. Compare a diferença com uma tolerância pequena: <code>fabs(a - b) &lt; 0.0001<\/code>."], "lembrar": ["x += 5 é x = x + 5. x++ é x = x + 1.", "Precisou pensar na precedência? Use parênteses.", "Potência é pow(b, e), nunca ^."], "exercicios": [{"nivel": 1, "titulo": "Preço com desconto", "enunciado": "Leia o preço de um produto e o percentual de desconto. Mostre o valor do desconto e o preço final.", "dica": "desconto = preco * percentual / 100. Use double para tudo.", "lang": "c", "teste": "250 15", "solucao": "#include <stdio.h>\n\nint main(void) {\n    double preco, percentual;\n    printf(\"Preço e desconto (%%): \");\n    scanf(\"%lf %lf\", &preco, &percentual);\n\n    double desconto = preco * percentual / 100;\n    double final = preco - desconto;\n\n    printf(\"Desconto: R$ %.2f\\n\", desconto);\n    printf(\"Preço final: R$ %.2f\\n\", final);\n    return 0;\n}"}, {"nivel": 2, "titulo": "Distância entre dois pontos", "enunciado": "Leia as coordenadas (x1, y1) e (x2, y2) de dois pontos e mostre a distância entre eles: raiz de (x2 - x1)² + (y2 - y1)².", "dica": "Use sqrt e pow da math.h. Lembre de compilar com -lm.", "lang": "c", "teste": "1 2 4 6", "solucao": "#include <stdio.h>\n#include <math.h>\n\nint main(void) {\n    double x1, y1, x2, y2;\n    printf(\"x1 y1 x2 y2: \");\n    scanf(\"%lf %lf %lf %lf\", &x1, &y1, &x2, &y2);\n\n    double d = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));\n    printf(\"Distância: %.2f\\n\", d);\n    return 0;\n}"}, {"nivel": 2, "titulo": "Previsão de x++", "enunciado": "Sem executar, diga o que este trecho imprime. Depois confira rodando.", "trecho": "int x = 3;\nint y = x++ + 2;\nint z = ++x * 2;\nprintf(\"%d %d %d\\n\", x, y, z);", "dica": "Faça um teste de mesa. x++ usa o valor antes de somar; ++x soma antes de usar.", "lang": "texto", "solucao": "x = 3\ny = x++ + 2  -> usa x = 3, então y = 5; depois x vira 4\nz = ++x * 2  -> x vira 5 primeiro, então z = 10\n\nSaída: 5 5 10"}, {"nivel": 3, "titulo": "Parcelas arredondadas", "enunciado": "Uma loja divide compras em parcelas iguais, arredondando cada parcela para cima, em centavos. Leia o valor total e o número de parcelas e mostre o valor de cada parcela e o total que o cliente vai pagar de fato.", "dica": "Trabalhe em centavos: ceil(total * 100 / parcelas) / 100.", "lang": "c", "teste": "100 3", "solucao": "#include <stdio.h>\n#include <math.h>\n\nint main(void) {\n    double total;\n    int parcelas;\n    printf(\"Total e número de parcelas: \");\n    scanf(\"%lf %d\", &total, &parcelas);\n\n    double parcela = ceil(total * 100 / parcelas) / 100;\n    printf(\"%d x R$ %.2f\\n\", parcelas, parcela);\n    printf(\"Total pago: R$ %.2f\\n\", parcela * parcelas);\n    return 0;\n}"}]}, {"id": "c-entrada-saida", "modulo": "c-basico", "titulo": "printf e scanf", "resumo": "Mostrar dados formatados na tela e ler o que o usuário digita.", "ideia": "\n<p><code>printf<\/code> escreve na tela e <code>scanf<\/code> lê do teclado. Os dois usam o mesmo \"molde\": um texto com marcadores como <code>%d<\/code> que serão trocados por valores.<\/p>\n<p>O <code>scanf<\/code> precisa saber <em>onde<\/em> guardar o que leu, por isso recebe o endereço da variável com <code>&amp;<\/code>. A exceção é texto (<code>char[]<\/code>): o nome do vetor já é um endereço.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Você escreve<\/th><th>Aparece<\/th><th>Para que serve<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>%.2f<\/code><\/td><td><code>3.14<\/code><\/td><td>2 casas decimais<\/td><\/tr>\n    <tr><td><code>%5d<\/code><\/td><td><code>&nbsp;&nbsp;&nbsp;42<\/code><\/td><td>ocupa 5 espaços, alinhado à direita<\/td><\/tr>\n    <tr><td><code>%-10s<\/code><\/td><td><code>Ana&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<\/code><\/td><td>10 espaços, alinhado à esquerda<\/td><\/tr>\n    <tr><td><code>%02d<\/code><\/td><td><code>07<\/code><\/td><td>completa com zero à esquerda<\/td><\/tr>\n    <tr><td><code>\\n<\/code> / <code>\\t<\/code><\/td><td>quebra de linha / tabulação<\/td><td>organizar a saída<\/td><\/tr>\n  <\/tbody>\n<\/table>\n", "exemplos": [{"lang": "c", "titulo": "Um pequeno relatório", "entrada": "Bruno\n19\n2350.5", "codigo": "#include <stdio.h>\n\nint main(void) {\n    char  nome[50];\n    int   idade;\n    double salario;\n\n    printf(\"Nome: \");\n    scanf(\"%49s\", nome);        // 49 = tamanho - 1, evita estourar o vetor\n    printf(\"Idade: \");\n    scanf(\"%d\", &idade);\n    printf(\"Salário: \");\n    scanf(\"%lf\", &salario);     // %lf para ler double\n\n    printf(\"\\n--- Relatório ---\\n\");\n    printf(\"Nome:    %-12s|\\n\", nome);\n    printf(\"Idade:   %3d anos\\n\", idade);\n    printf(\"Salário: R$ %9.2f\\n\", salario);\n    return 0;\n}", "nota": "No terminal, o que aparece destacado foi digitado pelo usuário. O resto é o que o programa imprimiu.", "saida": "Nome: Idade: Salário: \n--- Relatório ---\nNome:    Bruno       |\nIdade:    19 anos\nSalário: R$   2350.50\n", "terminal": [["out", "Nome: "], ["in", "Bruno\n"], ["out", "Idade: "], ["in", "19\n"], ["out", "Salário: "], ["in", "2350.5\n"], ["out", "\n--- Relatório ---\nNome:    Bruno       |\nIdade:    19 anos\nSalário: R$   2350.50\n"]]}, {"lang": "c", "titulo": "Ler um nome com espaço", "entrada": "Maria da Silva", "codigo": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char nome[60];\n    printf(\"Nome completo: \");\n    fgets(nome, sizeof nome, stdin);     // lê a linha inteira, com espaços\n    nome[strcspn(nome, \"\\n\")] = '\\0';    // tira o Enter do final\n\n    printf(\"Olá, %s!\\n\", nome);\n    return 0;\n}", "nota": "O scanf com %s para no primeiro espaço. Para ler uma linha inteira, use fgets.", "saida": "Nome completo: Olá, Maria da Silva!\n", "terminal": [["out", "Nome completo: "], ["in", "Maria da Silva\n"], ["out", "Olá, Maria da Silva!\n"]]}], "pegadinhas": ["Esquecer o <code>&amp;<\/code> no scanf de int ou double faz o programa travar ou dar resultado estranho.", "Para ler <code>double<\/code> use <code>%lf<\/code> no scanf. No printf, <code>%f<\/code> serve para os dois.", "Sempre limite o tamanho ao ler texto: <code>%49s<\/code> para um vetor de 50. Sem limite, um nome longo invade a memória vizinha.", "Misturar <code>scanf(\"%d\")<\/code> com <code>fgets<\/code> depois: o Enter que sobrou é lido pelo fgets como linha vazia. Use <code>getchar()<\/code> para consumir esse Enter."], "lembrar": ["printf mostra, scanf lê.", "scanf de número precisa de &amp;. De texto, não.", "%d int, %lf double (no scanf), %c char, %s texto."], "exercicios": [{"titulo": "Tabela de temperaturas", "enunciado": "Leia 3 temperaturas e mostre numa tabela com bordas, cada valor com 1 casa decimal e 8 espaços de largura.", "dica": "printf(\"| %8.1f | %8.1f | %8.1f |\\n\", t1, t2, t3);", "lang": "c", "teste": "21.5 -3 37.25", "solucao": "#include <stdio.h>\n\nint main(void) {\n    double t1, t2, t3;\n    printf(\"Três temperaturas: \");\n    scanf(\"%lf %lf %lf\", &t1, &t2, &t3);\n\n    printf(\"+----------+----------+----------+\\n\");\n    printf(\"| %8.1f | %8.1f | %8.1f |\\n\", t1, t2, t3);\n    printf(\"+----------+----------+----------+\\n\");\n    return 0;\n}"}, {"titulo": "Segundos para HH:MM:SS", "enunciado": "Leia um total de segundos e mostre no formato de relógio, por exemplo 3725 vira 01:02:05.", "dica": "Horas = total / 3600. Minutos = (total % 3600) / 60. Segundos = total % 60. Use %02d.", "lang": "c", "teste": "3725", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int total;\n    printf(\"Segundos: \");\n    scanf(\"%d\", &total);\n\n    int h = total / 3600;\n    int m = (total % 3600) / 60;\n    int s = total % 60;\n\n    printf(\"%02d:%02d:%02d\\n\", h, m, s);\n    return 0;\n}"}, {"titulo": "Nota e conceito", "enunciado": "Leia o nome do aluno (pode ter espaços) e a nota. Mostre o conceito: A (9 ou mais), B (7 ou mais), C (5 ou mais), F (abaixo de 5).", "dica": "Use fgets para o nome e scanf(\"%lf\") para a nota. Para o conceito, uma cadeia de if / else if.", "lang": "c", "teste": "Ana Lima\n8.2", "solucao": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char nome[60];\n    double nota;\n\n    printf(\"Nome: \");\n    fgets(nome, sizeof nome, stdin);\n    nome[strcspn(nome, \"\\n\")] = '\\0';\n    printf(\"Nota: \");\n    scanf(\"%lf\", &nota);\n\n    char conceito;\n    if (nota >= 9)      conceito = 'A';\n    else if (nota >= 7) conceito = 'B';\n    else if (nota >= 5) conceito = 'C';\n    else                conceito = 'F';\n\n    printf(\"%s tirou %.1f, conceito %c\\n\", nome, nota, conceito);\n    return 0;\n}"}]}, {"id": "c-decisoes", "modulo": "c-basico", "titulo": "Decisões: if e switch", "resumo": "Fazer o programa escolher um caminho conforme os dados.", "ideia": "\n<p>Sem decisões, um programa faz sempre a mesma coisa. Com <code>if<\/code>, ele olha para os dados e escolhe o que fazer.<\/p>\n<ul>\n  <li><code>if<\/code> sozinho: faz algo só se a condição for verdadeira.<\/li>\n  <li><code>if / else<\/code>: escolhe entre dois caminhos.<\/li>\n  <li><code>if / else if / else<\/code>: escolhe entre vários caminhos. O primeiro verdadeiro vence e os outros nem são testados.<\/li>\n  <li><code>switch<\/code>: compara uma variável com valores fixos. Ótimo para menus.<\/li>\n<\/ul>\n<p>Na cadeia de <code>else if<\/code>, a ordem importa. Teste do mais restrito para o mais amplo: primeiro \"nota ≥ 9\", depois \"nota ≥ 7\".<\/p>\n", "exemplos": [{"lang": "c", "titulo": "Faixas com else if", "entrada": "16", "codigo": "#include <stdio.h>\n\nint main(void) {\n    int idade;\n    printf(\"Idade: \");\n    scanf(\"%d\", &idade);\n\n    if (idade < 0) {\n        printf(\"Idade inválida\\n\");\n    } else if (idade < 16) {\n        printf(\"Não vota\\n\");\n    } else if (idade < 18 || idade > 70) {\n        printf(\"Voto facultativo\\n\");\n    } else {\n        printf(\"Voto obrigatório\\n\");\n    }\n    return 0;\n}", "saida": "Idade: Voto facultativo\n", "terminal": [["out", "Idade: "], ["in", "16\n"], ["out", "Voto facultativo\n"]]}, {"lang": "c", "titulo": "Menu com switch", "entrada": "2", "codigo": "#include <stdio.h>\n\nint main(void) {\n    int opcao;\n    printf(\"1 - Café  2 - Chá  3 - Suco\\nEscolha: \");\n    scanf(\"%d\", &opcao);\n\n    switch (opcao) {\n        case 1:\n            printf(\"Café saindo\\n\");\n            break;\n        case 2:\n            printf(\"Chá saindo\\n\");\n            break;\n        case 3:\n            printf(\"Suco saindo\\n\");\n            break;\n        default:\n            printf(\"Opção inválida\\n\");\n    }\n    return 0;\n}", "nota": "O break encerra o switch. Sem ele, o programa continua executando os cases de baixo.", "saida": "1 - Café  2 - Chá  3 - Suco\nEscolha: Chá saindo\n", "terminal": [["out", "1 - Café  2 - Chá  3 - Suco\nEscolha: "], ["in", "2\n"], ["out", "Chá saindo\n"]]}], "pegadinhas": ["Esquecer o <code>break<\/code> no switch faz o código \"cair\" no próximo case.", "<code>switch<\/code> só funciona com valores inteiros ou char. Para faixas (nota ≥ 7) use if.", "Um <code>;<\/code> logo depois do if, como em <code>if (x &gt; 0);<\/code>, termina o if ali. O bloco seguinte sempre executa.", "Use chaves mesmo com uma linha só. Evita erro quando alguém adiciona uma segunda linha depois."], "lembrar": ["if para condições e faixas, switch para opções fixas.", "Em else if, o primeiro verdadeiro vence."], "exercicios": [{"titulo": "Par, ímpar e sinal", "enunciado": "Leia um inteiro e diga se é par ou ímpar e se é positivo, negativo ou zero.", "dica": "São duas decisões independentes: uma usa n % 2, a outra compara com 0.", "lang": "c", "teste": "-7", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int n;\n    scanf(\"%d\", &n);\n\n    if (n % 2 == 0) printf(\"%d é par\\n\", n);\n    else            printf(\"%d é ímpar\\n\", n);\n\n    if (n > 0)      printf(\"e positivo\\n\");\n    else if (n < 0) printf(\"e negativo\\n\");\n    else            printf(\"e zero\\n\");\n    return 0;\n}"}, {"titulo": "Calculadora com switch", "enunciado": "Leia dois números e uma operação (+, -, * ou /). Mostre o resultado. Trate divisão por zero e operação inválida.", "dica": "Leia a operação com scanf(\" %c\", &op). O espaço antes do %c pula o Enter que ficou para trás.", "lang": "c", "teste": "8 / 2", "solucao": "#include <stdio.h>\n\nint main(void) {\n    double a, b;\n    char op;\n    printf(\"Conta (ex: 8 / 2): \");\n    scanf(\"%lf %c %lf\", &a, &op, &b);\n\n    switch (op) {\n        case '+': printf(\"%.2f\\n\", a + b); break;\n        case '-': printf(\"%.2f\\n\", a - b); break;\n        case '*': printf(\"%.2f\\n\", a * b); break;\n        case '/':\n            if (b == 0) printf(\"Divisão por zero\\n\");\n            else        printf(\"%.2f\\n\", a / b);\n            break;\n        default:\n            printf(\"Operação inválida: %c\\n\", op);\n    }\n    return 0;\n}"}, {"titulo": "Ano bissexto", "enunciado": "Leia um ano e diga se é bissexto. Regra: divisível por 4 e não por 100, ou divisível por 400.", "dica": "Uma expressão só: (ano % 4 == 0 && ano % 100 != 0) || ano % 400 == 0", "lang": "c", "teste": "1900", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int ano;\n    scanf(\"%d\", &ano);\n\n    int bissexto = (ano % 4 == 0 && ano % 100 != 0) || (ano % 400 == 0);\n\n    printf(\"%d %s bissexto\\n\", ano, bissexto ? \"é\" : \"não é\");\n    return 0;\n}"}]}, {"id": "c-lacos", "modulo": "c-basico", "titulo": "Laços: for, while, do-while", "resumo": "Repetir instruções sem copiar e colar.", "ideia": "\n<p>Laço é repetição. Em vez de escrever <code>printf<\/code> dez vezes, você escreve uma vez e diz quantas vezes repetir, ou até quando.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Laço<\/th><th>Use quando<\/th><th>Exemplo do dia a dia<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>for<\/code><\/td><td>você sabe quantas vezes vai repetir<\/td><td>dar 10 voltas na quadra<\/td><\/tr>\n    <tr><td><code>while<\/code><\/td><td>repete enquanto algo for verdadeiro, pode nem começar<\/td><td>mexer o arroz enquanto tiver água<\/td><\/tr>\n    <tr><td><code>do-while<\/code><\/td><td>precisa executar pelo menos uma vez<\/td><td>provar a comida e repetir até ficar bom<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>Todo laço precisa de algo que mude a cada volta e faça a condição ficar falsa um dia. Se nada muda, o laço é infinito.<\/p>\n<p>Siga o <code>for<\/code> abaixo passo a passo e repare na ordem: inicializa, testa, executa, incrementa, testa de novo.<\/p>\n", "trace": {"lang": "c", "codigo": "int soma = 0;\nfor (int i = 1; i <= 4; i++) {\n    soma = soma + i;\n}\nprintf(\"%d\\n\", soma);", "vars": ["i", "soma"], "passos": [{"l": 1, "v": {"soma": 0}, "n": "soma começa em 0, o neutro da adição."}, {"l": 2, "v": {"i": 1}, "n": "Inicializa i = 1 e testa: 1 &lt;= 4, verdadeiro."}, {"l": 3, "v": {"soma": 1}, "n": "soma = 0 + 1."}, {"l": 2, "v": {"i": 2}, "n": "i++ faz i virar 2. Testa: 2 &lt;= 4, verdadeiro."}, {"l": 3, "v": {"soma": 3}, "n": "soma = 1 + 2."}, {"l": 2, "v": {"i": 3}, "n": "i = 3. 3 &lt;= 4, verdadeiro."}, {"l": 3, "v": {"soma": 6}, "n": "soma = 3 + 3."}, {"l": 2, "v": {"i": 4}, "n": "i = 4. 4 &lt;= 4, verdadeiro."}, {"l": 3, "v": {"soma": 10}, "n": "soma = 6 + 4."}, {"l": 2, "v": {"i": 5}, "n": "i = 5. 5 &lt;= 4 é falso: o laço termina."}, {"l": 5, "v": {}, "o": "10\n", "n": "Imprime 10, a soma de 1 a 4."}]}, "exemplos": [{"lang": "c", "titulo": "Os três laços lado a lado", "entrada": "5\n1", "codigo": "#include <stdio.h>\n\nint main(void) {\n    // for: tabuada do 7 até 5\n    for (int i = 1; i <= 5; i++) {\n        printf(\"7 x %d = %2d\\n\", i, 7 * i);\n    }\n\n    // while: potências de 2 até passar de 100\n    int p = 1;\n    while (p <= 100) {\n        printf(\"%d \", p);\n        p = p * 2;\n    }\n    printf(\"\\n\");\n\n    // do-while: pede a opção até ser 1 ou 2\n    int op;\n    do {\n        printf(\"Digite 1 ou 2: \");\n        scanf(\"%d\", &op);\n    } while (op != 1 && op != 2);\n    printf(\"\\nVocê escolheu %d\\n\", op);\n    return 0;\n}", "nota": "Nesta execução o usuário digitou 5 (inválido, o laço pede de novo) e depois 1.", "saida": "7 x 1 =  7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n1 2 4 8 16 32 64 \nDigite 1 ou 2: Digite 1 ou 2: \nVocê escolheu 1\n", "terminal": [["out", "7 x 1 =  7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n1 2 4 8 16 32 64 \nDigite 1 ou 2: "], ["in", "5\n"], ["out", "Digite 1 ou 2: "], ["in", "1\n"], ["out", "\nVocê escolheu 1\n"]]}], "pegadinhas": ["<code>for (int i = 0; i &lt; 10; i++)<\/code> roda 10 vezes (0 a 9). Com <code>&lt;=<\/code> roda 11. Esse \"um a mais\" é o erro mais comum com laços.", "Um <code>;<\/code> logo depois do for, como em <code>for (...);<\/code>, cria um laço vazio. O bloco de baixo roda uma vez só.", "Se a variável da condição nunca muda dentro do while, o laço não termina."], "lembrar": ["Sabe quantas vezes? for. Depende de algo? while. Pelo menos uma vez? do-while.", "Contador começa em 0, soma em 0, produto em 1."], "exercicios": [{"titulo": "FizzBuzz", "enunciado": "De 1 a 30, mostre \"Fizz\" para múltiplos de 3, \"Buzz\" para múltiplos de 5, \"FizzBuzz\" para múltiplos dos dois, e o número nos outros casos.", "dica": "Teste o caso de 15 (múltiplo dos dois) primeiro. Se testar o 3 antes, o 15 nunca chega no FizzBuzz.", "lang": "c", "solucao": "#include <stdio.h>\n\nint main(void) {\n    for (int i = 1; i <= 30; i++) {\n        if (i % 15 == 0)     printf(\"FizzBuzz\\n\");\n        else if (i % 3 == 0) printf(\"Fizz\\n\");\n        else if (i % 5 == 0) printf(\"Buzz\\n\");\n        else                 printf(\"%d\\n\", i);\n    }\n    return 0;\n}"}, {"titulo": "Adivinhe o número", "enunciado": "O número secreto é 42. Peça palpites até o usuário acertar, dizendo \"maior\" ou \"menor\". No fim, mostre quantas tentativas foram.", "dica": "do-while, porque é preciso pedir pelo menos um palpite. Um contador soma 1 a cada volta.", "lang": "c", "teste": "50\n30\n42", "solucao": "#include <stdio.h>\n\nint main(void) {\n    const int SECRETO = 42;\n    int palpite, tentativas = 0;\n\n    do {\n        printf(\"Palpite: \");\n        scanf(\"%d\", &palpite);\n        tentativas++;\n\n        if (palpite < SECRETO)      printf(\"É maior\\n\");\n        else if (palpite > SECRETO) printf(\"É menor\\n\");\n    } while (palpite != SECRETO);\n\n    printf(\"Acertou em %d tentativas!\\n\", tentativas);\n    return 0;\n}"}, {"titulo": "Triângulo de asteriscos", "enunciado": "Leia N e desenhe um triângulo com N linhas: a primeira com 1 asterisco, a segunda com 2, e assim por diante.", "dica": "Um for de fora conta as linhas. Um for de dentro imprime i asteriscos na linha i.", "lang": "c", "teste": "4", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int n;\n    scanf(\"%d\", &n);\n\n    for (int i = 1; i <= n; i++) {\n        for (int j = 1; j <= i; j++) {\n            printf(\"* \");\n        }\n        printf(\"\\n\");\n    }\n    return 0;\n}"}]}, {"id": "c-vetores", "titulo": "Vetores e matrizes", "resumo": "Guardar muitos valores do mesmo tipo numa única variável, acessando cada um pela posição.", "ideia": "\n<p>Se você precisa guardar a nota de 40 alunos, não vai criar 40 variáveis (<code>nota1<\/code>, <code>nota2<\/code>…). Você cria um <strong>vetor<\/strong> (em inglês, <em>array<\/em>): uma fileira de caixas do mesmo tipo, lado a lado na memória, todas com o mesmo nome e diferenciadas por um número, o <strong>índice<\/strong>.<\/p>\n<p>Pense num prédio de apartamentos: o endereço é o mesmo para todos, e o número do apartamento diz qual é qual.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Código<\/th><th>Significa<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>double notas[5];<\/code><\/td><td>cria 5 caixas de double: notas[0] até notas[4]<\/td><\/tr>\n    <tr><td><code>int v[4] = {7, 2, 9, 4};<\/code><\/td><td>cria e já preenche<\/td><\/tr>\n    <tr><td><code>notas[2] = 8.5;<\/code><\/td><td>guarda 8.5 na <strong>terceira<\/strong> caixa<\/td><\/tr>\n    <tr><td><code>printf(\"%d\", v[0]);<\/code><\/td><td>mostra a primeira caixa<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p><strong>O índice começa em 0.<\/strong> Num vetor de tamanho N, os índices vão de 0 a N - 1. Isso confunde todo mundo no começo, então repita: o primeiro é o 0, o último é o N - 1.<\/p>\n<h3>Percorrer um vetor<\/h3>\n<p>Vetor e laço <code>for<\/code> andam sempre juntos. O padrão é este, e você vai escrevê-lo centenas de vezes:<\/p>\n<p><code>for (int i = 0; i &lt; N; i++) { ... v[i] ... }<\/code><\/p>\n<h3>Matrizes<\/h3>\n<p>Uma <strong>matriz<\/strong> é um vetor de duas dimensões, como uma planilha: linhas e colunas. <code>int m[3][4];<\/code> cria 3 linhas com 4 colunas cada. Para acessar, use dois índices: <code>m[linha][coluna]<\/code>. Para percorrer, use dois <code>for<\/code>, um dentro do outro.<\/p>\n", "exemplos": [{"lang": "c", "titulo": "Notas da turma", "entrada": "7.5 9 6 8.5 5", "codigo": "#include <stdio.h>\n\n#define N 5   // tamanho do vetor, definido num lugar só\n\nint main(void) {\n    double notas[N];\n    double soma = 0;\n\n    printf(\"Digite as %d notas: \", N);\n    for (int i = 0; i < N; i++) {\n        scanf(\"%lf\", &notas[i]);\n        soma += notas[i];\n    }\n\n    double media = soma / N;\n    printf(\"Média: %.2f\\n\", media);\n\n    printf(\"Acima da média:\");\n    for (int i = 0; i < N; i++) {\n        if (notas[i] > media) {\n            printf(\" %.1f (aluno %d)\", notas[i], i + 1);\n        }\n    }\n    printf(\"\\n\");\n    return 0;\n}", "explica": ["<code>#define N 5<\/code> cria uma constante. Se a turma mudar para 30 alunos, você altera só essa linha.", "O primeiro <code>for<\/code> lê e soma ao mesmo tempo. Repare no <code>&amp;notas[i]<\/code>: cada caixa do vetor se comporta como uma variável comum.", "Precisamos de dois laços: só dá para saber quem ficou acima da média depois de ter lido todas as notas. É exatamente para isso que o vetor existe: lembrar os valores.", "<code>i + 1<\/code> mostra o número do aluno começando em 1, que é mais natural para quem lê, embora o índice comece em 0."], "saida": "Digite as 5 notas: Média: 7.20\nAcima da média: 7.5 (aluno 1) 9.0 (aluno 2) 8.5 (aluno 4)\n", "terminal": [["out", "Digite as 5 notas: "], ["in", "7.5 9 6 8.5 5\n"], ["out", "Média: 7.20\nAcima da média: 7.5 (aluno 1) 9.0 (aluno 2) 8.5 (aluno 4)\n"]]}, {"lang": "c", "titulo": "Matriz: notas por aluno e por prova", "codigo": "#include <stdio.h>\n\nint main(void) {\n    // 3 alunos (linhas) x 4 provas (colunas)\n    int notas[3][4] = {\n        {7, 8, 6, 9},\n        {5, 6, 7, 4},\n        {9, 9, 10, 8}\n    };\n\n    for (int aluno = 0; aluno < 3; aluno++) {\n        int soma = 0;\n        printf(\"Aluno %d:\", aluno + 1);\n        for (int prova = 0; prova < 4; prova++) {\n            printf(\" %2d\", notas[aluno][prova]);\n            soma += notas[aluno][prova];\n        }\n        printf(\"  | média %.2f\\n\", soma / 4.0);\n    }\n    return 0;\n}", "nota": "O laço de fora anda pelas linhas; o de dentro anda pelas colunas de cada linha. A variável soma é zerada a cada aluno porque foi declarada dentro do laço de fora.", "saida": "Aluno 1:  7  8  6  9  | média 7.50\nAluno 2:  5  6  7  4  | média 5.50\nAluno 3:  9  9 10  8  | média 9.00\n"}], "pegadinhas": ["Acessar <code>v[N]<\/code> num vetor de tamanho N. O último índice válido é N - 1. O C não avisa: lê ou escreve lixo na memória vizinha, e o erro aparece em outro lugar.", "<code>for (i = 0; i &lt;= N; i++)<\/code> com <code>&lt;=<\/code> passa uma vez do limite. Com vetores, use <code>&lt; N<\/code>.", "Não dá para copiar um vetor com <code>a = b;<\/code> nem comparar com <code>a == b<\/code>. É preciso copiar ou comparar elemento por elemento, num laço.", "O tamanho de um vetor comum é fixo. Para tamanhos decididos durante a execução, usa-se memória dinâmica (malloc), um assunto de C mais avançado."], "lembrar": ["Índices de 0 a N - 1.", "Vetor + for: <code>for (int i = 0; i &lt; N; i++)<\/code>.", "Matriz: m[linha][coluna], dois for aninhados."], "exercicios": [{"nivel": 1, "titulo": "Ao contrário", "enunciado": "Leia 6 números inteiros num vetor e mostre-os na ordem inversa.", "dica": "Para mostrar invertido, o for começa em 5 (N - 1) e vai diminuindo até 0.", "lang": "c", "teste": "1 2 3 4 5 6", "solucao": "#include <stdio.h>\n#define N 6\n\nint main(void) {\n    int v[N];\n    for (int i = 0; i < N; i++) scanf(\"%d\", &v[i]);\n\n    for (int i = N - 1; i >= 0; i--) printf(\"%d \", v[i]);\n    printf(\"\\n\");\n    return 0;\n}"}, {"nivel": 2, "titulo": "Procurar um valor", "enunciado": "Com o vetor {12, 45, 7, 23, 56, 89, 7}, leia um número e diga em quais posições ele aparece, ou que não aparece.", "dica": "Percorra o vetor inteiro (o número pode aparecer mais de uma vez) e use uma variável achou que começa em 0.", "lang": "c", "teste": "7", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int v[] = {12, 45, 7, 23, 56, 89, 7};\n    int n = sizeof v / sizeof v[0];   // quantidade de elementos: 7\n    int alvo, achou = 0;\n\n    printf(\"Procurar: \");\n    scanf(\"%d\", &alvo);\n\n    for (int i = 0; i < n; i++) {\n        if (v[i] == alvo) {\n            printf(\"Encontrado na posição %d\\n\", i);\n            achou = 1;\n        }\n    }\n    if (!achou) printf(\"%d não está no vetor\\n\", alvo);\n    return 0;\n}"}, {"nivel": 2, "titulo": "Matriz transposta", "enunciado": "Leia uma matriz 2x3 e mostre a sua transposta, 3x2 (as linhas viram colunas).", "dica": "A transposta t é tal que t[j][i] = m[i][j].", "lang": "c", "teste": "1 2 3\n4 5 6", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int m[2][3], t[3][2];\n\n    for (int i = 0; i < 2; i++)\n        for (int j = 0; j < 3; j++)\n            scanf(\"%d\", &m[i][j]);\n\n    for (int i = 0; i < 2; i++)\n        for (int j = 0; j < 3; j++)\n            t[j][i] = m[i][j];\n\n    for (int i = 0; i < 3; i++) {\n        for (int j = 0; j < 2; j++) printf(\"%3d\", t[i][j]);\n        printf(\"\\n\");\n    }\n    return 0;\n}"}, {"nivel": 3, "titulo": "Ordenação pelo método da bolha", "enunciado": "Ordene o vetor {29, 10, 14, 37, 13} em ordem crescente usando o bubble sort: percorra o vetor comparando vizinhos e troque-os se estiverem fora de ordem; repita até não haver mais trocas.", "dica": "Dois laços: o de fora repete as passadas; o de dentro compara v[j] com v[j + 1]. Para trocar, use uma variável aux.", "lang": "c", "solucao": "#include <stdio.h>\n\nint main(void) {\n    int v[] = {29, 10, 14, 37, 13};\n    int n = 5;\n\n    for (int passada = 0; passada < n - 1; passada++) {\n        int trocou = 0;\n        for (int j = 0; j < n - 1 - passada; j++) {\n            if (v[j] > v[j + 1]) {\n                int aux = v[j];\n                v[j] = v[j + 1];\n                v[j + 1] = aux;\n                trocou = 1;\n            }\n        }\n        if (!trocou) break;   // já está ordenado\n    }\n\n    for (int i = 0; i < n; i++) printf(\"%d \", v[i]);\n    printf(\"\\n\");\n    return 0;\n}\n\n/* A cada passada, o maior valor ainda fora do lugar\n   \"borbulha\" até o fim. Por isso o laço de dentro\n   pode parar uma casa antes a cada passada. */"}]}, {"id": "c-strings", "titulo": "Textos (strings)", "resumo": "Como o C guarda textos, o terminador '\\0' e as funções de string.h.", "ideia": "\n<p>O C não tem um tipo \"texto\" de verdade. Um texto é um <strong>vetor de char<\/strong>, um caractere em cada caixa, com um caractere especial no final: o <code>'\\0'<\/code> (barra zero), chamado <strong>terminador<\/strong>. É ele que avisa às funções \"o texto acaba aqui\".<\/p>\n<p>A palavra <code>\"Ana\"<\/code> ocupa <strong>4<\/strong> caixas: <code>'A'<\/code>, <code>'n'<\/code>, <code>'a'<\/code> e <code>'\\0'<\/code>. Por isso, para guardar um nome de até 49 letras, declare <code>char nome[50]<\/code>: sempre uma caixa a mais para o terminador.<\/p>\n<h3>Lendo textos<\/h3>\n<ul>\n  <li><code>scanf(\"%49s\", nome)<\/code> lê uma palavra, para no primeiro espaço. Note: sem <code>&amp;<\/code>, porque o nome de um vetor já é um endereço.<\/li>\n  <li><code>fgets(nome, sizeof nome, stdin)<\/code> lê a linha inteira, com espaços. Ele guarda também o Enter (<code>'\\n'<\/code>) no fim, que normalmente removemos.<\/li>\n<\/ul>\n<h3>Funções de string.h<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Função<\/th><th>Faz<\/th><th>Em vez de…<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>strlen(s)<\/code><\/td><td>quantos caracteres (sem contar o '\\0')<\/td><td><\/td><\/tr>\n    <tr><td><code>strcpy(destino, origem)<\/code><\/td><td>copia um texto para outro<\/td><td><code>destino = origem<\/code>, que não funciona<\/td><\/tr>\n    <tr><td><code>strcat(destino, origem)<\/code><\/td><td>junta origem no fim de destino<\/td><td><code>destino + origem<\/code>, que não funciona<\/td><\/tr>\n    <tr><td><code>strcmp(a, b)<\/code><\/td><td>compara: devolve 0 se iguais, &lt;0 se a vem antes na ordem alfabética, &gt;0 se depois<\/td><td><code>a == b<\/code>, que compara endereços, não textos<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>E de <code>ctype.h<\/code>: <code>toupper(c)<\/code> e <code>tolower(c)<\/code> convertem uma letra; <code>isdigit(c)<\/code>, <code>isalpha(c)<\/code> e <code>isspace(c)<\/code> testam o tipo de caractere.<\/p>\n", "exemplos": [{"lang": "c", "titulo": "Funções de texto em ação", "entrada": "Maria Clara", "codigo": "#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\nint main(void) {\n    char nome[50];\n    printf(\"Seu nome: \");\n    fgets(nome, sizeof nome, stdin);\n    nome[strcspn(nome, \"\\n\")] = '\\0';     // tira o Enter do final\n\n    printf(\"Você digitou \\\"%s\\\", com %zu caracteres\\n\", nome, strlen(nome));\n\n    // Percorrer caractere por caractere até o '\\0'\n    printf(\"Em maiúsculas: \");\n    for (int i = 0; nome[i] != '\\0'; i++) {\n        putchar(toupper(nome[i]));\n    }\n    printf(\"\\n\");\n\n    char saudacao[80] = \"Olá, \";\n    strcat(saudacao, nome);               // junta o nome no fim\n    printf(\"%s!\\n\", saudacao);\n\n    if (strcmp(nome, \"Maria Clara\") == 0) {\n        printf(\"Mesmo nome da professora!\\n\");\n    }\n    return 0;\n}", "explica": ["<code>strcspn(nome, \"\\n\")<\/code> devolve a posição do Enter dentro do texto. Colocar <code>'\\0'<\/code> nessa posição corta o texto ali.", "<code>%zu<\/code> é o formato do printf para o tipo devolvido por <code>strlen<\/code>.", "O laço <code>for (i = 0; nome[i] != '\\0'; i++)<\/code> é o jeito clássico de percorrer um texto: anda até encontrar o terminador.", "<code>saudacao<\/code> foi declarado com 80 caixas para ter espaço de sobra para o nome. <code>strcat<\/code> não confere o tamanho: se não couber, invade a memória vizinha."], "saida": "Seu nome: Você digitou \"Maria Clara\", com 11 caracteres\nEm maiúsculas: MARIA CLARA\nOlá, Maria Clara!\nMesmo nome da professora!\n", "terminal": [["out", "Seu nome: "], ["in", "Maria Clara\n"], ["out", "Você digitou \"Maria Clara\", com 11 caracteres\nEm maiúsculas: MARIA CLARA\nOlá, Maria Clara!\nMesmo nome da professora!\n"]]}], "pegadinhas": ["Comparar textos com <code>==<\/code>. Compila, mas compara endereços de memória e quase sempre dá falso. Use <code>strcmp(a, b) == 0<\/code>.", "Atribuir texto com <code>=<\/code> depois da declaração: <code>nome = \"Ana\";<\/code> não compila. Na declaração pode (<code>char nome[50] = \"Ana\";<\/code>); depois, use <code>strcpy<\/code>.", "Esquecer a caixa do <code>'\\0'<\/code>: <code>char sigla[3] = \"ABC\";<\/code> não tem lugar para o terminador.", "<code>'A'<\/code> (aspas simples) é um único char. <code>\"A\"<\/code> (aspas duplas) é um texto com 2 caixas: 'A' e '\\0'."], "lembrar": ["Texto em C = vetor de char terminado em '\\0'.", "Comparar: strcmp. Copiar: strcpy. Juntar: strcat. Tamanho: strlen.", "Declare sempre uma caixa a mais que o maior texto esperado."], "exercicios": [{"nivel": 1, "titulo": "Contar vogais", "enunciado": "Leia uma frase e conte quantas vogais ela tem, maiúsculas ou minúsculas.", "dica": "Percorra até o '\\0'. Converta cada letra com tolower e compare com 'a', 'e', 'i', 'o' e 'u'.", "lang": "c", "teste": "Programar em C e Divertido", "solucao": "#include <stdio.h>\n#include <ctype.h>\n\nint main(void) {\n    char frase[200];\n    printf(\"Frase: \");\n    fgets(frase, sizeof frase, stdin);\n\n    int vogais = 0;\n    for (int i = 0; frase[i] != '\\0'; i++) {\n        char c = tolower(frase[i]);\n        if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {\n            vogais++;\n        }\n    }\n    printf(\"Vogais: %d\\n\", vogais);\n    return 0;\n}"}, {"nivel": 2, "titulo": "Palíndromo", "enunciado": "Leia uma palavra e diga se ela é um palíndromo (igual de trás para frente, como \"arara\" e \"radar\").", "dica": "Compare o primeiro com o último caractere, o segundo com o penúltimo, e assim por diante, até o meio.", "lang": "c", "teste": "radar", "solucao": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char p[100];\n    printf(\"Palavra: \");\n    scanf(\"%99s\", p);\n\n    int n = strlen(p);\n    int ehPalindromo = 1;\n    for (int i = 0; i < n / 2; i++) {\n        if (p[i] != p[n - 1 - i]) {\n            ehPalindromo = 0;\n            break;\n        }\n    }\n    printf(\"%s %s palíndromo\\n\", p, ehPalindromo ? \"é\" : \"não é\");\n    return 0;\n}"}, {"nivel": 2, "titulo": "Ordem alfabética", "enunciado": "Leia dois nomes (uma palavra cada) e mostre-os em ordem alfabética.", "dica": "strcmp(a, b) < 0 quer dizer que a vem antes de b.", "lang": "c", "teste": "Bruno Ana", "solucao": "#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char a[50], b[50];\n    printf(\"Dois nomes: \");\n    scanf(\"%49s %49s\", a, b);\n\n    if (strcmp(a, b) <= 0) printf(\"%s\\n%s\\n\", a, b);\n    else                   printf(\"%s\\n%s\\n\", b, a);\n    return 0;\n}"}, {"nivel": 3, "titulo": "Iniciais e contagem de palavras", "enunciado": "Leia um nome completo e mostre as iniciais em maiúsculas (\"ana maria lima\" vira \"A.M.L.\") e quantas palavras ele tem.", "dica": "Uma letra é inicial se for a primeira do texto ou se o caractere anterior for um espaço. Use isspace e toupper.", "lang": "c", "teste": "ana maria lima", "solucao": "#include <stdio.h>\n#include <ctype.h>\n\nint main(void) {\n    char nome[100];\n    printf(\"Nome completo: \");\n    fgets(nome, sizeof nome, stdin);\n\n    int palavras = 0;\n    printf(\"Iniciais: \");\n    for (int i = 0; nome[i] != '\\0'; i++) {\n        int comeco = !isspace(nome[i]) && (i == 0 || isspace(nome[i - 1]));\n        if (comeco) {\n            printf(\"%c.\", toupper(nome[i]));\n            palavras++;\n        }\n    }\n    printf(\"\\nPalavras: %d\\n\", palavras);\n    return 0;\n}"}]}, {"id": "c-funcoes", "titulo": "Funções", "resumo": "Dividir o programa em partes com nome, que recebem dados e devolvem resultados.", "ideia": "\n<p>Uma função é uma <strong>receita com nome<\/strong>. Você escreve a receita uma vez e depois só diz o nome dela quando precisar. Você já usa funções desde o primeiro dia: <code>printf<\/code>, <code>scanf<\/code> e <code>sqrt<\/code> são funções que alguém escreveu. Agora você vai escrever as suas.<\/p>\n<h3>Por que usar funções<\/h3>\n<ul>\n  <li><strong>Evitar repetição<\/strong>: um cálculo usado em 5 lugares é escrito uma vez só. Se tiver um erro, você corrige num lugar.<\/li>\n  <li><strong>Organizar<\/strong>: um <code>main<\/code> com 200 linhas é difícil de entender. Com funções, ele vira uma lista de passos com nomes: <code>lerNotas()<\/code>, <code>calcularMedia()<\/code>, <code>mostrarResultado()<\/code>.<\/li>\n  <li><strong>Testar por partes<\/strong>: dá para conferir cada função separadamente.<\/li>\n<\/ul>\n<h3>Anatomia de uma função<\/h3>\n<p><code>double media(double a, double b) { return (a + b) / 2; }<\/code><\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Parte<\/th><th>No exemplo<\/th><th>Significa<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td>tipo de retorno<\/td><td><code>double<\/code><\/td><td>o tipo do valor que a função devolve. <code>void<\/code> se não devolve nada.<\/td><\/tr>\n    <tr><td>nome<\/td><td><code>media<\/code><\/td><td>como ela será chamada<\/td><\/tr>\n    <tr><td>parâmetros<\/td><td><code>(double a, double b)<\/code><\/td><td>os dados que ela recebe. <code>(void)<\/code> se não recebe nada.<\/td><\/tr>\n    <tr><td>corpo<\/td><td><code>{ ... }<\/code><\/td><td>o que ela faz<\/td><\/tr>\n    <tr><td>retorno<\/td><td><code>return ...;<\/code><\/td><td>devolve o resultado e encerra a função na hora<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>Parâmetros são cópias<\/h3>\n<p>Quando você chama <code>dobrar(x)<\/code>, a função recebe uma <strong>cópia<\/strong> do valor de x. Se ela alterar o parâmetro, a variável x original não muda. (Para uma função alterar a variável de quem a chamou, usam-se ponteiros, um assunto mais avançado.)<\/p>\n<h3>Escopo: onde a variável existe<\/h3>\n<p>Uma variável declarada dentro de uma função só existe ali dentro, e some quando a função termina. Duas funções diferentes podem ter variáveis com o mesmo nome sem nenhum conflito: são caixas diferentes.<\/p>\n<h3>Protótipo<\/h3>\n<p>O C lê o arquivo de cima para baixo. Se o <code>main<\/code> chama uma função escrita mais abaixo, coloque antes do <code>main<\/code> o <strong>protótipo<\/strong>: a primeira linha da função, terminada em ponto e vírgula. Ele avisa: \"essa função existe e tem este formato\".<\/p>\n", "exemplos": [{"lang": "c", "titulo": "Um boletim organizado em funções", "codigo": "#include <stdio.h>\n\n// Protótipos\ndouble media(double n1, double n2, double n3);\nconst char *situacao(double m);\nvoid linha(int tamanho);\n\nint main(void) {\n    double m = media(7.0, 8.5, 6.0);\n\n    linha(30);\n    printf(\"Média: %.2f\\n\", m);\n    printf(\"Situação: %s\\n\", situacao(m));\n    linha(30);\n\n    printf(\"Outra aluna: %.2f, %s\\n\", media(4, 5, 6), situacao(media(4, 5, 6)));\n    return 0;\n}\n\ndouble media(double n1, double n2, double n3) {\n    return (n1 + n2 + n3) / 3;\n}\n\nconst char *situacao(double m) {\n    if (m >= 7) return \"aprovado\";\n    if (m >= 5) return \"recuperação\";\n    return \"reprovado\";\n}\n\nvoid linha(int tamanho) {\n    for (int i = 0; i < tamanho; i++) {\n        printf(\"-\");\n    }\n    printf(\"\\n\");\n}", "explica": ["As três primeiras linhas depois do include são protótipos. Sem eles, o compilador chegaria no <code>main<\/code> sem saber que <code>media<\/code> existe.", "<code>situacao<\/code> devolve um texto. <code>const char *<\/code> é o tipo de um texto que não será alterado. Repare que cada <code>return<\/code> já encerra a função: não precisa de <code>else<\/code>.", "<code>linha<\/code> é <code>void<\/code>: só faz algo (desenha), não devolve nada. Por isso é chamada sozinha numa linha, sem guardar o resultado.", "Uma função pode ser usada dentro da chamada de outra: <code>situacao(media(4, 5, 6))<\/code>."], "saida": "------------------------------\nMédia: 7.17\nSituação: aprovado\n------------------------------\nOutra aluna: 5.00, recuperação\n"}, {"lang": "c", "titulo": "Parâmetros são cópias", "codigo": "#include <stdio.h>\n\nvoid tentaDobrar(int n) {\n    n = n * 2;                        // muda só a cópia\n    printf(\"Dentro da função: n = %d\\n\", n);\n}\n\nint dobra(int n) {\n    return n * 2;                     // devolve o resultado\n}\n\nint main(void) {\n    int x = 10;\n    tentaDobrar(x);\n    printf(\"Depois de tentaDobrar: x = %d\\n\", x);\n\n    x = dobra(x);                     // guarda o valor devolvido\n    printf(\"Depois de dobra: x = %d\\n\", x);\n    return 0;\n}", "nota": "Para uma função \"mudar\" uma variável sem ponteiros, faça ela devolver o novo valor e guarde o resultado: x = dobra(x);", "saida": "Dentro da função: n = 20\nDepois de tentaDobrar: x = 10\nDepois de dobra: x = 20\n"}], "pegadinhas": ["Chamar a função e esquecer de usar o resultado: <code>media(7, 8, 9);<\/code> sozinho calcula e joga fora. Guarde numa variável ou use direto no printf.", "Esquecer o <code>return<\/code> numa função que não é void. O compilador às vezes só avisa, e a função devolve lixo.", "Escrever código depois de um <code>return<\/code> esperando que ele execute. O return encerra a função na hora.", "Passar os argumentos na ordem errada. <code>potencia(2, 10)<\/code> e <code>potencia(10, 2)<\/code> são coisas diferentes, e o compilador não tem como saber qual você quis."], "lembrar": ["tipo nome(parâmetros) { corpo; return valor; }", "void: não devolve nada. Parâmetros recebem cópias.", "Uma função, uma tarefa, um nome que diz o que ela faz."], "exercicios": [{"nivel": 1, "titulo": "Área do círculo", "enunciado": "Escreva double areaCirculo(double raio) e use-a para mostrar a área de círculos com raio 1, 2.5 e 10.", "dica": "Área = 3.14159 * raio * raio. Chame a função três vezes no main.", "lang": "c", "solucao": "#include <stdio.h>\n\ndouble areaCirculo(double raio) {\n    const double PI = 3.14159265;\n    return PI * raio * raio;\n}\n\nint main(void) {\n    printf(\"Raio 1:   %.2f\\n\", areaCirculo(1));\n    printf(\"Raio 2.5: %.2f\\n\", areaCirculo(2.5));\n    printf(\"Raio 10:  %.2f\\n\", areaCirculo(10));\n    return 0;\n}"}, {"nivel": 2, "titulo": "É primo?", "enunciado": "Escreva int ehPrimo(int n), que devolve 1 se n é primo e 0 se não é. No main, mostre todos os primos de 2 a 50.", "dica": "Teste divisores de 2 até a raiz de n (condição i * i <= n). Se algum dividir, devolva 0 na hora.", "lang": "c", "solucao": "#include <stdio.h>\n\nint ehPrimo(int n) {\n    if (n < 2) return 0;\n    for (int i = 2; i * i <= n; i++) {\n        if (n % i == 0) return 0;\n    }\n    return 1;\n}\n\nint main(void) {\n    for (int n = 2; n <= 50; n++) {\n        if (ehPrimo(n)) printf(\"%d \", n);\n    }\n    printf(\"\\n\");\n    return 0;\n}"}, {"nivel": 2, "titulo": "Média de um vetor", "enunciado": "Escreva double mediaVetor(double v[], int n), que devolve a média dos n elementos do vetor. Teste com {8, 6.5, 9, 7}.", "dica": "Vetores são passados para funções junto com o tamanho, porque a função não tem como descobrir o tamanho sozinha.", "lang": "c", "solucao": "#include <stdio.h>\n\ndouble mediaVetor(double v[], int n) {\n    double soma = 0;\n    for (int i = 0; i < n; i++) soma += v[i];\n    return soma / n;\n}\n\nint main(void) {\n    double notas[] = {8, 6.5, 9, 7};\n    printf(\"Média: %.2f\\n\", mediaVetor(notas, 4));\n    return 0;\n}"}, {"nivel": 3, "titulo": "Menu de conversões", "enunciado": "Faça um programa com um menu que repete: 1) Celsius para Fahrenheit, 2) quilômetros para milhas, 0) sair. Cada conversão deve ser uma função.", "dica": "Funções celsiusParaF e kmParaMilhas devolvendo double. O menu fica num do-while no main, com switch.", "lang": "c", "teste": "1\n100\n2\n42.195\n0", "solucao": "#include <stdio.h>\n\ndouble celsiusParaF(double c) { return c * 9.0 / 5 + 32; }\ndouble kmParaMilhas(double km) { return km / 1.609344; }\n\nint main(void) {\n    int op;\n    double valor;\n    do {\n        printf(\"\\n1) C para F  2) km para milhas  0) sair: \");\n        scanf(\"%d\", &op);\n        switch (op) {\n            case 1:\n                printf(\"Celsius: \");\n                scanf(\"%lf\", &valor);\n                printf(\"= %.1f F\\n\", celsiusParaF(valor));\n                break;\n            case 2:\n                printf(\"km: \");\n                scanf(\"%lf\", &valor);\n                printf(\"= %.2f milhas\\n\", kmParaMilhas(valor));\n                break;\n            case 0:\n                printf(\"Até logo!\\n\");\n                break;\n            default:\n                printf(\"Opção inválida\\n\");\n        }\n    } while (op != 0);\n    return 0;\n}"}]}, {"id": "c-recursao", "titulo": "Recursão", "resumo": "Funções que chamam a si mesmas para resolver um problema maior a partir de um menor.", "ideia": "\n<p><strong>Recursão<\/strong> é quando uma função chama a si mesma. Parece um truque estranho, mas é uma forma natural de resolver problemas que contêm versões menores de si mesmos.<\/p>\n<p>Pense em bonecas russas (matrioscas): para ver a menor boneca, você abre a boneca de fora e repete o mesmo processo com a de dentro, até chegar numa que não abre. Essa última é o <strong>caso base<\/strong>: o ponto em que você para de repetir.<\/p>\n<h3>Toda função recursiva tem duas partes<\/h3>\n<ol>\n  <li><strong>Caso base<\/strong>: um caso tão simples que a resposta é direta, sem chamar a função de novo. Sem ele, a função chama a si mesma para sempre.<\/li>\n  <li><strong>Passo recursivo<\/strong>: a função chama a si mesma com um problema <em>menor<\/em>, que chega cada vez mais perto do caso base.<\/li>\n<\/ol>\n<p>Exemplo clássico, o fatorial: 5! = 5 × 4 × 3 × 2 × 1. Repare que 5! = 5 × 4!. E 4! = 4 × 3!. O problema de tamanho 5 é resolvido usando o de tamanho 4. O caso base é 1! = 1 (e 0! = 1).<\/p>\n<h3>A volta<\/h3>\n<p>Cada chamada fica \"esperando\" a de dentro terminar. Quando o caso base responde, as respostas voltam de dentro para fora, como as bonecas sendo fechadas. O teste de mesa abaixo mostra isso: a função imprime na ida e na volta.<\/p>\n", "trace": {"lang": "c", "codigo": "void conta(int n) {\n    if (n == 0) return;\n    printf(\"ida %d\\n\", n);\n    conta(n - 1);\n    printf(\"volta %d\\n\", n);\n}\n// no main: conta(3);", "vars": ["chamada", "n"], "passos": [{"l": 1, "v": {"chamada": "conta(3)", "n": 3}, "n": "O main chama conta(3)."}, {"l": 2, "v": {}, "n": "3 == 0? Não. Segue."}, {"l": 3, "v": {}, "o": "ida 3\n", "n": "Imprime \"ida 3\"."}, {"l": 4, "v": {"chamada": "conta(2)", "n": 2}, "n": "conta(3) chama conta(2) e fica esperando, parada na linha 4."}, {"l": 3, "v": {}, "o": "ida 2\n", "n": "2 == 0? Não. Imprime \"ida 2\"."}, {"l": 4, "v": {"chamada": "conta(1)", "n": 1}, "n": "conta(2) chama conta(1) e também espera."}, {"l": 3, "v": {}, "o": "ida 1\n", "n": "Imprime \"ida 1\"."}, {"l": 4, "v": {"chamada": "conta(0)", "n": 0}, "n": "conta(1) chama conta(0)."}, {"l": 2, "v": {}, "n": "0 == 0: caso base! conta(0) termina sem chamar mais ninguém."}, {"l": 5, "v": {"chamada": "conta(1)", "n": 1}, "o": "volta 1\n", "n": "Voltamos para conta(1), que continua da linha 5 com o seu n, que ainda é 1. Imprime \"volta 1\" e termina."}, {"l": 5, "v": {"chamada": "conta(2)", "n": 2}, "o": "volta 2\n", "n": "conta(2) continua de onde parou e imprime \"volta 2\"."}, {"l": 5, "v": {"chamada": "conta(3)", "n": 3}, "o": "volta 3\n", "n": "conta(3) imprime \"volta 3\"."}, {"l": 6, "v": {"chamada": "(fim)"}, "n": "Todas as chamadas terminaram. Repare: as voltas saíram na ordem inversa das idas."}]}, "exemplos": [{"lang": "c", "titulo": "Fatorial, potência e soma de dígitos", "codigo": "#include <stdio.h>\n\n// n! = n * (n-1)!     caso base: 0! = 1! = 1\nlong long fatorial(int n) {\n    if (n <= 1) return 1;\n    return n * fatorial(n - 1);\n}\n\n// b^e = b * b^(e-1)   caso base: b^0 = 1\ndouble potencia(double b, int e) {\n    if (e == 0) return 1;\n    return b * potencia(b, e - 1);\n}\n\n// soma dos dígitos de 1234 = 4 + soma dos dígitos de 123\nint somaDigitos(int n) {\n    if (n < 10) return n;\n    return n % 10 + somaDigitos(n / 10);\n}\n\nint main(void) {\n    printf(\"5! = %lld\\n\", fatorial(5));\n    printf(\"20! = %lld\\n\", fatorial(20));\n    printf(\"2^10 = %.0f\\n\", potencia(2, 10));\n    printf(\"Soma dos dígitos de 1234 = %d\\n\", somaDigitos(1234));\n    return 0;\n}", "explica": ["Em todas as funções, o caso base vem primeiro, logo na entrada. É um bom hábito: deixa claro quando a recursão para.", "Cada chamada recursiva diminui o problema: <code>n - 1<\/code>, <code>e - 1<\/code>, <code>n / 10<\/code>. É isso que garante que o caso base vai chegar.", "<code>fatorial<\/code> usa <code>long long<\/code> porque o fatorial cresce muito rápido: com <code>int<\/code>, a conta estoura a partir de 13!."], "saida": "5! = 120\n20! = 2432902008176640000\n2^10 = 1024\nSoma dos dígitos de 1234 = 10\n"}], "pegadinhas": ["Esquecer o caso base, ou escrever um que nunca é alcançado (por exemplo, <code>if (n == 0)<\/code> quando n pode ficar negativo). O programa trava e fecha com erro de <em>stack overflow<\/em>.", "Chamar com o mesmo problema, sem diminuir: <code>return n * fatorial(n);<\/code> nunca termina.", "Recursão nem sempre é a melhor escolha. O Fibonacci recursivo ingênuo recalcula os mesmos valores milhões de vezes: fib(45) leva segundos, enquanto um laço resolve na hora.", "Esquecer o <code>return<\/code> na chamada recursiva: escrever <code>fatorial(n - 1);<\/code> sem usar o resultado."], "lembrar": ["Caso base + chamada com problema menor.", "Escreva o caso base primeiro.", "As respostas voltam na ordem inversa das chamadas."], "exercicios": [{"nivel": 1, "titulo": "Soma de 1 a N", "enunciado": "Escreva int soma(int n) recursiva, que devolve 1 + 2 + … + n. Teste com soma(100).", "dica": "soma(n) = n + soma(n - 1). Caso base: soma(0) = 0.", "lang": "c", "solucao": "#include <stdio.h>\n\nint soma(int n) {\n    if (n == 0) return 0;\n    return n + soma(n - 1);\n}\n\nint main(void) {\n    printf(\"%d\\n\", soma(100));   // 5050\n    return 0;\n}"}, {"nivel": 2, "titulo": "Contagem regressiva", "enunciado": "Escreva void regressiva(int n) recursiva, que mostra n, n-1, … 1 e depois \"Fogo!\". Depois, mude uma única linha de lugar para que ela mostre 1, 2, … n.", "dica": "Lembre do teste de mesa: o que vem antes da chamada acontece na ida; o que vem depois, na volta.", "lang": "c", "solucao": "#include <stdio.h>\n\nvoid regressiva(int n) {\n    if (n == 0) {\n        printf(\"Fogo!\\n\");\n        return;\n    }\n    printf(\"%d\\n\", n);      // na ida: 3, 2, 1\n    regressiva(n - 1);\n}\n\nvoid crescente(int n) {\n    if (n == 0) return;\n    crescente(n - 1);\n    printf(\"%d\\n\", n);      // na volta: 1, 2, 3\n}\n\nint main(void) {\n    regressiva(3);\n    crescente(3);\n    return 0;\n}"}, {"nivel": 2, "titulo": "MDC de Euclides", "enunciado": "O máximo divisor comum de a e b pode ser calculado assim: se b é 0, o MDC é a; senão, é o MDC de b e (a % b). Implemente int mdc(int a, int b).", "dica": "A própria definição já é recursiva: é só traduzir para C.", "lang": "c", "solucao": "#include <stdio.h>\n\nint mdc(int a, int b) {\n    if (b == 0) return a;\n    return mdc(b, a % b);\n}\n\nint main(void) {\n    printf(\"mdc(48, 18) = %d\\n\", mdc(48, 18));   // 6\n    printf(\"mdc(17, 5)  = %d\\n\", mdc(17, 5));    // 1\n    return 0;\n}"}, {"nivel": 3, "titulo": "Número em binário", "enunciado": "Escreva void binario(int n) recursiva, que mostra n em binário. Por exemplo, binario(13) mostra 1101.", "dica": "O último dígito binário é n % 2. Os outros são o binário de n / 2. Para que saiam na ordem certa, imprima n % 2 depois da chamada (na volta).", "lang": "c", "solucao": "#include <stdio.h>\n\nvoid binario(int n) {\n    if (n >= 2) binario(n / 2);\n    printf(\"%d\", n % 2);\n}\n\nint main(void) {\n    binario(13);  printf(\"\\n\");   // 1101\n    binario(255); printf(\"\\n\");   // 11111111\n    return 0;\n}"}]}];
+const PAGINA = {"id": "c-basico", "nome": "C básico", "nivel": "Iniciante", "descricao": "Do primeiro programa até funções e recursão: compilar, variáveis, operadores, entrada e saída, decisões, laços, vetores, textos, funções e recursão.", "comoRodar": "\n<p>Para programar em C você precisa de um <strong>compilador<\/strong>. O mais usado é o gcc.<\/p>\n<ul>\n  <li><strong>Windows:<\/strong> instale uma IDE que já vem com o gcc, como o Code::Blocks (versão \"mingw-setup\") ou o Dev-C++. Crie um arquivo, cole o código e use o botão de compilar e executar.<\/li>\n  <li><strong>Linux:<\/strong> o gcc normalmente já está instalado (ou instale com <code>sudo apt install gcc<\/code>).<\/li>\n  <li><strong>macOS:<\/strong> rode <code>xcode-select --install<\/code> no Terminal.<\/li>\n  <li><strong>Sem instalar nada:<\/strong> sites como o OnlineGDB permitem compilar e rodar C no navegador.<\/li>\n<\/ul>\n<p>No terminal, salve o código como <code>programa.c<\/code> e rode:<\/p>\n<table class=\"tabela\"><tbody>\n  <tr><td><code>gcc -Wall programa.c -o programa -lm<\/code><\/td><td>compila (o <code>-Wall<\/code> mostra avisos úteis; o <code>-lm<\/code> é para a math.h)<\/td><\/tr>\n  <tr><td><code>./programa<\/code> (Linux e macOS) ou <code>programa<\/code> (Windows)<\/td><td>executa<\/td><\/tr>\n<\/tbody><\/table>\n<p>Se acentos aparecerem estranhos no terminal do Windows, rode <code>chcp 65001<\/code> antes de executar o programa.<\/p>\n"};
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  const ARQUIVO = { c: "programa.c", java: "Main.java", python: "programa.py", pseudo: "algoritmo (Portugol)", texto: "anotações" };
+
+  /* ---------- progresso salvo no navegador ---------- */
+  const CHAVE = "aula-" + PAGINA.id + "-feitos";
+  const NIVEIS = { 1: "Fácil", 2: "Médio", 3: "Desafio" };
+  const nivelDe = (e, i, n) => e.nivel || (i === 0 ? 1 : (i === n - 1 && n >= 3 ? 3 : 2));
+  let feitos = new Set();
+  try { feitos = new Set(JSON.parse(localStorage.getItem(CHAVE) || "[]")); } catch (e) { /* sem armazenamento */ }
+  function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify([...feitos])); } catch (e) {} }
+  const totalEx = AULAS.reduce((s, a) => s + a.exercicios.length, 0);
+  const feitosDaAula = a => a.exercicios.filter((_, i) => feitos.has(a.id + ":" + i)).length;
+
+  /* ---------- utilidades ---------- */
+  const el = (tag, attrs = {}, html) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+    }
+    if (html != null) n.innerHTML = html;
+    return n;
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  function realcar(codigo, lang) {
+    const g = window.Prism && Prism.languages[lang];
+    return g ? Prism.highlight(codigo, g, lang) : esc(codigo);
+  }
+  function avisar(txt) {
+    const a = document.getElementById("aviso");
+    a.textContent = txt; a.classList.add("ver");
+    clearTimeout(avisar.t); avisar.t = setTimeout(() => a.classList.remove("ver"), 1800);
+  }
+  async function copiar(texto) {
+    try { await navigator.clipboard.writeText(texto); avisar("Código copiado"); }
+    catch (e) { avisar("Não deu para copiar. Selecione o código e use Ctrl+C."); }
+  }
+  // envolve tabelas da prosa num contêiner que rola na horizontal
+  function ajustarTabelas(raiz) {
+    raiz.querySelectorAll("table.tabela").forEach(t => {
+      if (t.parentElement.classList.contains("rolar")) return;
+      const w = el("div", { class: "rolar" }); t.replaceWith(w); w.appendChild(t);
+    });
+  }
+
+  function blocoCodigo(codigo, lang, rotulo) {
+    const box = el("div", { class: "codigo" });
+    const topo = el("div", { class: "codigo-topo" });
+    topo.appendChild(el("span", { text: rotulo || ARQUIVO[lang] || "" }));
+    if (lang !== "texto") {
+      const b = el("button", { class: "botao", type: "button", text: "Copiar" });
+      b.addEventListener("click", () => copiar(codigo));
+      topo.appendChild(b);
+    }
+    box.appendChild(topo);
+    const pre = el("pre"); const c = el("code");
+    c.innerHTML = lang === "texto" ? esc(codigo) : realcar(codigo, lang);
+    pre.appendChild(c); box.appendChild(pre);
+    return box;
+  }
+
+  function terminal(ex) {
+    const t = el("div", { class: "terminal", role: "group", "aria-label": "Saída ao executar" });
+    if (ex.terminal && ex.terminal.length) {
+      t.innerHTML = ex.terminal.map(([tipo, txt]) =>
+        tipo === "in" ? `<span class="in" title="digitado pelo usuário">${esc(txt.replace(/\n$/, ""))}</span>\n` : esc(txt)
+      ).join("").replace(/\n+$/, "");
+    } else {
+      t.textContent = (ex.saida || "").replace(/\n+$/, "");
+    }
+    return t;
+  }
+
+  /* ---------- tabela verdade ---------- */
+  function montarVerdade(alvo) {
+    let A = 1, B = 0;
+    alvo.innerHTML = `
+      <div class="entradas" role="group" aria-label="Valores de entrada">
+        <button type="button" class="chave" data-v="A"></button>
+        <button type="button" class="chave" data-v="B"></button>
+      </div>
+      <dl aria-live="polite">
+        <dt>A &amp;&amp; B</dt><dt>A || B</dt><dt>!A</dt>
+        <dd data-r="e"></dd><dd data-r="ou"></dd><dd data-r="nao"></dd>
+      </dl>`;
+    const pinta = (dd, v) => { dd.textContent = v; dd.className = "v" + v; };
+    function atualizar() {
+      alvo.querySelectorAll(".chave").forEach(b => {
+        const v = b.dataset.v === "A" ? A : B;
+        b.textContent = `${b.dataset.v} = ${v}`;
+        b.setAttribute("aria-pressed", v ? "true" : "false");
+      });
+      pinta(alvo.querySelector('[data-r="e"]'), A && B ? 1 : 0);
+      pinta(alvo.querySelector('[data-r="ou"]'), A || B ? 1 : 0);
+      pinta(alvo.querySelector('[data-r="nao"]'), A ? 0 : 1);
+    }
+    alvo.addEventListener("click", e => {
+      const b = e.target.closest(".chave"); if (!b) return;
+      if (b.dataset.v === "A") A = 1 - A; else B = 1 - B;
+      atualizar();
+    });
+    atualizar();
+  }
+
+  /* ---------- teste de mesa ---------- */
+  function montarMesa(tr) {
+    const linhas = tr.codigo.split("\n");
+    const caixa = el("div", { class: "mesa", tabindex: "0", "aria-label": "Teste de mesa interativo. Use as setas para avançar e voltar." });
+    const realce = realcar(tr.codigo, tr.lang).split("\n");
+    caixa.innerHTML = `
+      <div class="mesa-corpo">
+        <div class="mesa-codigo">${linhas.map((_, i) =>
+          `<div class="ln" data-l="${i + 1}"><span class="num">${i + 1}</span><code>${realce[i] || " "}</code></div>`).join("")}</div>
+        <div class="mesa-lado">
+          <p class="mesa-nota" aria-live="polite"></p>
+          <div class="mesa-tab-wrap"><table class="mesa-tab">
+            <thead><tr><th class="passo">passo</th>${tr.vars.map(v => `<th>${esc(v)}</th>`).join("")}</tr></thead>
+            <tbody></tbody></table></div>
+          <div class="mesa-saida"></div>
+        </div>
+      </div>
+      <div class="mesa-controles">
+        <button type="button" class="botao" data-a="ini">Recomeçar</button>
+        <button type="button" class="botao" data-a="ant">Voltar</button>
+        <button type="button" class="botao ativo" data-a="prox">Próximo passo</button>
+        <span class="contador"></span>
+      </div>`;
+    let p = 0;
+    const N = tr.passos.length;
+    const tbody = caixa.querySelector("tbody");
+    const wrap = caixa.querySelector(".mesa-tab-wrap");
+    function desenhar() {
+      caixa.querySelectorAll(".ln").forEach(l => l.classList.toggle("atual", +l.dataset.l === tr.passos[p].l));
+      caixa.querySelector(".mesa-nota").innerHTML = tr.passos[p].n;
+      let saida = "", linhasTab = "";
+      for (let i = 0; i <= p; i++) {
+        const s = tr.passos[i];
+        if (s.o) saida += s.o;
+        const muda = Object.keys(s.v);
+        if (muda.length) {
+          linhasTab += `<tr class="${i === p ? "atual" : ""}"><td class="passo">${i + 1}</td>${tr.vars.map(v =>
+            muda.includes(v) ? `<td class="mudou">${s.v[v]}</td>` : "<td></td>").join("")}</tr>`;
+        }
+      }
+      tbody.innerHTML = linhasTab;
+      wrap.scrollTop = wrap.scrollHeight;
+      caixa.querySelector(".mesa-saida").textContent = saida;
+      caixa.querySelector(".contador").textContent = `Passo ${p + 1} de ${N}`;
+      caixa.querySelector('[data-a="ant"]').disabled = p === 0;
+      caixa.querySelector('[data-a="ini"]').disabled = p === 0;
+      caixa.querySelector('[data-a="prox"]').disabled = p === N - 1;
+    }
+    caixa.addEventListener("click", e => {
+      const b = e.target.closest("button[data-a]"); if (!b) return;
+      if (b.dataset.a === "prox" && p < N - 1) p++;
+      if (b.dataset.a === "ant" && p > 0) p--;
+      if (b.dataset.a === "ini") p = 0;
+      desenhar();
+    });
+    caixa.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight" && p < N - 1) { p++; desenhar(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && p > 0) { p--; desenhar(); e.preventDefault(); }
+    });
+    desenhar();
+    return caixa;
+  }
+
+  /* ---------- trilha lateral ---------- */
+  const fracao = (f, t) => `<span class="fr${t && f === t ? " completo" : ""}" title="exercícios feitos">${f}/${t}</span>`;
+
+  function desenharTrilha(atual) {
+    const lista = document.getElementById("lista-modulos");
+    lista.innerHTML = "";
+    lista.appendChild(el("div", { class: "modulo-nome" }, `<span class="pino pino-${PAGINA.id}"></span>Aulas`));
+    const ol = el("ol");
+    AULAS.forEach((a, i) => {
+      ol.appendChild(el("li", {}, `<a href="#${a.id}"${a.id === atual ? ' aria-current="page"' : ""}>
+        <span class="n">${i + 1}</span><span>${esc(a.titulo)}</span>${fracao(feitosDaAula(a), a.exercicios.length)}</a>`));
+    });
+    lista.appendChild(ol);
+    const tot = AULAS.reduce((s, a) => s + feitosDaAula(a), 0);
+    document.getElementById("prog-txt").textContent = `${tot} de ${totalEx} exercícios feitos`;
+    document.getElementById("prog-barra").style.width = (100 * tot / totalEx) + "%";
+  }
+
+  /* ---------- página inicial ---------- */
+  function paginaInicio() {
+    const c = document.getElementById("conteudo");
+    const porNivel = [1, 2, 3].map(n => AULAS.reduce((s, a) => s + a.exercicios.filter((e, i) => nivelDe(e, i, a.exercicios.length) === n).length, 0));
+    c.innerHTML = `
+      <h1>${esc(PAGINA.nome)}</h1>
+      <p class="resumo">${PAGINA.descricao}</p>
+      <dl class="ficha">
+        <div><dt>Nível</dt><dd>${esc(PAGINA.nivel)}</dd></div>
+        <div><dt>Aulas</dt><dd>${AULAS.length}</dd></div>
+        <div><dt>Exercícios</dt><dd>${totalEx}: ${porNivel[0]} fáceis, ${porNivel[1]} médios, ${porNivel[2]} desafios</dd></div>
+      </dl>
+      <section class="bloco">
+        <h2>O que você vai aprender</h2>
+        <div class="inicio-modulos"><div class="inicio-modulo"><ol id="lista-aulas"></ol></div></div>
+      </section>
+      <section class="bloco prosa">
+        <h2>Como estudar</h2>
+        <ol class="passos">
+          <li>Siga as aulas na ordem: cada uma usa o que veio antes.</li>
+          <li>Leia a ideia com calma. As comparações com o dia a dia estão ali para você ter uma imagem na cabeça antes do código.</li>
+          <li>Copie o exemplo, rode no seu computador e confira a saída. Depois mude alguma coisa e veja o que acontece.</li>
+          <li>Leia a explicação linha por linha do exemplo e as pegadinhas. Elas mostram os erros que quase todo mundo comete.</li>
+          <li>Faça os exercícios do fácil para o desafio. Tente sem abrir nada; se travar por mais de 10 minutos, abra a dica.</li>
+          <li>Só depois de tentar, compare com a solução e marque como feito.</li>
+        </ol>
+      </section>
+      <section class="bloco prosa">
+        <h2>Como rodar os exemplos</h2>
+        ${PAGINA.comoRodar}
+      </section>
+      <p class="selo">Todos os exemplos e soluções em código foram executados antes de serem publicados. As saídas mostradas nas aulas são as reais. O seu progresso fica salvo só neste navegador.</p>`;
+    ajustarTabelas(c);
+    const ol = c.querySelector("#lista-aulas");
+    AULAS.forEach((a, i) => {
+      ol.appendChild(el("li", {}, `<a href="#${a.id}"><span class="n">${i + 1}</span>
+        <span><span class="t">${esc(a.titulo)}</span><span class="r">${esc(a.resumo)}</span></span>
+        ${fracao(feitosDaAula(a), a.exercicios.length)}</a>`));
+    });
+  }
+
+  /* ---------- página da aula ---------- */
+  function paginaAula(a) {
+    const idx = AULAS.indexOf(a);
+    const c = document.getElementById("conteudo");
+    c.innerHTML = "";
+
+    c.appendChild(el("p", { class: "contexto" },
+      `<a href="#inicio">${esc(PAGINA.nome)}</a>, aula ${idx + 1} de ${AULAS.length}`));
+    c.appendChild(el("h1", { text: a.titulo }));
+    c.appendChild(el("p", { class: "resumo", text: a.resumo }));
+
+    // A ideia
+    const ideia = el("section", { class: "bloco prosa" });
+    ideia.appendChild(el("h2", { text: "A ideia" }));
+    const corpo = el("div", {}, a.ideia);
+    ideia.appendChild(corpo);
+    corpo.querySelectorAll('[data-widget="verdade"]').forEach(montarVerdade);
+    if (a.trace) {
+      corpo.appendChild(montarMesa(a.trace));
+    }
+    ajustarTabelas(ideia);
+    c.appendChild(ideia);
+
+    // Exemplos
+    if (a.exemplos.length) {
+      const sec = el("section", { class: "bloco" });
+      sec.appendChild(el("h2", { text: a.exemplos.length > 1 ? "Exemplos" : "Exemplo" }));
+      for (const ex of a.exemplos) {
+        const box = el("div", { class: "exemplo" });
+        box.appendChild(el("h3", { text: ex.titulo }));
+        box.appendChild(blocoCodigo(ex.codigo, ex.lang));
+        if (ex.saida || (ex.terminal && ex.terminal.length)) box.appendChild(terminal(ex));
+        if (ex.nota) box.appendChild(el("p", { class: "nota", text: ex.nota }));
+        if (ex.explica && ex.explica.length) {
+          const exp = el("div", { class: "explica" });
+          exp.appendChild(el("h4", { text: "Entendendo o código" }));
+          const ul = el("ul");
+          ex.explica.forEach(t => ul.appendChild(el("li", {}, t)));
+          exp.appendChild(ul);
+          box.appendChild(exp);
+        }
+        sec.appendChild(box);
+      }
+      c.appendChild(sec);
+    }
+
+    // Pegadinhas
+    const peg = el("section", { class: "bloco" });
+    peg.appendChild(el("h2", { text: "Pegadinhas" }));
+    const ul = el("ul", { class: "pegadinhas" });
+    a.pegadinhas.forEach(p => ul.appendChild(el("li", {}, p)));
+    peg.appendChild(ul);
+    c.appendChild(peg);
+
+    // Para lembrar
+    const lem = el("aside", { class: "bloco lembrar", "aria-label": "Para lembrar" });
+    lem.appendChild(el("h2", { text: "Para lembrar" }));
+    const ul2 = el("ul");
+    a.lembrar.forEach(p => ul2.appendChild(el("li", {}, p)));
+    lem.appendChild(ul2);
+    c.appendChild(lem);
+
+    // Exercícios
+    const exs = el("section", { class: "bloco" });
+    exs.appendChild(el("h2", { text: "Exercícios" }));
+    const lista = el("div", { class: "exercicios" });
+    a.exercicios.forEach((ex, i) => {
+      const chave = a.id + ":" + i;
+      const card = el("article", { class: "exercicio" + (feitos.has(chave) ? " feito" : "") });
+      const idChk = `feito-${a.id}-${i}`;
+      card.innerHTML = `
+        <div class="ex-topo">
+          <h3>${i + 1}. ${esc(ex.titulo)} <span class="nivel nivel-${nivelDe(ex, i, a.exercicios.length)}">${NIVEIS[nivelDe(ex, i, a.exercicios.length)]}</span></h3>
+          <label class="feito-check" for="${idChk}"><input type="checkbox" id="${idChk}"${feitos.has(chave) ? " checked" : ""}> Já fiz</label>
+        </div>
+        <p>${ex.enunciado}</p>`;
+      if (ex.trecho) {
+        const t = el("div", { class: "ex-trecho" });
+        t.appendChild(blocoCodigo(ex.trecho, ex.trechoLang || "c", "trecho para analisar"));
+        card.appendChild(t);
+      }
+      const acoes = el("div", { class: "ex-acoes" });
+      const bDica = el("button", { class: "botao", type: "button", "aria-expanded": "false", text: "Mostrar dica" });
+      const bSol = el("button", { class: "botao", type: "button", "aria-expanded": "false", text: "Mostrar solução" });
+      acoes.append(bDica, bSol);
+      card.appendChild(acoes);
+      const dica = el("div", { class: "revelar dica", hidden: "" }, `<strong>Dica.</strong> ${ex.dica}`);
+      const sol = el("div", { class: "revelar", hidden: "" });
+      sol.appendChild(blocoCodigo(ex.solucao, ex.lang, ex.lang === "texto" ? "resposta" : "solução: " + ARQUIVO[ex.lang]));
+      card.append(dica, sol);
+      const alternar = (btn, painel, rotuloVer, rotuloEsconder) => () => {
+        const abrir = painel.hidden;
+        painel.hidden = !abrir;
+        btn.setAttribute("aria-expanded", abrir ? "true" : "false");
+        btn.textContent = abrir ? rotuloEsconder : rotuloVer;
+      };
+      bDica.addEventListener("click", alternar(bDica, dica, "Mostrar dica", "Esconder dica"));
+      bSol.addEventListener("click", alternar(bSol, sol, "Mostrar solução", "Esconder solução"));
+      card.querySelector("input").addEventListener("change", e => {
+        if (e.target.checked) feitos.add(chave); else feitos.delete(chave);
+        card.classList.toggle("feito", e.target.checked);
+        salvar(); desenharTrilha(a.id);
+      });
+      lista.appendChild(card);
+    });
+    exs.appendChild(lista);
+    c.appendChild(exs);
+
+    // anterior / próxima
+    const nav = el("nav", { class: "navegar", "aria-label": "Outras aulas" });
+    if (idx > 0) {
+      const ant = AULAS[idx - 1];
+      nav.appendChild(el("a", { href: "#" + ant.id }, `<small>Aula anterior</small><strong>${esc(ant.titulo)}</strong>`));
+    }
+    if (idx < AULAS.length - 1) {
+      const prox = AULAS[idx + 1];
+      nav.appendChild(el("a", { href: "#" + prox.id, class: "prox" }, `<small>Próxima aula</small><strong>${esc(prox.titulo)}</strong>`));
+    }
+    c.appendChild(nav);
+  }
+
+  /* ---------- roteamento pelo # ---------- */
+  function rota() {
+    const id = location.hash.slice(1);
+    const aula = AULAS.find(a => a.id === id);
+    if (aula) { paginaAula(aula); document.title = aula.titulo + " | " + PAGINA.nome; }
+    else { paginaInicio(); document.title = PAGINA.nome; }
+    desenharTrilha(aula ? aula.id : null);
+    document.getElementById("trilha").classList.remove("aberta");
+    const bt = document.getElementById("abrir-trilha");
+    bt.setAttribute("aria-expanded", "false");
+    bt.textContent = "Ver a lista";
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("abrir-trilha").addEventListener("click", e => {
+    const t = document.getElementById("trilha");
+    const aberta = t.classList.toggle("aberta");
+    e.currentTarget.setAttribute("aria-expanded", aberta ? "true" : "false");
+    e.currentTarget.textContent = aberta ? "Fechar a lista" : "Ver a lista";
+  });
+  window.addEventListener("hashchange", () => { rota(); document.getElementById("folha").focus({ preventScroll: true }); });
+  rota();
+})();
+</script>
+</body>
+</html>

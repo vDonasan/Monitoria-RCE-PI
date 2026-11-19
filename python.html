@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Caderno quadriculado de dia, lousa à noite.
+   Layout: trilha de aulas à esquerda; a folha da aula à direita, com a linha vermelha de margem do caderno. */
+:root {
+  --papel: #f5f7fb;
+  --grade: #e1e7f0;
+  --tinta: #1c2a4a;
+  --lapis: #556079;
+  --margem: #d24b45;
+  --caneta: #2b56c9;
+  --marca: #ffe27a;
+  --painel: #ffffff;
+  --borda: #cfd7e4;
+  --term-bg: #1b2130;
+  --term-txt: #d9e1ef;
+  --term-in: #ffd66b;
+  --ok: #23855a;
+
+  --k-kw: #a3336d; --k-str: #2c7a4b; --k-num: #b4561a; --k-com: #758099;
+  --k-fn: #2b56c9; --k-cls: #8a6400; --k-op: #4a5570;
+
+  --f-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-codigo: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #1d2925; --grade: #26342f; --tinta: #e4ebe3; --lapis: #a2afa7;
+    --margem: #e5867c; --caneta: #8fb9f3; --marca: #e9d27c; --painel: #24322d;
+    --borda: #3a4b45; --term-bg: #111815; --term-txt: #d6e0da; --term-in: #f0d47a; --ok: #7fd3a5;
+    --k-kw: #f0a6c4; --k-str: #a8db9a; --k-num: #f4b47a; --k-com: #8d9c94;
+    --k-fn: #9dc3f7; --k-cls: #e9d27c; --k-op: #b9c6be;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #1d2925; --grade: #26342f; --tinta: #e4ebe3; --lapis: #a2afa7;
+  --margem: #e5867c; --caneta: #8fb9f3; --marca: #e9d27c; --painel: #24322d;
+  --borda: #3a4b45; --term-bg: #111815; --term-txt: #d6e0da; --term-in: #f0d47a; --ok: #7fd3a5;
+  --k-kw: #f0a6c4; --k-str: #a8db9a; --k-num: #f4b47a; --k-com: #8d9c94;
+  --k-fn: #9dc3f7; --k-cls: #e9d27c; --k-op: #b9c6be;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--papel);
+  background-image:
+    linear-gradient(var(--grade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--tinta);
+  font: 17px/1.6 var(--f-texto);
+}
+a { color: var(--caneta); }
+:focus-visible { outline: 3px solid var(--caneta); outline-offset: 2px; border-radius: 4px; }
+code, pre { font-family: var(--f-codigo); }
+:not(pre) > code {
+  font-size: .86em; padding: .08em .35em; border-radius: 4px;
+  background: color-mix(in srgb, var(--painel) 70%, var(--grade));
+  border: 1px solid var(--borda);
+  white-space: nowrap;
+}
+h1, h2, h3 { font-family: var(--f-titulo); line-height: 1.15; text-wrap: balance; margin: 0; }
+
+/* ---------- estrutura ---------- */
+.app {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 280px minmax(0, 1fr);
+  gap: 0; min-height: 100vh;
+}
+.trilha {
+  position: sticky; top: 0; align-self: start;
+  height: 100vh; overflow-y: auto;
+  padding: 28px 20px 40px 24px;
+  border-right: 1px solid var(--borda);
+  background: color-mix(in srgb, var(--papel) 88%, transparent);
+}
+.marca-site {
+  display: block; text-decoration: none; color: var(--tinta);
+  font: 800 1.35rem/1.1 var(--f-titulo); margin-bottom: 4px;
+}
+.progresso-geral { font-size: .86rem; color: var(--lapis); margin: 0 0 22px; }
+.barra { height: 6px; border-radius: 3px; background: var(--grade); margin-top: 6px; overflow: hidden; }
+.barra > span { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+
+.modulo-nome {
+  font: 600 .95rem var(--f-titulo); margin: 18px 0 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pino { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.pino-logica { background: #8b6fd6; } .pino-c { background: #4a7fc4; }
+.pino-java { background: #d9822b; } .pino-python { background: #3c9a6e; }
+
+.trilha ol { list-style: none; margin: 0; padding: 0; }
+.trilha li a {
+  display: grid; grid-template-columns: 1.6em 1fr auto; gap: 6px; align-items: baseline;
+  padding: 5px 8px; border-radius: 6px; text-decoration: none;
+  color: var(--tinta); font-size: .92rem; line-height: 1.3;
+}
+.trilha li a:hover { background: var(--grade); }
+.trilha li a[aria-current="page"] { background: var(--tinta); color: var(--papel); }
+.trilha .n { color: var(--lapis); font-variant-numeric: tabular-nums; font-size: .82rem; }
+.trilha a[aria-current="page"] .n, .trilha a[aria-current="page"] .fr { color: inherit; opacity: .75; }
+.trilha .fr { font-size: .78rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.trilha .fr.completo { color: var(--ok); font-weight: 700; }
+
+.abrir-trilha { display: none; }
+
+.folha {
+  border-left: 2px solid var(--margem);
+  margin-left: 40px;
+  padding: 40px clamp(20px, 4vw, 56px) 80px;
+  min-width: 0;
+}
+.conteudo { max-width: 760px; }
+
+/* ---------- textos da aula ---------- */
+.contexto { color: var(--lapis); font-size: .95rem; margin: 0 0 8px; }
+.folha h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -.02em; }
+.resumo { font-size: 1.15rem; color: var(--lapis); margin: 12px 0 0; max-width: 60ch; }
+.bloco { margin-top: 48px; }
+.bloco > h2 { font-size: 1.45rem; font-weight: 800; margin-bottom: 14px; }
+.prosa p, .prosa li { max-width: 66ch; }
+.prosa p { margin: 0 0 14px; }
+.prosa ul, .prosa ol { padding-left: 1.3em; margin: 0 0 14px; }
+.prosa li { margin-bottom: 6px; }
+ol.passos { counter-reset: p; list-style: none; padding: 0; }
+ol.passos li { counter-increment: p; position: relative; padding-left: 2.2em; }
+ol.passos li::before {
+  content: counter(p); position: absolute; left: 0; top: .05em;
+  width: 1.55em; height: 1.55em; border-radius: 50%;
+  border: 1.5px solid var(--tinta); display: grid; place-items: center;
+  font: 700 .8rem var(--f-titulo);
+}
+
+.rolar { overflow-x: auto; margin: 6px 0 18px; }
+.tabela { border-collapse: collapse; width: 100%; font-size: .93rem; background: var(--painel); }
+.tabela th, .tabela td { text-align: left; padding: 8px 12px; border: 1px solid var(--borda); vertical-align: top; }
+.tabela th { font-family: var(--f-titulo); font-weight: 600; background: color-mix(in srgb, var(--painel) 80%, var(--grade)); }
+.tabela code { white-space: pre; }
+
+/* ---------- código e terminal ---------- */
+.exemplo { margin: 0 0 32px; }
+.exemplo h3 { font-size: 1.12rem; font-weight: 600; margin: 0 0 10px; }
+.codigo {
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  overflow: hidden;
+}
+.codigo-topo {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 6px 8px 6px 14px; border-bottom: 1px solid var(--borda);
+  font: .8rem var(--f-codigo); color: var(--lapis);
+}
+.codigo pre { margin: 0; padding: 14px 16px; overflow-x: auto; font-size: .85rem; line-height: 1.6; tab-size: 4; }
+.botao {
+  font: 600 .85rem var(--f-texto); color: var(--tinta);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 6px;
+  padding: 5px 12px; cursor: pointer;
+}
+.botao:hover { border-color: var(--tinta); }
+.botao[aria-pressed="true"], .botao.ativo { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.botao:disabled { opacity: .45; cursor: default; }
+
+.terminal {
+  margin-top: 0; background: var(--term-bg); color: var(--term-txt);
+  border-radius: 0 0 10px 10px; padding: 14px 16px 16px;
+  font: .84rem/1.55 var(--f-codigo); white-space: pre; overflow-x: auto;
+  position: relative;
+}
+.terminal::before {
+  content: "Saída ao executar"; display: block; margin-bottom: 8px;
+  font: .76rem var(--f-texto); color: color-mix(in srgb, var(--term-txt) 60%, transparent);
+}
+.terminal .in { color: var(--term-in); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.codigo + .terminal { border-top: 0; }
+.codigo:has(+ .terminal) { border-radius: 10px 10px 0 0; }
+.nota { font-size: .93rem; color: var(--lapis); margin: 10px 0 0; max-width: 66ch; }
+
+/* tokens do Prism */
+.token.comment, .token.prolog { color: var(--k-com); font-style: italic; }
+.token.keyword, .token.boolean, .token.macro, .token.directive-hash, .token.directive { color: var(--k-kw); }
+.token.string, .token.char, .token.template-string { color: var(--k-str); }
+.token.number { color: var(--k-num); }
+.token.function { color: var(--k-fn); }
+.token.class-name, .token.builtin { color: var(--k-cls); }
+.token.operator, .token.punctuation { color: var(--k-op); }
+.token.macro .token.string { color: var(--k-str); }
+
+/* ---------- pegadinhas e lembrar ---------- */
+.pegadinhas { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.pegadinhas li {
+  padding: 12px 16px; background: var(--painel);
+  border: 1px solid var(--borda); border-left: 4px solid var(--margem); border-radius: 0 8px 8px 0;
+  max-width: 70ch;
+}
+.lembrar {
+  background: var(--marca); color: #2a2410; border-radius: 3px;
+  padding: 18px 22px 18px; transform: rotate(-.4deg);
+  box-shadow: 0 1px 0 rgba(0,0,0,.08), 0 8px 18px -12px rgba(0,0,0,.35);
+  max-width: 560px;
+}
+.lembrar h2 { font-size: 1.15rem; margin: 0 0 8px; color: inherit; }
+.lembrar ul { margin: 0; padding-left: 1.2em; }
+.lembrar li { margin-bottom: 4px; }
+.lembrar code { background: rgba(255,255,255,.5); border-color: rgba(0,0,0,.15); color: inherit; }
+
+/* ---------- exercícios ---------- */
+.exercicios { display: grid; gap: 18px; }
+.exercicio {
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  padding: 18px 20px;
+}
+.exercicio.feito { border-color: var(--ok); box-shadow: inset 4px 0 0 var(--ok); }
+.ex-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.exercicio h3 { font-size: 1.1rem; font-weight: 600; }
+.exercicio p { margin: 8px 0 0; max-width: 66ch; }
+.feito-check { display: flex; align-items: center; gap: 6px; font-size: .88rem; color: var(--lapis); white-space: nowrap; cursor: pointer; }
+.feito-check input { width: 18px; height: 18px; accent-color: var(--ok); margin: 0; }
+.ex-trecho { margin-top: 12px; }
+.ex-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.revelar { margin-top: 12px; }
+.revelar[hidden] { display: none; }
+.dica {
+  padding: 10px 14px; border-radius: 6px;
+  background: color-mix(in srgb, var(--marca) 35%, var(--painel));
+  border: 1px dashed color-mix(in srgb, var(--marca) 60%, var(--tinta));
+}
+.dica strong { font-family: var(--f-titulo); }
+
+/* ---------- teste de mesa interativo ---------- */
+.mesa {
+  margin: 8px 0 24px; border: 1.5px solid var(--tinta); border-radius: 12px;
+  background: var(--painel); overflow: hidden;
+}
+.mesa-corpo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.mesa-codigo { border-right: 1px solid var(--borda); padding: 12px 0; overflow-x: auto; }
+.mesa-codigo .ln {
+  display: grid; grid-template-columns: 2.4em 1fr; font: .84rem/1.75 var(--f-codigo);
+  padding-right: 14px; white-space: pre;
+}
+.mesa-codigo .ln code { background: none; border: 0; padding: 0; font-size: inherit; white-space: pre; border-radius: 0; }
+.mesa-codigo .ln .num { color: var(--lapis); text-align: right; padding-right: 12px; user-select: none; }
+.mesa-codigo .ln.atual { background: color-mix(in srgb, var(--marca) 55%, transparent); }
+.mesa-codigo .ln.atual .num { color: var(--tinta); font-weight: 700; }
+.mesa-lado { padding: 14px 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.mesa-tab { border-collapse: collapse; width: 100%; font: .85rem var(--f-codigo); font-variant-numeric: tabular-nums; }
+.mesa-tab th, .mesa-tab td { border-bottom: 1px solid var(--borda); padding: 4px 8px; text-align: center; }
+.mesa-tab th { font-family: var(--f-codigo); font-weight: 600; border-bottom: 1.5px solid var(--tinta); }
+.mesa-tab td.passo { color: var(--lapis); text-align: left; width: 3.5em; }
+.mesa-tab tr.atual td { background: color-mix(in srgb, var(--marca) 45%, transparent); }
+.mesa-tab td.mudou { font-weight: 700; }
+.mesa-tab-wrap { max-height: 230px; overflow: auto; }
+.mesa-saida { font: .84rem var(--f-codigo); background: var(--term-bg); color: var(--term-txt); padding: 8px 10px; border-radius: 6px; min-height: 2.4em; white-space: pre-wrap; }
+.mesa-saida::before { content: "Saída: "; color: color-mix(in srgb, var(--term-txt) 55%, transparent); }
+.mesa-nota { margin: 0; font-size: .95rem; min-height: 3em; }
+.mesa-controles {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; border-top: 1px solid var(--borda);
+  background: color-mix(in srgb, var(--painel) 85%, var(--grade));
+}
+.mesa-controles .contador { margin-left: auto; font-size: .88rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+
+/* ---------- tabela verdade interativa ---------- */
+.verdade { margin: 8px 0 24px; display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: center;
+  padding: 16px 18px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; }
+.verdade .entradas { display: flex; gap: 10px; }
+.chave {
+  font: 700 1rem var(--f-codigo); min-width: 4.6em; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  border: 1.5px solid var(--tinta); background: var(--painel); color: var(--tinta);
+}
+.chave[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.verdade dl { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 22px; margin: 0; }
+.verdade dt { font: .85rem var(--f-codigo); color: var(--lapis); }
+.verdade dd { margin: 0; font: 700 1.2rem var(--f-codigo); }
+.verdade dd.v1 { color: var(--ok); } .verdade dd.v0 { color: var(--margem); }
+
+/* ---------- fluxograma ---------- */
+.fluxo-par { margin: 6px 0 18px; }
+.fluxo { width: 100%; max-width: 330px; height: auto; display: block; }
+.f-forma { fill: var(--painel); stroke: var(--tinta); stroke-width: 1.6; }
+.f-dec { fill: color-mix(in srgb, var(--marca) 45%, var(--painel)); }
+.f-linha { stroke: var(--tinta); stroke-width: 1.6; fill: none; }
+.f-seta { fill: var(--tinta); }
+.f-txt { fill: var(--tinta); font: 13px var(--f-codigo); text-anchor: middle; }
+.f-rot { fill: var(--lapis); font: 12px var(--f-texto); text-anchor: middle; }
+
+/* ---------- início ---------- */
+.inicio-modulos { display: grid; gap: 28px; margin-top: 18px; }
+.inicio-modulo h3 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.inicio-modulo ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+.inicio-modulo li a {
+  display: grid; grid-template-columns: 2em 1fr auto; gap: 8px; align-items: baseline;
+  padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--tinta);
+}
+.inicio-modulo li a:hover { background: var(--painel); }
+.inicio-modulo .n { color: var(--lapis); font-variant-numeric: tabular-nums; }
+.inicio-modulo .t { font-weight: 700; }
+.inicio-modulo .r { display: block; font-weight: 400; color: var(--lapis); font-size: .93rem; }
+.inicio-modulo .fr { font-size: .85rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.inicio-modulo .fr.completo { color: var(--ok); font-weight: 700; }
+.selo { font-size: .93rem; color: var(--lapis); margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--borda); max-width: 66ch; }
+
+/* ---------- navegação entre aulas ---------- */
+.navegar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 56px; }
+.navegar a {
+  display: block; padding: 14px 16px; border: 1px solid var(--borda); border-radius: 10px;
+  background: var(--painel); text-decoration: none; color: var(--tinta);
+}
+.navegar a:hover { border-color: var(--tinta); }
+.navegar small { display: block; color: var(--lapis); font-size: .85rem; }
+.navegar strong { font-family: var(--f-titulo); font-weight: 600; }
+.navegar .prox { text-align: right; grid-column: 2; }
+
+.aviso { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: var(--tinta); color: var(--papel); padding: 8px 16px; border-radius: 8px; font-size: .9rem;
+  opacity: 0; pointer-events: none; transition: opacity .2s; }
+.aviso.ver { opacity: 1; }
+
+.pino-c-basico { background: #4a7fc4; } .pino-c-avancado { background: #2c4f8a; }
+.mesa-tab thead th { position: sticky; top: 0; background: var(--painel); z-index: 1; }
+.trilha .modulo-nome.outros { margin-top: 26px; color: var(--lapis); }
+.outros-cadernos a { grid-template-columns: 1.6em 1fr auto !important; }
+.outros-cadernos .pino { justify-self: center; align-self: center; }
+.contexto a { color: inherit; }
+.ficha { display: flex; flex-wrap: wrap; gap: 10px 36px; margin: 24px 0 0; }
+.ficha dt { font-size: .85rem; color: var(--lapis); }
+.ficha dd { margin: 0; font-weight: 700; }
+.cadernos { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.cartao-caderno {
+  display: grid; grid-template-columns: 2.2em 1fr auto; gap: 12px; align-items: start;
+  padding: 16px 18px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  text-decoration: none; color: var(--tinta);
+}
+.cartao-caderno:hover { border-color: var(--tinta); }
+.cc-n { font: 800 1.5rem/1 var(--f-titulo); color: var(--lapis); font-variant-numeric: tabular-nums; }
+.cc-corpo { display: grid; gap: 4px; }
+.cc-nome { font: 600 1.2rem var(--f-titulo); display: flex; align-items: center; gap: 8px; }
+.cc-desc { max-width: 60ch; }
+.cc-meta { font-size: .9rem; color: var(--lapis); }
+.cc-aulas { font-size: .88rem; color: var(--lapis); }
+.cartao-caderno .fr { font-size: .9rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.cartao-caderno .fr.completo { color: var(--ok); font-weight: 700; }
+
+.pino-logica { background: #8b6fd6; }
+.explica { margin-top: 14px; padding: 14px 18px; border-radius: 8px; background: var(--painel); border: 1px solid var(--borda); }
+.explica h4 { margin: 0 0 8px; font: 600 1rem var(--f-titulo); }
+.explica ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.explica li { max-width: 68ch; }
+.nivel { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+  font: 600 .74rem var(--f-texto); border: 1px solid currentColor; }
+.nivel-1 { color: var(--ok); } .nivel-2 { color: var(--caneta); } .nivel-3 { color: var(--margem); }
+.prosa h3 { font-size: 1.15rem; font-weight: 600; margin: 26px 0 10px; }
+
+/* ---------- telas menores ---------- */
+@media (max-width: 920px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .trilha {
+    position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--borda);
+    padding: 14px 16px; background: var(--papel);
+  }
+  .trilha .progresso-geral { margin-bottom: 8px; }
+  .abrir-trilha { display: inline-block; }
+  .trilha:not(.aberta) .lista-modulos { display: none; }
+  .folha { margin-left: 14px; padding: 28px 16px 64px 18px; }
+  .mesa-corpo { grid-template-columns: minmax(0, 1fr); }
+  .mesa-codigo { border-right: 0; border-bottom: 1px solid var(--borda); }
+}
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .navegar { grid-template-columns: 1fr; }
+  .navegar .prox { grid-column: 1; }
+  .ex-topo { flex-direction: column; gap: 8px; }
+  .lembrar { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="trilha" id="trilha" aria-label="Aulas">
+    <a class="marca-site" href="#inicio">Python</a>
+    <p class="progresso-geral"><span id="prog-txt"></span><span class="barra" aria-hidden="true"><span id="prog-barra"></span></span></p>
+    <button class="botao abrir-trilha" id="abrir-trilha" aria-expanded="false" aria-controls="lista-modulos">Ver a lista</button>
+    <div class="lista-modulos" id="lista-modulos"></div>
+  </nav>
+  <main class="folha" id="folha" tabindex="-1">
+    <div class="conteudo" id="conteudo"></div>
+  </main>
+</div>
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>
+const AULAS = [{"id": "python-basico", "modulo": "python", "titulo": "Primeiros passos em Python", "resumo": "Variáveis sem declarar tipo, input, f-strings e a indentação que manda.", "ideia": "\n<p>Python tem menos cerimônia. Não há <code>main<\/code>, nem ponto e vírgula, nem declaração de tipo: você escreve <code>idade = 20<\/code> e o Python entende que é um inteiro.<\/p>\n<p>Em vez de chaves, Python usa a <strong>indentação<\/strong> (os espaços no começo da linha) para saber o que está dentro de um <code>if<\/code> ou de um laço. Ela não é estética: é parte da sintaxe. Use sempre 4 espaços.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Em C<\/th><th>Em Python<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>if (x &gt; 0) { ... }<\/code><\/td><td><code>if x &gt; 0:<\/code> e o bloco indentado<\/td><\/tr>\n    <tr><td><code>for (i = 0; i &lt; 5; i++)<\/code><\/td><td><code>for i in range(5):<\/code><\/td><\/tr>\n    <tr><td><code>&amp;&amp;<\/code>, <code>||<\/code>, <code>!<\/code><\/td><td><code>and<\/code>, <code>or<\/code>, <code>not<\/code><\/td><\/tr>\n    <tr><td><code>printf(\"%d\", x)<\/code><\/td><td><code>print(x)<\/code> ou <code>print(f\"{x}\")<\/code><\/td><\/tr>\n  <\/tbody>\n<\/table>\n", "exemplos": [{"lang": "python", "titulo": "Lendo, convertendo e mostrando", "entrada": "Lia\n2004\n1.62", "codigo": "nome = input(\"Nome: \")\nano = int(input(\"Ano de nascimento: \"))      # input sempre devolve texto\naltura = float(input(\"Altura: \"))\n\nidade = 2026 - ano\nprint(f\"Olá, {nome}! Você faz {idade} anos em 2026.\")\nprint(f\"Altura: {altura:.2f} m\")\nprint(type(nome), type(ano), type(altura))\n\n# Troca de valores sem variável auxiliar\na, b = 1, 2\na, b = b, a\nprint(a, b)\n\n# Divisões\nprint(7 / 2)    # divisão real\nprint(7 // 2)   # divisão inteira\nprint(7 % 2)    # resto", "saida": "Nome: Ano de nascimento: Altura: Olá, Lia! Você faz 22 anos em 2026.\nAltura: 1.62 m\n<class 'str'> <class 'int'> <class 'float'>\n2 1\n3.5\n3\n1\n", "terminal": [["out", "Nome: "], ["in", "Lia\n"], ["out", "Ano de nascimento: "], ["in", "2004\n"], ["out", "Altura: "], ["in", "1.62\n"], ["out", "Olá, Lia! Você faz 22 anos em 2026.\nAltura: 1.62 m\n<class 'str'> <class 'int'> <class 'float'>\n2 1\n3.5\n3\n1\n"]]}, {"lang": "python", "titulo": "if, for e while", "codigo": "nota = 7.5\nif nota >= 9:\n    print(\"A\")\nelif nota >= 7:\n    print(\"B\")\nelse:\n    print(\"C\")\n\nfor i in range(1, 6):        # 1, 2, 3, 4, 5 (o 6 fica de fora)\n    print(i, end=\" \")\nprint()\n\nn = 1\nwhile n <= 100:\n    print(n, end=\" \")\n    n *= 3\nprint()\n\n# Python aceita comparação encadeada\nidade = 30\nprint(18 <= idade <= 65)", "saida": "B\n1 2 3 4 5 \n1 3 9 27 81 \nTrue\n"}], "pegadinhas": ["<code>input()<\/code> devolve texto. <code>input() + 1<\/code> dá erro: converta com <code>int()<\/code> ou <code>float()<\/code> antes.", "Misturar Tab e espaços na indentação gera <code>IndentationError<\/code>. Configure o editor para usar 4 espaços.", "<code>range(1, 10)<\/code> vai até 9. O número final nunca entra.", "<code>7 / 2<\/code> dá 3.5 em Python, diferente de C. Para a divisão inteira, use <code>//<\/code>."], "lembrar": ["Dois pontos no fim do if/for/while, bloco indentado embaixo.", "f-string: <code>f\"Texto {variavel:.2f}\"<\/code>."], "exercicios": [{"titulo": "Média ponderada", "enunciado": "Leia 3 notas e 3 pesos. Mostre a média ponderada com 2 casas e se o aluno foi aprovado (média 6 ou mais).", "dica": "media = (n1*p1 + n2*p2 + n3*p3) / (p1 + p2 + p3)", "lang": "python", "teste": "8\n2\n6\n3\n9\n5", "solucao": "notas = []\npesos = []\nfor i in range(1, 4):\n    notas.append(float(input(f\"Nota {i}: \")))\n    pesos.append(float(input(f\"Peso {i}: \")))\n\nsoma = 0\nfor n, p in zip(notas, pesos):\n    soma += n * p\nmedia = soma / sum(pesos)\n\nsituacao = \"Aprovado\" if media >= 6 else \"Reprovado\"\nprint(f\"Média: {media:.2f} ({situacao})\")"}, {"titulo": "FizzBuzz curto", "enunciado": "Resolva o FizzBuzz de 1 a 20 em poucas linhas, usando o operador ternário do Python.", "dica": "\"Fizz\" if i % 3 == 0 else i. Encadeie para os outros casos.", "lang": "python", "solucao": "for i in range(1, 21):\n    print(\"FizzBuzz\" if i % 15 == 0 else\n          \"Fizz\" if i % 3 == 0 else\n          \"Buzz\" if i % 5 == 0 else i)"}, {"titulo": "Iniciais do nome", "enunciado": "Leia um nome completo e mostre as iniciais em maiúsculas, por exemplo \"maria da silva\" vira \"M.D.S.\".", "dica": "nome.split() separa em palavras. palavra[0] pega a primeira letra. .upper() deixa maiúscula.", "lang": "python", "teste": "maria da silva", "solucao": "nome = input(\"Nome completo: \")\n\niniciais = \"\"\nfor palavra in nome.split():\n    iniciais += palavra[0].upper() + \".\"\n\nprint(iniciais)"}]}, {"id": "python-strings", "titulo": "Textos (strings)", "resumo": "Índices, fatiamento, os métodos mais úteis e formatação com f-strings.", "ideia": "\n<p>Em Python, texto é do tipo <code>str<\/code> e pode ser escrito com aspas simples ou duplas: <code>'Ana'<\/code> e <code>\"Ana\"<\/code> são a mesma coisa. Para textos de várias linhas, use três aspas: <code>\"\"\"…\"\"\"<\/code>.<\/p>\n<h3>Índices e fatiamento<\/h3>\n<p>Cada caractere tem uma posição, começando em 0. Índices negativos contam do fim: <code>-1<\/code> é o último.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Com s = \"Python\"<\/th><th>Resultado<\/th><th>Significa<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>s[0]<\/code><\/td><td>'P'<\/td><td>primeiro caractere<\/td><\/tr>\n    <tr><td><code>s[-1]<\/code><\/td><td>'n'<\/td><td>último caractere<\/td><\/tr>\n    <tr><td><code>s[0:3]<\/code><\/td><td>'Pyt'<\/td><td>do 0 até antes do 3<\/td><\/tr>\n    <tr><td><code>s[2:]<\/code><\/td><td>'thon'<\/td><td>do 2 até o fim<\/td><\/tr>\n    <tr><td><code>s[:2]<\/code><\/td><td>'Py'<\/td><td>do começo até antes do 2<\/td><\/tr>\n    <tr><td><code>s[::-1]<\/code><\/td><td>'nohtyP'<\/td><td>de trás para frente<\/td><\/tr>\n    <tr><td><code>len(s)<\/code><\/td><td>6<\/td><td>tamanho<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>Fatiar nunca dá erro por passar do fim: <code>s[2:100]<\/code> simplesmente devolve até onde existe.<\/p>\n<h3>Métodos mais usados<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Método<\/th><th>Exemplo<\/th><th>Resultado<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>upper()<\/code>, <code>lower()<\/code>, <code>title()<\/code><\/td><td><code>\"maria silva\".title()<\/code><\/td><td>'Maria Silva'<\/td><\/tr>\n    <tr><td><code>strip()<\/code><\/td><td><code>\"  oi  \".strip()<\/code><\/td><td>'oi'<\/td><\/tr>\n    <tr><td><code>split(sep)<\/code><\/td><td><code>\"a;b;c\".split(\";\")<\/code><\/td><td>['a', 'b', 'c']<\/td><\/tr>\n    <tr><td><code>sep.join(lista)<\/code><\/td><td><code>\"-\".join([\"a\", \"b\"])<\/code><\/td><td>'a-b'<\/td><\/tr>\n    <tr><td><code>replace(a, b)<\/code><\/td><td><code>\"3,14\".replace(\",\", \".\")<\/code><\/td><td>'3.14'<\/td><\/tr>\n    <tr><td><code>find(t)<\/code><\/td><td><code>\"banana\".find(\"na\")<\/code><\/td><td>2 (ou -1)<\/td><\/tr>\n    <tr><td><code>count(t)<\/code><\/td><td><code>\"banana\".count(\"a\")<\/code><\/td><td>3<\/td><\/tr>\n    <tr><td><code>startswith(t)<\/code>, <code>endswith(t)<\/code><\/td><td><code>\"foto.png\".endswith(\".png\")<\/code><\/td><td>True<\/td><\/tr>\n    <tr><td><code>isdigit()<\/code>, <code>isalpha()<\/code><\/td><td><code>\"2025\".isdigit()<\/code><\/td><td>True<\/td><\/tr>\n    <tr><td><code>in<\/code><\/td><td><code>\"py\" in \"python\"<\/code><\/td><td>True<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>Strings são <strong>imutáveis<\/strong>: os métodos devolvem um texto novo e não alteram o original. Para guardar o resultado, atribua: <code>nome = nome.strip()<\/code>.<\/p>\n<h3>f-strings: formatação<\/h3>\n<p>Coloque um <code>f<\/code> antes das aspas e escreva variáveis ou contas entre chaves: <code>f\"Total: {preco * qtd}\"<\/code>. Depois de dois pontos vem o formato:<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Formato<\/th><th>Exemplo<\/th><th>Resultado<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>:.2f<\/code><\/td><td><code>f\"{3.14159:.2f}\"<\/code><\/td><td>'3.14'<\/td><\/tr>\n    <tr><td><code>:&gt;8<\/code> e <code>:&lt;8<\/code><\/td><td><code>f\"[{'oi':&gt;8}]\"<\/code><\/td><td>'[      oi]'<\/td><\/tr>\n    <tr><td><code>:05d<\/code><\/td><td><code>f\"{42:05d}\"<\/code><\/td><td>'00042'<\/td><\/tr>\n    <tr><td><code>:,<\/code><\/td><td><code>f\"{1234567:,}\"<\/code><\/td><td>'1,234,567'<\/td><\/tr>\n    <tr><td><code>:.1%<\/code><\/td><td><code>f\"{0.256:.1%}\"<\/code><\/td><td>'25.6%'<\/td><\/tr>\n  <\/tbody>\n<\/table>\n", "exemplos": [{"lang": "python", "titulo": "Limpando e analisando um texto", "codigo": "nome = \"   joão   DA silva  \"\nnome = \" \".join(nome.split()).title()      # tira espaços extras e capitaliza\nprint(f\"[{nome}]\")\n\npartes = nome.split()\nprint(\"Primeiro nome:\", partes[0])\nprint(\"Último sobrenome:\", partes[-1])\nprint(\"Iniciais:\", \"\".join(p[0] for p in partes))\n\npalavra = \"Arara\"\nlimpa = palavra.lower()\nprint(f\"{palavra} é palíndromo? {limpa == limpa[::-1]}\")\n\ndata = \"19/11/2026\"\ndia, mes, ano = data.split(\"/\")\nprint(f\"Dia {dia}, mês {mes}, ano {ano}\")\n\n# Tabela alinhada com f-strings\nprodutos = [(\"Caderno\", 18.9), (\"Caneta\", 3.5), (\"Mochila\", 129.9)]\nfor nome_p, preco in produtos:\n    print(f\"{nome_p:<10}R$ {preco:>8.2f}\")", "explica": ["<code>nome.split()<\/code> sem argumento separa por qualquer quantidade de espaços e ignora os das pontas. Juntando de volta com <code>\" \".join<\/code>, sobra só um espaço entre as palavras.", "<code>partes[-1]<\/code> pega o último elemento, seja qual for o tamanho da lista.", "<code>limpa[::-1]<\/code> inverte o texto. Comparar com o original diz se é palíndromo.", "<code>dia, mes, ano = data.split(\"/\")<\/code> desempacota a lista de 3 partes em 3 variáveis de uma vez.", "<code>{nome_p:&lt;10}<\/code> alinha à esquerda em 10 espaços; <code>{preco:&gt;8.2f}<\/code> alinha à direita em 8, com 2 casas decimais."], "saida": "[João Da Silva]\nPrimeiro nome: João\nÚltimo sobrenome: Silva\nIniciais: JDS\nArara é palíndromo? True\nDia 19, mês 11, ano 2026\nCaderno   R$    18.90\nCaneta    R$     3.50\nMochila   R$   129.90\n"}], "pegadinhas": ["<code>s.upper()<\/code> sozinho numa linha não muda s. Strings são imutáveis: <code>s = s.upper()<\/code>.", "<code>s[0] = \"X\"<\/code> dá erro (<em>'str' object does not support item assignment<\/em>). Monte um texto novo: <code>s = \"X\" + s[1:]<\/code>.", "Somar texto com número: <code>\"Idade: \" + 20<\/code> dá <code>TypeError<\/code>. Use f-string ou <code>str(20)<\/code>.", "Esquecer o <code>f<\/code> antes das aspas: <code>\"Total: {total}\"<\/code> imprime as chaves literalmente."], "lembrar": ["s[0] primeiro, s[-1] último, s[a:b] do a até antes do b.", "split separa, join junta.", "f\"{valor:.2f}\" para formatar."], "exercicios": [{"nivel": 1, "titulo": "Contar letras", "enunciado": "Leia uma palavra e uma letra, e mostre quantas vezes a letra aparece na palavra, sem diferenciar maiúsculas de minúsculas.", "dica": "Converta as duas para minúsculas com lower() e use count().", "lang": "python", "teste": "Paralelepípedo\np", "solucao": "palavra = input(\"Palavra: \").lower()\nletra = input(\"Letra: \").lower()\nprint(f\"A letra '{letra}' aparece {palavra.count(letra)} vez(es).\")"}, {"nivel": 2, "titulo": "Censurar palavras", "enunciado": "Leia uma frase e troque as palavras \"chato\" e \"feio\" por asteriscos do mesmo tamanho, sem diferenciar maiúsculas.", "dica": "Separe com split(). Para cada palavra, se palavra.lower() estiver na lista proibida, troque por \"*\" * len(palavra). Junte com \" \".join.", "lang": "python", "teste": "Que filme Chato e feio", "solucao": "PROIBIDAS = {\"chato\", \"feio\"}\n\nfrase = input(\"Frase: \")\nresultado = []\nfor palavra in frase.split():\n    if palavra.lower() in PROIBIDAS:\n        resultado.append(\"*\" * len(palavra))\n    else:\n        resultado.append(palavra)\n\nprint(\" \".join(resultado))"}, {"nivel": 3, "titulo": "Cifra de César", "enunciado": "Leia uma mensagem e um deslocamento N. Troque cada letra pela letra N posições à frente no alfabeto (com N = 3, \"abc\" vira \"def\" e \"xyz\" vira \"abc\"). Mantenha espaços e pontuação.", "dica": "ord(c) dá o código de uma letra, chr(n) faz o caminho inverso. A posição no alfabeto é ord(c) - ord('a'). Use % 26 para dar a volta.", "lang": "python", "teste": "ataque ao amanhecer, zebra!\n3", "solucao": "def cifrar(texto, n):\n    saida = \"\"\n    for c in texto:\n        if \"a\" <= c <= \"z\":\n            saida += chr((ord(c) - ord(\"a\") + n) % 26 + ord(\"a\"))\n        elif \"A\" <= c <= \"Z\":\n            saida += chr((ord(c) - ord(\"A\") + n) % 26 + ord(\"A\"))\n        else:\n            saida += c\n    return saida\n\nmsg = input(\"Mensagem: \")\nn = int(input(\"Deslocamento: \"))\ncodificada = cifrar(msg, n)\nprint(\"Cifrada:  \", codificada)\nprint(\"Decifrada:\", cifrar(codificada, -n))"}]}, {"id": "python-lacos", "titulo": "Laços a fundo: for, range e while", "resumo": "Repetir com for e while, range, enumerate, zip, break, continue e laços aninhados.", "ideia": "\n<p>O <code>for<\/code> do Python é diferente do de C e Java: ele não conta de um número a outro; ele <strong>percorre os itens de uma coleção<\/strong>, um de cada vez. \"Para cada letra desta palavra\", \"para cada aluno desta lista\".<\/p>\n<p><code>for letra in \"python\":<\/code> roda 6 vezes, com <code>letra<\/code> valendo 'p', depois 'y', e assim por diante.<\/p>\n<h3>range: quando você quer números<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Chamada<\/th><th>Gera<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>range(5)<\/code><\/td><td>0, 1, 2, 3, 4<\/td><\/tr>\n    <tr><td><code>range(1, 6)<\/code><\/td><td>1, 2, 3, 4, 5<\/td><\/tr>\n    <tr><td><code>range(0, 20, 5)<\/code><\/td><td>0, 5, 10, 15<\/td><\/tr>\n    <tr><td><code>range(10, 0, -1)<\/code><\/td><td>10, 9, … 1<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>O número final <strong>nunca<\/strong> entra. <code>range(1, 11)<\/code> vai de 1 a 10.<\/p>\n<h3>Ajudantes do for<\/h3>\n<ul>\n  <li><code>enumerate(lista)<\/code> dá a posição e o item ao mesmo tempo: <code>for i, nome in enumerate(nomes):<\/code><\/li>\n  <li><code>zip(a, b)<\/code> percorre duas listas lado a lado: <code>for nome, nota in zip(nomes, notas):<\/code><\/li>\n  <li><code>reversed(lista)<\/code> percorre de trás para frente; <code>sorted(lista)<\/code>, em ordem.<\/li>\n<\/ul>\n<h3>while<\/h3>\n<p>Repete enquanto a condição for verdadeira. Use quando não sabe quantas vezes vai repetir: \"pergunte até a resposta ser válida\". Um padrão muito comum em Python é <code>while True:<\/code> com um <code>break<\/code> lá dentro, quando a condição de saída aparece no meio do bloco.<\/p>\n<h3>break, continue e else<\/h3>\n<ul>\n  <li><code>break<\/code>: sai do laço imediatamente.<\/li>\n  <li><code>continue<\/code>: pula o resto desta volta e vai para a próxima.<\/li>\n  <li><code>else<\/code> no laço: executa se o laço terminou <em>sem<\/em> break. Útil em buscas: \"procurei em tudo e não achei\".<\/li>\n<\/ul>\n", "exemplos": [{"lang": "python", "titulo": "Os jeitos de usar o for", "codigo": "nomes = [\"Ana\", \"Bruno\", \"Carla\"]\nnotas = [8.5, 6.0, 9.2]\n\nfor nome in nomes:\n    print(nome, end=\" \")\nprint()\n\nfor i, nome in enumerate(nomes, start=1):\n    print(f\"{i}. {nome}\")\n\nfor nome, nota in zip(nomes, notas):\n    situacao = \"aprovado\" if nota >= 7 else \"recuperação\"\n    print(f\"{nome:<6} {nota:>4} {situacao}\")\n\nfor n in range(10, 0, -2):\n    print(n, end=\" \")\nprint()\n\n# Tabuada do 1 ao 3: laço dentro de laço\nfor a in range(1, 4):\n    linha = \"\"\n    for b in range(1, 6):\n        linha += f\"{a * b:4}\"\n    print(linha)", "explica": ["<code>print(nome, end=\" \")<\/code> troca a quebra de linha do final por um espaço, para imprimir tudo na mesma linha.", "<code>enumerate(nomes, start=1)<\/code> numera a partir de 1, que é mais natural para quem lê.", "<code>zip<\/code> anda nas duas listas ao mesmo tempo: na primeira volta, Ana e 8.5; na segunda, Bruno e 6.0.", "No laço aninhado, para cada valor de <code>a<\/code> o laço de dentro roda completo. São 3 × 5 = 15 contas."], "saida": "Ana Bruno Carla \n1. Ana\n2. Bruno\n3. Carla\nAna     8.5 aprovado\nBruno   6.0 recuperação\nCarla   9.2 aprovado\n10 8 6 4 2 \n   1   2   3   4   5\n   2   4   6   8  10\n   3   6   9  12  15\n"}, {"lang": "python", "titulo": "while, break, continue e else", "entrada": "abc\n-3\n7", "codigo": "# Repetir até a entrada ser válida\nwhile True:\n    texto = input(\"Digite um número positivo: \")\n    if not texto.isdigit():\n        print(\"  Isso não é um número inteiro positivo.\")\n        continue\n    numero = int(texto)\n    if numero > 0:\n        break\n    print(\"  Precisa ser maior que zero.\")\nprint(\"Número aceito:\", numero)\n\n# else no for: só roda se não houve break\nfor d in range(2, numero):\n    if numero % d == 0:\n        print(f\"{numero} não é primo: divisível por {d}\")\n        break\nelse:\n    print(f\"{numero} é primo\")", "nota": "\"-3\" não passa no isdigit(), porque o sinal de menos não é um dígito. Por isso a mensagem é a de \"não é um número\".", "saida": "Digite um número positivo:   Isso não é um número inteiro positivo.\nDigite um número positivo:   Isso não é um número inteiro positivo.\nDigite um número positivo: Número aceito: 7\n7 é primo\n", "terminal": [["out", "Digite um número positivo: "], ["in", "abc\n"], ["out", "  Isso não é um número inteiro positivo.\nDigite um número positivo: "], ["in", "-3\n"], ["out", "  Isso não é um número inteiro positivo.\nDigite um número positivo: "], ["in", "7\n"], ["out", "Número aceito: 7\n7 é primo\n"]]}], "pegadinhas": ["Esperar que <code>range(1, 10)<\/code> inclua o 10. Não inclui.", "Alterar uma lista (remover itens) enquanto percorre a própria lista com for. Itens são pulados. Percorra uma cópia (<code>for x in lista[:]<\/code>) ou monte uma lista nova.", "Esquecer de atualizar a variável da condição no while: laço infinito. Para interromper um programa preso, use Ctrl+C no terminal.", "Indentação errada: uma linha que devia estar dentro do laço ficou fora (ou o contrário). Em Python, o recuo decide o que repete."], "lembrar": ["for percorre itens; range gera números (o final não entra).", "enumerate: posição e item. zip: duas listas juntas.", "while True + break quando a condição de saída aparece no meio."], "exercicios": [{"nivel": 1, "titulo": "Soma dos pares", "enunciado": "Leia N e mostre a soma de todos os números pares de 1 até N.", "dica": "range(2, n + 1, 2) gera só os pares. A função sum() soma tudo.", "lang": "python", "teste": "10", "solucao": "n = int(input(\"N: \"))\n\n# Jeito com laço\ntotal = 0\nfor i in range(2, n + 1, 2):\n    total += i\nprint(\"Soma dos pares:\", total)\n\n# Jeito curto\nprint(\"Conferindo:\", sum(range(2, n + 1, 2)))"}, {"nivel": 2, "titulo": "Caixa eletrônico", "enunciado": "Leia um valor inteiro de saque e mostre quantas notas de 100, 50, 20, 10, 5 e 2 serão entregues, usando o menor número de notas. Valores impossíveis (como 1 ou 3) devem ser recusados.", "dica": "Percorra a lista de notas da maior para a menor. Para cada uma: quantidade = valor // nota; valor = valor % nota. Se sobrar algo no fim, o valor é impossível.", "lang": "python", "teste": "387", "solucao": "NOTAS = [100, 50, 20, 10, 5, 2]\n\nvalor = int(input(\"Valor do saque: \"))\nresto = valor\nentregar = []\nfor nota in NOTAS:\n    qtd = resto // nota\n    if qtd > 0:\n        entregar.append((qtd, nota))\n        resto -= qtd * nota\n\nif resto != 0:\n    print(f\"Não é possível sacar R$ {valor} com essas notas.\")\nelse:\n    for qtd, nota in entregar:\n        print(f\"{qtd} nota(s) de R$ {nota}\")\n\n# Observação: este método \"guloso\" funciona para a maioria dos valores,\n# mas falha em casos como 6 (5 + ? não fecha) apesar de 6 = 2 + 2 + 2.\n# Tratar esses casos exige tentar combinações, um bom desafio extra."}, {"nivel": 3, "titulo": "Losango de asteriscos", "enunciado": "Leia um número ímpar N e desenhe um losango de asteriscos com N linhas, centralizado. Para N = 5: 1, 3, 5, 3 e 1 asteriscos.", "dica": "Para cada linha, calcule quantos asteriscos (largura) e quantos espaços à esquerda ((N - largura) // 2). Duas metades: crescendo e diminuindo.", "lang": "python", "teste": "7", "solucao": "n = int(input(\"N (ímpar): \"))\n\nlarguras = list(range(1, n + 1, 2)) + list(range(n - 2, 0, -2))\nfor largura in larguras:\n    espacos = (n - largura) // 2\n    print(\" \" * espacos + \"*\" * largura)"}]}, {"id": "python-colecoes", "modulo": "python", "titulo": "Listas e dicionários", "resumo": "Guardar vários valores: em fila, com list, ou por nome, com dict.", "ideia": "\n<p>Uma <strong>lista<\/strong> é uma fila numerada que pode crescer, diminuir e misturar tipos: <code>[8.5, 7.0, 9.2]<\/code>. Você acessa pela posição, a partir de 0.<\/p>\n<p>Um <strong>dicionário<\/strong> é como uma agenda de contatos: você procura pelo nome (a <strong>chave<\/strong>) e encontra o telefone (o <strong>valor<\/strong>). <code>{\"Ana\": \"9999-0001\"}<\/code>.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Quero…<\/th><th>Lista<\/th><th>Dicionário<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td>Criar vazio<\/td><td><code>notas = []<\/code><\/td><td><code>agenda = {}<\/code><\/td><\/tr>\n    <tr><td>Adicionar<\/td><td><code>notas.append(9)<\/code><\/td><td><code>agenda[\"Bia\"] = \"9888\"<\/code><\/td><\/tr>\n    <tr><td>Ler<\/td><td><code>notas[0]<\/code><\/td><td><code>agenda[\"Bia\"]<\/code><\/td><\/tr>\n    <tr><td>Testar se existe<\/td><td><code>9 in notas<\/code><\/td><td><code>\"Bia\" in agenda<\/code><\/td><\/tr>\n    <tr><td>Tamanho<\/td><td><code>len(notas)<\/code><\/td><td><code>len(agenda)<\/code><\/td><\/tr>\n  <\/tbody>\n<\/table>\n", "exemplos": [{"lang": "python", "titulo": "Listas na prática", "codigo": "notas = [8.5, 7.0, 9.2, 6.8]\nnotas.append(10.0)\nnotas.insert(0, 5.0)\nprint(notas)\nprint(\"Primeira:\", notas[0], \"| Última:\", notas[-1])\nprint(\"Do índice 1 ao 3:\", notas[1:4])\n\nmedia = sum(notas) / len(notas)\nprint(f\"Média: {media:.2f} | Maior: {max(notas)} | Menor: {min(notas)}\")\n\n# List comprehension: uma lista nova a partir de outra\naprovadas = [n for n in notas if n >= 7]\nprint(\"Notas 7 ou mais:\", aprovadas)\n\nfor i, n in enumerate(notas, start=1):\n    print(f\"Prova {i}: {n}\")", "saida": "[5.0, 8.5, 7.0, 9.2, 6.8, 10.0]\nPrimeira: 5.0 | Última: 10.0\nDo índice 1 ao 3: [8.5, 7.0, 9.2]\nMédia: 7.75 | Maior: 10.0 | Menor: 5.0\nNotas 7 ou mais: [8.5, 7.0, 9.2, 10.0]\nProva 1: 5.0\nProva 2: 8.5\nProva 3: 7.0\nProva 4: 9.2\nProva 5: 6.8\nProva 6: 10.0\n"}, {"lang": "python", "titulo": "Dicionários na prática", "codigo": "aluno = {\"nome\": \"João\", \"curso\": \"ADS\", \"notas\": [8, 9, 7]}\n\nprint(aluno[\"nome\"])\naluno[\"turma\"] = \"A1\"                    # adiciona uma chave nova\nprint(aluno.get(\"email\", \"sem e-mail\"))  # get não dá erro se faltar\n\nfor chave, valor in aluno.items():\n    print(f\"{chave}: {valor}\")\n\n# Contar palavras: o uso clássico de dicionário\nfrase = \"o rato roeu a roupa do rei de roma e o rato fugiu\"\ncontagem = {}\nfor palavra in frase.split():\n    contagem[palavra] = contagem.get(palavra, 0) + 1\nprint(contagem[\"rato\"], contagem[\"o\"])", "saida": "João\nsem e-mail\nnome: João\ncurso: ADS\nnotas: [8, 9, 7]\nturma: A1\n2 2\n"}], "pegadinhas": ["<code>dic[\"chave\"]<\/code> com uma chave que não existe dá <code>KeyError<\/code>. Use <code>dic.get(\"chave\")<\/code> ou teste com <code>in<\/code> antes.", "<code>b = a<\/code> com listas não copia: as duas variáveis apontam para a mesma lista. Mudou uma, mudou a outra. Para copiar, use <code>b = a.copy()<\/code>.", "<code>lista.sort()<\/code> ordena a própria lista e devolve None. <code>sorted(lista)<\/code> devolve uma lista nova ordenada."], "lembrar": ["Acessa por posição? Lista. Acessa por nome? Dicionário.", "notas[-1] é o último elemento."], "exercicios": [{"titulo": "Agenda com menu", "enunciado": "Faça uma agenda com dicionário {nome: telefone} e um menu: 1 adicionar, 2 buscar, 3 listar, 4 sair.", "dica": "while True com break na opção 4. Para buscar, agenda.get(nome, \"Não encontrado\").", "lang": "python", "teste": "1\nAna\n9999-0001\n2\nAna\n3\n4", "solucao": "agenda = {}\n\nwhile True:\n    op = input(\"\\n1 Adicionar | 2 Buscar | 3 Listar | 4 Sair: \")\n    if op == \"1\":\n        nome = input(\"Nome: \")\n        agenda[nome] = input(\"Telefone: \")\n        print(\"Salvo.\")\n    elif op == \"2\":\n        nome = input(\"Buscar: \")\n        print(agenda.get(nome, \"Não encontrado\"))\n    elif op == \"3\":\n        if not agenda:\n            print(\"Agenda vazia.\")\n        for nome, tel in sorted(agenda.items()):\n            print(f\"  {nome}: {tel}\")\n    elif op == \"4\":\n        break\n    else:\n        print(\"Opção inválida.\")"}, {"titulo": "Raio-x de uma frase", "enunciado": "Leia uma frase e mostre: número de palavras, número de vogais (incluindo acentuadas) e a palavra mais longa.", "dica": "max(palavras, key=len) acha a mais longa. Para as vogais, use uma string com todas: \"aeiouáéíóúâêôãõà\".", "lang": "python", "teste": "A programação é uma ferramenta incrível", "solucao": "frase = input(\"Frase: \")\npalavras = frase.split()\nVOGAIS = \"aeiouáéíóúâêôãõà\"\n\nqtd_vogais = 0\nfor letra in frase.lower():\n    if letra in VOGAIS:\n        qtd_vogais += 1\n\nprint(f\"Palavras: {len(palavras)}\")\nprint(f\"Vogais: {qtd_vogais}\")\nprint(f\"Mais longa: {max(palavras, key=len)}\")"}, {"titulo": "Matriz 3x3", "enunciado": "Leia uma matriz 3x3, uma linha por vez com os números separados por espaço. Mostre a soma de cada linha, de cada coluna e da diagonal principal.", "dica": "Matriz é lista de listas: m[linha][coluna]. Para a coluna j, some m[0][j] + m[1][j] + m[2][j].", "lang": "python", "teste": "1 2 3\n4 5 6\n7 8 9", "solucao": "m = []\nfor i in range(3):\n    linha = [int(x) for x in input(f\"Linha {i + 1}: \").split()]\n    m.append(linha)\n\nfor i in range(3):\n    print(f\"Linha {i + 1}: {sum(m[i])}\")\n\nfor j in range(3):\n    print(f\"Coluna {j + 1}: {sum(m[i][j] for i in range(3))}\")\n\nprint(f\"Diagonal: {sum(m[i][i] for i in range(3))}\")"}]}, {"id": "python-funcoes", "modulo": "python", "titulo": "Funções em Python", "resumo": "def, valores padrão, *args e lambda.", "ideia": "\n<p>Funções em Python se criam com <code>def<\/code>. Não é preciso dizer o tipo dos parâmetros nem do retorno.<\/p>\n<ul>\n  <li><strong>Valor padrão<\/strong>: <code>def saudar(nome, saudacao=\"Olá\")<\/code>. Se ninguém passar a saudação, usa \"Olá\".<\/li>\n  <li><strong>Argumento nomeado<\/strong>: <code>saudar(nome=\"Ana\", saudacao=\"Oi\")<\/code>. A ordem deixa de importar.<\/li>\n  <li><strong>*args<\/strong>: aceita quantos argumentos vierem, recebidos como uma tupla.<\/li>\n  <li><strong>lambda<\/strong>: uma função pequena, de uma expressão só, escrita sem nome. Muito usada como critério de ordenação.<\/li>\n<\/ul>\n<p>Uma função que não tem <code>return<\/code> devolve <code>None<\/code>.<\/p>\n", "exemplos": [{"lang": "python", "titulo": "Os jeitos de passar argumentos", "codigo": "def saudar(nome, saudacao=\"Olá\", pontuacao=\"!\"):\n    return f\"{saudacao}, {nome}{pontuacao}\"\n\nprint(saudar(\"Ana\"))\nprint(saudar(\"Bruno\", \"Bom dia\"))\nprint(saudar(\"Carol\", pontuacao=\".\"))\n\n\ndef media(*valores):\n    if not valores:              # nenhum valor recebido\n        return 0\n    return sum(valores) / len(valores)\n\nprint(media(7, 8, 9))\nprint(media(6, 7, 8, 9, 10))\nprint(media())\n\n\n# lambda como critério de ordenação\nalunos = [(\"Ana\", 8.5), (\"Beto\", 9.7), (\"Caio\", 6.0)]\nalunos.sort(key=lambda aluno: aluno[1], reverse=True)\nprint(alunos)\n\n\n# Função que devolve outra função\ndef multiplicador(fator):\n    return lambda x: x * fator\n\ndobro = multiplicador(2)\nprint(dobro(21))", "saida": "Olá, Ana!\nBom dia, Bruno!\nOlá, Carol.\n8.0\n8.0\n0\n[('Beto', 9.7), ('Ana', 8.5), ('Caio', 6.0)]\n42\n"}], "pegadinhas": ["Nunca use lista ou dicionário como valor padrão: <code>def f(itens=[])<\/code>. A mesma lista é reaproveitada entre chamadas. Use <code>itens=None<\/code> e crie a lista dentro.", "Esquecer o <code>return<\/code> faz a função devolver None, e o erro aparece longe dali.", "Lambda serve para coisas curtas. Se precisar de mais de uma linha, escreva um def."], "lembrar": ["def nome(parametros): e o corpo indentado.", "Parâmetros com padrão vêm depois dos obrigatórios."], "exercicios": [{"titulo": "Calculadora com dicionário", "enunciado": "Crie calcular(op, a, b), em que op é \"soma\", \"sub\", \"mul\" ou \"div\". Trate divisão por zero e operação desconhecida.", "dica": "Um dicionário que liga o nome da operação a uma função: {\"soma\": lambda a, b: a + b, ...}.", "lang": "python", "solucao": "OPERACOES = {\n    \"soma\": lambda a, b: a + b,\n    \"sub\":  lambda a, b: a - b,\n    \"mul\":  lambda a, b: a * b,\n    \"div\":  lambda a, b: a / b,\n}\n\ndef calcular(op, a, b):\n    if op not in OPERACOES:\n        return f\"Operação desconhecida: {op}\"\n    if op == \"div\" and b == 0:\n        return \"Não dá para dividir por zero\"\n    return OPERACOES[op](a, b)\n\nprint(calcular(\"soma\", 2, 3))\nprint(calcular(\"div\", 10, 4))\nprint(calcular(\"div\", 1, 0))\nprint(calcular(\"pot\", 2, 3))"}, {"titulo": "Filtrar e transformar", "enunciado": "Dada a lista [1, 2, 3, 4, 5, 6, 7, 8], pegue só os pares e eleve cada um ao quadrado. Faça de dois jeitos: com filter/map e com list comprehension.", "dica": "filter(lambda x: x % 2 == 0, nums) e depois map(lambda x: x ** 2, ...). Lembre de envolver com list().", "lang": "python", "solucao": "nums = [1, 2, 3, 4, 5, 6, 7, 8]\n\n# Jeito 1: filter e map\npares = list(filter(lambda x: x % 2 == 0, nums))\nquadrados = list(map(lambda x: x ** 2, pares))\nprint(quadrados)\n\n# Jeito 2: list comprehension (mais comum em Python)\nprint([x ** 2 for x in nums if x % 2 == 0])"}, {"titulo": "Maior e menor de uma vez", "enunciado": "Escreva extremos(lista) que devolve o menor e o maior valor ao mesmo tempo, sem usar min() e max().", "dica": "Uma função Python pode devolver dois valores: return menor, maior. Quem chama recebe com a, b = extremos(...).", "lang": "python", "solucao": "def extremos(lista):\n    menor = maior = lista[0]\n    for x in lista[1:]:\n        if x < menor:\n            menor = x\n        if x > maior:\n            maior = x\n    return menor, maior\n\nmn, mx = extremos([7, -2, 15, 3, 9])\nprint(f\"Menor: {mn}, maior: {mx}\")"}]}, {"id": "python-excecoes", "titulo": "Erros e exceções", "resumo": "Entender as mensagens de erro do Python e tratar problemas com try e except.", "ideia": "\n<p>Quando algo dá errado durante a execução, o Python <strong>lança uma exceção<\/strong> e, se ninguém tratar, o programa para e mostra um <em>Traceback<\/em>. Ele assusta, mas é um ótimo amigo: diz exatamente o que e onde.<\/p>\n<h3>Lendo um Traceback<\/h3>\n<p>Leia de <strong>baixo para cima<\/strong>. A última linha diz o tipo do erro e a mensagem, por exemplo <code>ValueError: invalid literal for int() with base 10: 'abc'<\/code>. Logo acima vem o arquivo e a linha onde aconteceu.<\/p>\n<h3>Erros mais comuns<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Erro<\/th><th>Exemplo que causa<\/th><th>Significa<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>ValueError<\/code><\/td><td><code>int(\"abc\")<\/code><\/td><td>o tipo está certo, mas o valor não serve<\/td><\/tr>\n    <tr><td><code>TypeError<\/code><\/td><td><code>\"idade: \" + 20<\/code><\/td><td>operação com tipos incompatíveis<\/td><\/tr>\n    <tr><td><code>ZeroDivisionError<\/code><\/td><td><code>10 / 0<\/code><\/td><td>divisão por zero<\/td><\/tr>\n    <tr><td><code>IndexError<\/code><\/td><td><code>[1, 2][5]<\/code><\/td><td>posição que não existe na lista<\/td><\/tr>\n    <tr><td><code>KeyError<\/code><\/td><td><code>{\"a\": 1}[\"b\"]<\/code><\/td><td>chave que não existe no dicionário<\/td><\/tr>\n    <tr><td><code>NameError<\/code><\/td><td><code>print(nome)<\/code> sem criar nome<\/td><td>variável não definida (muitas vezes, erro de digitação)<\/td><\/tr>\n    <tr><td><code>FileNotFoundError<\/code><\/td><td><code>open(\"naoexiste.txt\")<\/code><\/td><td>arquivo não encontrado<\/td><\/tr>\n    <tr><td><code>IndentationError<\/code><\/td><td>recuo errado<\/td><td>espaços no começo da linha inconsistentes<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>try / except / else / finally<\/h3>\n<ul>\n  <li><code>try:<\/code> o código que pode falhar.<\/li>\n  <li><code>except TipoDeErro:<\/code> o que fazer se aquele erro acontecer. Pode haver vários.<\/li>\n  <li><code>else:<\/code> roda se <em>não<\/em> houve erro.<\/li>\n  <li><code>finally:<\/code> roda sempre.<\/li>\n<\/ul>\n<p>Com <code>except ValueError as e:<\/code>, a variável <code>e<\/code> guarda o erro, e <code>print(e)<\/code> mostra a mensagem.<\/p>\n<h3>raise: lançando o seu próprio erro<\/h3>\n<p>Se uma função recebe um valor que não faz sentido, ela pode recusá-lo: <code>raise ValueError(\"a idade não pode ser negativa\")<\/code>. Isso é melhor do que devolver um resultado errado em silêncio.<\/p>\n", "exemplos": [{"lang": "python", "titulo": "Ler um número sem o programa quebrar", "entrada": "dez\n0\n4", "codigo": "def ler_inteiro(mensagem):\n    while True:\n        try:\n            return int(input(mensagem))\n        except ValueError:\n            print(\"  Digite um número inteiro, como 7 ou 42.\")\n\n\ntotal = 120\nwhile True:\n    pessoas = ler_inteiro(\"Dividir a conta entre quantas pessoas? \")\n    try:\n        parte = total / pessoas\n    except ZeroDivisionError:\n        print(\"  Precisa ser pelo menos 1 pessoa.\")\n    else:\n        print(f\"Cada pessoa paga R$ {parte:.2f}\")\n        break\n    finally:\n        print(\"  (tentativa registrada)\")", "explica": ["<code>return int(input(...))<\/code> dentro do try: se a conversão funcionar, a função já devolve o número e sai do laço. Se falhar, cai no except e o laço repete.", "No segundo bloco, o <code>else<\/code> só roda quando a divisão deu certo, e é lá que fica o <code>break<\/code>.", "O <code>finally<\/code> roda nas duas situações: com erro e sem erro. Repare que ele roda até depois do <code>break<\/code>."], "saida": "Dividir a conta entre quantas pessoas?   Digite um número inteiro, como 7 ou 42.\nDividir a conta entre quantas pessoas?   Precisa ser pelo menos 1 pessoa.\n  (tentativa registrada)\nDividir a conta entre quantas pessoas? Cada pessoa paga R$ 30.00\n  (tentativa registrada)\n", "terminal": [["out", "Dividir a conta entre quantas pessoas? "], ["in", "dez\n"], ["out", "  Digite um número inteiro, como 7 ou 42.\nDividir a conta entre quantas pessoas? "], ["in", "0\n"], ["out", "  Precisa ser pelo menos 1 pessoa.\n  (tentativa registrada)\nDividir a conta entre quantas pessoas? "], ["in", "4\n"], ["out", "Cada pessoa paga R$ 30.00\n  (tentativa registrada)\n"]]}, {"lang": "python", "titulo": "raise: recusando valores inválidos", "codigo": "def calcular_imc(peso, altura):\n    if peso <= 0 or altura <= 0:\n        raise ValueError(\"peso e altura precisam ser positivos\")\n    return peso / altura ** 2\n\n\nfor peso, altura in [(70, 1.75), (80, 0), (-5, 1.6)]:\n    try:\n        print(f\"IMC: {calcular_imc(peso, altura):.1f}\")\n    except ValueError as erro:\n        print(f\"Não calculado ({peso}, {altura}): {erro}\")", "saida": "IMC: 22.9\nNão calculado (80, 0): peso e altura precisam ser positivos\nNão calculado (-5, 1.6): peso e altura precisam ser positivos\n"}], "pegadinhas": ["<code>except:<\/code> sozinho, sem tipo, captura <em>tudo<\/em>, até o Ctrl+C e erros de digitação no seu código. Sempre diga qual erro espera.", "Colocar código demais dentro do try. Deixe ali só a linha que pode falhar; assim você sabe exatamente de onde veio o erro.", "Usar try/except para esconder um bug. Se o erro é do seu código (NameError, TypeError por descuido), corrija o código.", "Ler o Traceback de cima para baixo e se perder. Comece pela última linha."], "lembrar": ["Traceback: leia de baixo para cima.", "try / except Tipo / else / finally.", "raise ValueError(\"…\") para recusar valores inválidos."], "exercicios": [{"nivel": 1, "titulo": "Idade válida", "enunciado": "Peça a idade até o usuário digitar um número inteiro entre 0 e 120. Mostre mensagens diferentes para texto inválido e para número fora da faixa.", "dica": "while True com try: int(input()). Depois do try, teste a faixa com if.", "lang": "python", "teste": "trinta\n150\n30", "solucao": "while True:\n    try:\n        idade = int(input(\"Idade: \"))\n    except ValueError:\n        print(\"Digite apenas números.\")\n        continue\n    if 0 <= idade <= 120:\n        break\n    print(\"A idade precisa estar entre 0 e 120.\")\n\nprint(f\"Idade registrada: {idade}\")"}, {"nivel": 2, "titulo": "Busca segura no dicionário", "enunciado": "Com o dicionário de preços {\"café\": 18.0, \"pão\": 0.8, \"leite\": 5.5}, leia o nome de um produto e a quantidade, e mostre o total. Trate produto inexistente (KeyError) e quantidade inválida (ValueError).", "dica": "Dois except no mesmo try. Para o KeyError, mostre também a lista de produtos disponíveis.", "lang": "python", "teste": "café\n2", "solucao": "precos = {\"café\": 18.0, \"pão\": 0.8, \"leite\": 5.5}\n\ntry:\n    produto = input(\"Produto: \").strip().lower()\n    preco = precos[produto]\n    qtd = int(input(\"Quantidade: \"))\nexcept KeyError:\n    print(f\"Produto não encontrado. Temos: {', '.join(precos)}\")\nexcept ValueError:\n    print(\"A quantidade precisa ser um número inteiro.\")\nelse:\n    print(f\"Total: R$ {preco * qtd:.2f}\")"}, {"nivel": 3, "titulo": "Média de um arquivo bagunçado", "enunciado": "Crie um arquivo notas.txt com uma nota por linha, incluindo algumas linhas inválidas (vazias, com texto). Leia o arquivo, calcule a média só das notas válidas e informe em quais linhas havia problemas. Se o arquivo não existir, mostre uma mensagem clara.", "dica": "enumerate(f, start=1) dá o número da linha. Troque vírgula por ponto antes do float(), porque muita gente digita 7,5.", "lang": "python", "solucao": "with open(\"notas.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"8.5\\n7,0\\n\\ndez\\n9\\n6.5\\n\")\n\ntry:\n    with open(\"notas.txt\", encoding=\"utf-8\") as f:\n        validas, problemas = [], []\n        for numero, linha in enumerate(f, start=1):\n            texto = linha.strip().replace(\",\", \".\")\n            try:\n                validas.append(float(texto))\n            except ValueError:\n                problemas.append(numero)\nexcept FileNotFoundError:\n    print(\"O arquivo notas.txt não foi encontrado.\")\nelse:\n    if validas:\n        print(f\"Média de {len(validas)} notas: {sum(validas) / len(validas):.2f}\")\n    print(f\"Linhas ignoradas: {problemas}\")"}]}, {"id": "python-arquivos", "modulo": "python", "titulo": "Arquivos: TXT, JSON e CSV", "resumo": "Salvar e carregar dados com with open, json e csv.", "ideia": "\n<p>Em Python, a forma certa de abrir arquivos é com <code>with open(...) as f:<\/code>. Quando o bloco termina, o arquivo é fechado sozinho, mesmo se der erro no meio.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Formato<\/th><th>Bom para<\/th><th>Módulo<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td>TXT<\/td><td>texto livre, logs<\/td><td>nenhum, só <code>open<\/code><\/td><\/tr>\n    <tr><td>JSON<\/td><td>listas e dicionários, com qualquer estrutura<\/td><td><code>json<\/code><\/td><\/tr>\n    <tr><td>CSV<\/td><td>tabelas que abrem no Excel<\/td><td><code>csv<\/code><\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>Sempre passe <code>encoding=\"utf-8\"<\/code>. Sem isso, no Windows, \"ação\" pode virar \"aÃ§Ã£o\".<\/p>\n", "exemplos": [{"lang": "python", "titulo": "Os três formatos", "codigo": "import csv\nimport json\n\n# --- TXT ---\nwith open(\"diario.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"Estudei ponteiros\\n\")\n    f.write(\"Fiz 3 exercícios\\n\")\n\nwith open(\"diario.txt\", encoding=\"utf-8\") as f:\n    for linha in f:\n        print(\"TXT:\", linha.strip())\n\n# --- JSON ---\ndados = {\"nome\": \"Ana\", \"notas\": [8, 9, 10], \"ativa\": True}\nwith open(\"aluna.json\", \"w\", encoding=\"utf-8\") as f:\n    json.dump(dados, f, indent=2, ensure_ascii=False)\n\nwith open(\"aluna.json\", encoding=\"utf-8\") as f:\n    lido = json.load(f)\nprint(\"JSON:\", lido[\"nome\"], lido[\"notas\"])\n\n# --- CSV ---\nalunos = [{\"Nome\": \"Ana\", \"Nota\": 9}, {\"Nome\": \"Bruno\", \"Nota\": 7}]\nwith open(\"notas.csv\", \"w\", newline=\"\", encoding=\"utf-8\") as f:\n    w = csv.DictWriter(f, fieldnames=[\"Nome\", \"Nota\"])\n    w.writeheader()\n    w.writerows(alunos)\n\nwith open(\"notas.csv\", newline=\"\", encoding=\"utf-8\") as f:\n    for linha in csv.DictReader(f):\n        print(\"CSV:\", linha[\"Nome\"], float(linha[\"Nota\"]))", "nota": "O CSV devolve tudo como texto. Por isso há o float() na última linha.", "saida": "TXT: Estudei ponteiros\nTXT: Fiz 3 exercícios\nJSON: Ana [8, 9, 10]\nCSV: Ana 9.0\nCSV: Bruno 7.0\n"}], "pegadinhas": ["Abrir com \"w\" apaga o conteúdo anterior. Para acrescentar, use \"a\".", "Ler um arquivo que não existe dá <code>FileNotFoundError<\/code>. Use try/except para começar com dados vazios na primeira execução.", "No CSV, esquecer <code>newline=\"\"<\/code> cria linhas em branco extras no Windows.", "<code>json.dump<\/code> sem <code>ensure_ascii=False<\/code> grava \"Jo\\u00e3o\" em vez de \"João\". Funciona, mas fica ilegível."], "lembrar": ["with open(arquivo, modo, encoding=\"utf-8\") as f:", "JSON para estrutura, CSV para tabela."], "exercicios": [{"titulo": "Lista de tarefas que não se perde", "enunciado": "Guarde tarefas em tarefas.json. Cada tarefa tem descrição e feita (True/False). Faça as funções carregar, salvar, adicionar e concluir.", "dica": "carregar() usa try/except FileNotFoundError e devolve [] na primeira vez. Toda alteração termina com salvar().", "lang": "python", "solucao": "import json\n\nARQUIVO = \"tarefas.json\"\n\ndef carregar():\n    try:\n        with open(ARQUIVO, encoding=\"utf-8\") as f:\n            return json.load(f)\n    except FileNotFoundError:\n        return []\n\ndef salvar(tarefas):\n    with open(ARQUIVO, \"w\", encoding=\"utf-8\") as f:\n        json.dump(tarefas, f, indent=2, ensure_ascii=False)\n\ndef adicionar(tarefas, descricao):\n    tarefas.append({\"descricao\": descricao, \"feita\": False})\n    salvar(tarefas)\n\ndef concluir(tarefas, posicao):\n    if 0 <= posicao < len(tarefas):\n        tarefas[posicao][\"feita\"] = True\n        salvar(tarefas)\n\ndef listar(tarefas):\n    for i, t in enumerate(tarefas):\n        marca = \"x\" if t[\"feita\"] else \" \"\n        print(f\"{i} [{marca}] {t['descricao']}\")\n\ntarefas = carregar()\nadicionar(tarefas, \"Revisar ponteiros\")\nadicionar(tarefas, \"Lista de Python\")\nconcluir(tarefas, 0)\nlistar(tarefas)"}, {"titulo": "Boletim em CSV", "enunciado": "Com uma lista de alunos (nome e 3 notas), calcule a média de cada um e salve boletim.csv com as colunas Nome, Média e Situação.", "dica": "csv.DictWriter com fieldnames=[\"Nome\", \"Média\", \"Situação\"]. Formate a média com f\"{media:.1f}\".", "lang": "python", "solucao": "import csv\n\nalunos = [\n    {\"nome\": \"Ana\",   \"notas\": [8, 9, 7.5]},\n    {\"nome\": \"Bruno\", \"notas\": [5, 6, 4]},\n    {\"nome\": \"Carla\", \"notas\": [7, 7, 6.5]},\n]\n\nwith open(\"boletim.csv\", \"w\", newline=\"\", encoding=\"utf-8\") as f:\n    w = csv.DictWriter(f, fieldnames=[\"Nome\", \"Média\", \"Situação\"])\n    w.writeheader()\n    for a in alunos:\n        media = sum(a[\"notas\"]) / len(a[\"notas\"])\n        w.writerow({\n            \"Nome\": a[\"nome\"],\n            \"Média\": f\"{media:.1f}\",\n            \"Situação\": \"Aprovado\" if media >= 6 else \"Reprovado\",\n        })\n\nwith open(\"boletim.csv\", encoding=\"utf-8\") as f:\n    print(f.read())"}]}, {"id": "python-classes", "titulo": "Classes e objetos", "resumo": "Criar seus próprios tipos com dados e comportamentos: __init__, self, métodos e herança.", "ideia": "\n<p>Até agora você guardou dados em variáveis soltas, listas e dicionários. Um aluno poderia ser <code>{\"nome\": \"Ana\", \"notas\": [8, 9]}<\/code>. Funciona, mas as funções que mexem nesse aluno ficam espalhadas pelo programa. Uma <strong>classe<\/strong> junta os dados <em>e<\/em> as ações sobre eles num lugar só.<\/p>\n<p>Pense na classe como uma <strong>forma de bolo<\/strong> e nos objetos como os <strong>bolos<\/strong>: uma forma, vários bolos, cada um com sua cobertura.<\/p>\n<h3>As peças<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Código<\/th><th>Significa<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>class Aluno:<\/code><\/td><td>define a classe (o nome começa com maiúscula, por convenção)<\/td><\/tr>\n    <tr><td><code>def __init__(self, nome):<\/code><\/td><td>o construtor: roda quando o objeto é criado e prepara os atributos<\/td><\/tr>\n    <tr><td><code>self.nome = nome<\/code><\/td><td>cria um atributo: um dado que pertence a este objeto<\/td><\/tr>\n    <tr><td><code>def media(self):<\/code><\/td><td>um método: uma função que pertence à classe<\/td><\/tr>\n    <tr><td><code>a = Aluno(\"Ana\")<\/code><\/td><td>cria um objeto (o Python chama o __init__)<\/td><\/tr>\n    <tr><td><code>a.media()<\/code><\/td><td>chama o método desse objeto<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>O que é o self<\/h3>\n<p><code>self<\/code> é o próprio objeto. Quando você escreve <code>ana.media()<\/code>, o Python chama <code>Aluno.media(ana)<\/code>, passando <code>ana<\/code> como <code>self<\/code>. Por isso todo método tem <code>self<\/code> como primeiro parâmetro, e por isso dentro dele os atributos se acessam com <code>self.nome<\/code>.<\/p>\n<h3>__str__<\/h3>\n<p>Definir o método <code>__str__<\/code> diz como o objeto aparece no <code>print<\/code>. Sem ele, aparece algo como <code>&lt;__main__.Aluno object at 0x7f…&gt;<\/code>.<\/p>\n<h3>Herança<\/h3>\n<p><code>class Bolsista(Aluno):<\/code> cria uma classe que herda tudo de Aluno e pode acrescentar ou substituir coisas. <code>super().__init__(…)<\/code> chama o construtor da classe mãe.<\/p>\n", "exemplos": [{"lang": "python", "titulo": "Uma classe Aluno completa", "codigo": "class Aluno:\n    MEDIA_APROVACAO = 7       # atributo da classe: igual para todos\n\n    def __init__(self, nome, matricula):\n        self.nome = nome\n        self.matricula = matricula\n        self.notas = []        # cada aluno tem a sua própria lista\n\n    def adicionar_nota(self, nota):\n        if not 0 <= nota <= 10:\n            raise ValueError(\"a nota precisa estar entre 0 e 10\")\n        self.notas.append(nota)\n\n    def media(self):\n        if not self.notas:\n            return 0\n        return sum(self.notas) / len(self.notas)\n\n    def aprovado(self):\n        return self.media() >= self.MEDIA_APROVACAO\n\n    def __str__(self):\n        situacao = \"aprovado\" if self.aprovado() else \"reprovado\"\n        return f\"{self.nome} ({self.matricula}): média {self.media():.1f}, {situacao}\"\n\n\nclass Bolsista(Aluno):\n    MEDIA_APROVACAO = 8       # bolsistas precisam de média maior\n\n    def __init__(self, nome, matricula, bolsa):\n        super().__init__(nome, matricula)\n        self.bolsa = bolsa\n\n    def __str__(self):\n        return super().__str__() + f\", bolsa de R$ {self.bolsa:.2f}\"\n\n\nana = Aluno(\"Ana\", 101)\nana.adicionar_nota(8)\nana.adicionar_nota(6.5)\n\nbeto = Bolsista(\"Beto\", 102, 700)\nbeto.adicionar_nota(7.5)\nbeto.adicionar_nota(8)\n\nfor aluno in [ana, beto]:\n    print(aluno)\n\ntry:\n    ana.adicionar_nota(15)\nexcept ValueError as e:\n    print(\"Erro:\", e)", "explica": ["<code>self.notas = []<\/code> dentro do <code>__init__<\/code> cria uma lista nova para cada aluno. Se a lista fosse criada fora, no corpo da classe, todos os alunos dividiriam a mesma.", "<code>MEDIA_APROVACAO<\/code> é um atributo da classe, compartilhado. <code>Bolsista<\/code> define o seu próprio valor, e <code>self.MEDIA_APROVACAO<\/code> encontra o certo para cada objeto.", "<code>aprovado()<\/code> chama outro método do mesmo objeto com <code>self.media()<\/code>.", "Em <code>Bolsista<\/code>, <code>super().__init__(nome, matricula)<\/code> reaproveita o construtor de Aluno, e <code>super().__str__()<\/code> reaproveita o texto, acrescentando a bolsa.", "Beto tem média 7.75: seria aprovado como aluno comum, mas não como bolsista. O mesmo método <code>aprovado()<\/code> deu respostas diferentes conforme a classe."], "saida": "Ana (101): média 7.2, aprovado\nBeto (102): média 7.8, reprovado, bolsa de R$ 700.00\nErro: a nota precisa estar entre 0 e 10\n"}], "pegadinhas": ["Esquecer o <code>self<\/code> nos parâmetros do método: o erro é <em>takes 0 positional arguments but 1 was given<\/em>.", "Esquecer o <code>self.<\/code> antes do atributo: <code>nome = nome<\/code> cria uma variável local que some, em vez de guardar no objeto.", "Criar listas ou dicionários no corpo da classe esperando que cada objeto tenha o seu. Crie dentro do <code>__init__<\/code>.", "Chamar o método sem parênteses: <code>ana.media<\/code> é o método em si, não o resultado. Use <code>ana.media()<\/code>."], "lembrar": ["Classe é a forma; objeto é o bolo.", "__init__ prepara; self é o próprio objeto; __str__ define o print.", "Herança: class Filha(Mae) e super()."], "exercicios": [{"nivel": 1, "titulo": "Retângulo", "enunciado": "Crie a classe Retangulo com largura e altura, e os métodos area(), perimetro() e eh_quadrado(). Crie dois retângulos e mostre os resultados.", "dica": "Cada método é uma linha com return, usando self.largura e self.altura.", "lang": "python", "solucao": "class Retangulo:\n    def __init__(self, largura, altura):\n        self.largura = largura\n        self.altura = altura\n\n    def area(self):\n        return self.largura * self.altura\n\n    def perimetro(self):\n        return 2 * (self.largura + self.altura)\n\n    def eh_quadrado(self):\n        return self.largura == self.altura\n\n    def __str__(self):\n        return f\"Retângulo {self.largura}x{self.altura}\"\n\n\nfor r in [Retangulo(3, 4), Retangulo(5, 5)]:\n    print(f\"{r}: área {r.area()}, perímetro {r.perimetro()}, quadrado? {r.eh_quadrado()}\")"}, {"nivel": 2, "titulo": "Conta bancária com extrato", "enunciado": "Crie a classe Conta com titular e saldo. Métodos: depositar(valor), sacar(valor) (que recusa valores inválidos ou maiores que o saldo, com raise) e extrato(), que mostra todas as operações feitas.", "dica": "Guarde as operações numa lista self.historico, com tuplas como (\"depósito\", 100).", "lang": "python", "solucao": "class Conta:\n    def __init__(self, titular, saldo=0):\n        self.titular = titular\n        self.saldo = saldo\n        self.historico = []\n\n    def depositar(self, valor):\n        if valor <= 0:\n            raise ValueError(\"depósito precisa ser positivo\")\n        self.saldo += valor\n        self.historico.append((\"depósito\", valor))\n\n    def sacar(self, valor):\n        if valor <= 0:\n            raise ValueError(\"saque precisa ser positivo\")\n        if valor > self.saldo:\n            raise ValueError(f\"saldo insuficiente (saldo: {self.saldo:.2f})\")\n        self.saldo -= valor\n        self.historico.append((\"saque\", valor))\n\n    def extrato(self):\n        print(f\"Extrato de {self.titular}\")\n        for tipo, valor in self.historico:\n            sinal = \"+\" if tipo == \"depósito\" else \"-\"\n            print(f\"  {tipo:<9} {sinal}{valor:>8.2f}\")\n        print(f\"  {'saldo':<9} {self.saldo:>9.2f}\")\n\n\nc = Conta(\"Ana\")\nc.depositar(500)\nc.sacar(120)\ntry:\n    c.sacar(1000)\nexcept ValueError as e:\n    print(\"Operação recusada:\", e)\nc.extrato()"}, {"nivel": 3, "titulo": "Biblioteca", "enunciado": "Crie as classes Livro (título, autor, disponível) e Biblioteca (lista de livros). A Biblioteca deve ter: adicionar(livro), emprestar(titulo), devolver(titulo) e disponiveis(). Emprestar um livro já emprestado ou inexistente deve gerar um erro com mensagem clara.", "dica": "Biblioteca guarda self.livros = []. Um método auxiliar _buscar(titulo) evita repetir o laço de busca em emprestar e devolver.", "lang": "python", "solucao": "class Livro:\n    def __init__(self, titulo, autor):\n        self.titulo = titulo\n        self.autor = autor\n        self.disponivel = True\n\n    def __str__(self):\n        return f\"{self.titulo}, de {self.autor}\"\n\n\nclass Biblioteca:\n    def __init__(self):\n        self.livros = []\n\n    def adicionar(self, livro):\n        self.livros.append(livro)\n\n    def _buscar(self, titulo):\n        for livro in self.livros:\n            if livro.titulo.lower() == titulo.lower():\n                return livro\n        raise ValueError(f\"não temos o livro \\\"{titulo}\\\"\")\n\n    def emprestar(self, titulo):\n        livro = self._buscar(titulo)\n        if not livro.disponivel:\n            raise ValueError(f\"\\\"{livro.titulo}\\\" já está emprestado\")\n        livro.disponivel = False\n\n    def devolver(self, titulo):\n        self._buscar(titulo).disponivel = True\n\n    def disponiveis(self):\n        return [l for l in self.livros if l.disponivel]\n\n\nb = Biblioteca()\nb.adicionar(Livro(\"Dom Casmurro\", \"Machado de Assis\"))\nb.adicionar(Livro(\"Vidas Secas\", \"Graciliano Ramos\"))\nb.adicionar(Livro(\"O Cortiço\", \"Aluísio Azevedo\"))\n\nb.emprestar(\"vidas secas\")\nfor pedido in [\"Vidas Secas\", \"Harry Potter\"]:\n    try:\n        b.emprestar(pedido)\n    except ValueError as e:\n        print(\"Não foi possível:\", e)\n\nprint(\"Disponíveis:\")\nfor livro in b.disponiveis():\n    print(\" \", livro)"}]}, {"id": "python-modulos", "titulo": "Módulos e bibliotecas", "resumo": "Usar código pronto com import: math, random, datetime, e criar seus próprios módulos.", "ideia": "\n<p>Uma das maiores vantagens do Python é a quantidade de código pronto que vem com ele, a chamada <strong>biblioteca padrão<\/strong>. Para usar, basta importar o <strong>módulo<\/strong> certo. Um módulo é simplesmente um arquivo .py com funções e variáveis.<\/p>\n<h3>Formas de importar<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Forma<\/th><th>Como usa depois<\/th><th>Quando preferir<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>import math<\/code><\/td><td><code>math.sqrt(16)<\/code><\/td><td>padrão: fica claro de onde veio cada função<\/td><\/tr>\n    <tr><td><code>from math import sqrt, pi<\/code><\/td><td><code>sqrt(16)<\/code><\/td><td>quando usa poucas funções, muitas vezes<\/td><\/tr>\n    <tr><td><code>import datetime as dt<\/code><\/td><td><code>dt.date.today()<\/code><\/td><td>para encurtar nomes longos<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>Evite <code>from modulo import *<\/code>: ele traz tudo, e você perde a noção de onde cada nome veio.<\/p>\n<h3>Módulos que você vai usar muito<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Módulo<\/th><th>Para<\/th><th>Exemplos<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>math<\/code><\/td><td>matemática<\/td><td><code>sqrt<\/code>, <code>ceil<\/code>, <code>floor<\/code>, <code>pi<\/code>, <code>factorial<\/code><\/td><\/tr>\n    <tr><td><code>random<\/code><\/td><td>sorteios<\/td><td><code>randint(1, 6)<\/code>, <code>choice(lista)<\/code>, <code>shuffle(lista)<\/code>, <code>sample(lista, k)<\/code><\/td><\/tr>\n    <tr><td><code>datetime<\/code><\/td><td>datas e horas<\/td><td><code>date.today()<\/code>, <code>timedelta(days=30)<\/code>, <code>strftime<\/code><\/td><\/tr>\n    <tr><td><code>statistics<\/code><\/td><td>estatística<\/td><td><code>mean<\/code>, <code>median<\/code>, <code>mode<\/code>, <code>stdev<\/code><\/td><\/tr>\n    <tr><td><code>os<\/code>, <code>pathlib<\/code><\/td><td>arquivos e pastas<\/td><td><code>Path(\"dados\").exists()<\/code><\/td><\/tr>\n    <tr><td><code>json<\/code>, <code>csv<\/code><\/td><td>formatos de arquivo<\/td><td><code>json.dump<\/code>, <code>csv.reader<\/code><\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>Seus próprios módulos<\/h3>\n<p>Qualquer arquivo .py seu é um módulo. Se você tem <code>calculos.py<\/code> com uma função <code>media<\/code>, outro arquivo na mesma pasta pode fazer <code>from calculos import media<\/code>.<\/p>\n<p>Dentro de um módulo, o bloco <code>if __name__ == \"__main__\":<\/code> só roda quando o arquivo é executado diretamente, e não quando é importado. É o lugar dos testes rápidos do módulo.<\/p>\n<h3>Bibliotecas de fora: pip<\/h3>\n<p>Além da biblioteca padrão, há milhares de pacotes instaláveis com o comando <code>pip install nome<\/code> no terminal, como <code>requests<\/code> (acessar sites) e <code>pandas<\/code> (planilhas e dados).<\/p>\n", "exemplos": [{"lang": "python", "titulo": "math, statistics e datetime", "codigo": "import math\nfrom statistics import mean, median\nfrom datetime import date, timedelta\n\n# math\nprint(\"Raiz de 2:\", round(math.sqrt(2), 4))\nprint(\"Área de um círculo de raio 3:\", round(math.pi * 3 ** 2, 2))\nprint(\"Caixas de 12 para 100 ovos:\", math.ceil(100 / 12))\nprint(\"5! =\", math.factorial(5))\n\n# statistics\nnotas = [7.5, 8.0, 6.0, 9.5, 8.0]\nprint(f\"Média {mean(notas):.2f}, mediana {median(notas)}\")\n\n# datetime, com uma data fixa para o exemplo dar sempre o mesmo resultado\ncompra = date(2026, 11, 19)\nvencimento = compra + timedelta(days=30)\nprint(\"Vence em:\", vencimento.strftime(\"%d/%m/%Y\"))\nprint(\"Dia da semana (0 = segunda):\", vencimento.weekday())\n\nnascimento = date(2005, 3, 14)\nidade = compra.year - nascimento.year - ((compra.month, compra.day) < (nascimento.month, nascimento.day))\nprint(\"Idade na data da compra:\", idade)", "explica": ["<code>math.ceil(100 / 12)<\/code> arredonda para cima: 8.33 caixas viram 9, porque não dá para comprar parte de uma caixa.", "<code>timedelta(days=30)<\/code> representa um intervalo de 30 dias. Somado a uma data, dá outra data, e o Python cuida de virar o mês e o ano.", "<code>strftime(\"%d/%m/%Y\")<\/code> formata a data no padrão brasileiro. <code>%d<\/code> é o dia, <code>%m<\/code> o mês, <code>%Y<\/code> o ano com 4 dígitos.", "No cálculo da idade, a comparação de tuplas <code>(mês, dia) &lt; (mês, dia)<\/code> vale True (que conta como 1) se o aniversário ainda não chegou naquele ano."], "saida": "Raiz de 2: 1.4142\nÁrea de um círculo de raio 3: 28.27\nCaixas de 12 para 100 ovos: 9\n5! = 120\nMédia 7.80, mediana 8.0\nVence em: 19/12/2026\nDia da semana (0 = segunda): 5\nIdade na data da compra: 21\n"}, {"lang": "python", "titulo": "random: sorteios reproduzíveis", "codigo": "import random\n\nrandom.seed(42)   # fixa a sequência: útil para testes e para este exemplo\n\nprint(\"Dado:\", random.randint(1, 6))\nprint(\"Sorteado:\", random.choice([\"Ana\", \"Bruno\", \"Carla\", \"Davi\"]))\n\nbaralho = [\"A\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\"]\nrandom.shuffle(baralho)\nprint(\"Embaralhado:\", baralho)\n\nprint(\"3 números da Mega:\", sorted(random.sample(range(1, 61), 3)))\n\n# 10 mil lançamentos de dado: cada face deve sair cerca de 1/6 das vezes\ncontagem = [0] * 7\nfor _ in range(10_000):\n    contagem[random.randint(1, 6)] += 1\nfor face in range(1, 7):\n    print(f\"Face {face}: {contagem[face] / 10_000:.1%}\")", "nota": "Sem o random.seed, cada execução dá resultados diferentes, que é o que se quer num jogo. Com seed, a sequência se repete, o que ajuda a testar.", "saida": "Dado: 6\nSorteado: Ana\nEmbaralhado: ['4', '5', '7', '2', '3', '6', 'A']\n3 números da Mega: [7, 44, 48]\nFace 1: 16.2%\nFace 2: 16.3%\nFace 3: 16.5%\nFace 4: 16.9%\nFace 5: 16.7%\nFace 6: 17.5%\n"}], "pegadinhas": ["Dar a um arquivo seu o mesmo nome de um módulo da biblioteca, como <code>random.py<\/code> ou <code>math.py<\/code>. O <code>import<\/code> passa a carregar o seu arquivo, e nada funciona.", "Esquecer o prefixo: com <code>import math<\/code>, escreva <code>math.sqrt<\/code>, não <code>sqrt<\/code>.", "<code>random.randint(1, 6)<\/code> inclui o 6, diferente de <code>range<\/code>.", "Instalar um pacote com pip e rodar o programa com outro Python (há computadores com várias versões instaladas). Use <code>python -m pip install nome<\/code> para garantir que é o mesmo."], "lembrar": ["import modulo, depois modulo.funcao().", "math, random, datetime e statistics resolvem muita coisa.", "if __name__ == \"__main__\": só roda quando o arquivo é executado direto."], "exercicios": [{"nivel": 1, "titulo": "Dados de RPG", "enunciado": "Simule o lançamento de 3 dados de 6 faces e mostre cada resultado e a soma. Depois, lance 2 dados de 20 faces e mostre o maior.", "dica": "random.randint(1, 6) para cada dado. Uma list comprehension cria a lista de lançamentos de uma vez.", "lang": "python", "solucao": "import random\n\nd6 = [random.randint(1, 6) for _ in range(3)]\nprint(f\"3d6: {d6} = {sum(d6)}\")\n\nd20 = [random.randint(1, 20) for _ in range(2)]\nprint(f\"2d20: {d20}, maior: {max(d20)}\")"}, {"nivel": 2, "titulo": "Quanto falta?", "enunciado": "Leia uma data no formato dd/mm/aaaa e mostre quantos dias faltam para ela a partir de 19/11/2026 (ou quantos dias se passaram, se for no passado), e em que dia da semana ela cai.", "dica": "datetime.strptime(texto, \"%d/%m/%Y\").date() converte o texto. Subtrair duas datas dá um timedelta, com o atributo .days.", "lang": "python", "teste": "25/12/2026", "solucao": "from datetime import date, datetime\n\nDIAS = [\"segunda\", \"terça\", \"quarta\", \"quinta\", \"sexta\", \"sábado\", \"domingo\"]\n\nhoje = date(2026, 11, 19)\ntexto = input(\"Data (dd/mm/aaaa): \")\nalvo = datetime.strptime(texto, \"%d/%m/%Y\").date()\n\ndiferenca = (alvo - hoje).days\nif diferenca > 0:\n    print(f\"Faltam {diferenca} dias.\")\nelif diferenca < 0:\n    print(f\"Passaram-se {-diferenca} dias.\")\nelse:\n    print(\"É hoje!\")\nprint(f\"Cai numa {DIAS[alvo.weekday()]}-feira\" if alvo.weekday() < 5\n      else f\"Cai num {DIAS[alvo.weekday()]}\")"}, {"nivel": 3, "titulo": "Gerador de senhas", "enunciado": "Escreva gerar_senha(tamanho), que cria uma senha aleatória com pelo menos uma letra maiúscula, uma minúscula, um dígito e um símbolo. Use o módulo secrets, feito para senhas, e o módulo string, que tem os conjuntos de caracteres prontos.", "dica": "Garanta um caractere de cada tipo primeiro, complete o resto com secrets.choice sobre todos os caracteres, e embaralhe no final.", "lang": "python", "solucao": "import secrets\nimport string\n\n\ndef gerar_senha(tamanho=12):\n    if tamanho < 4:\n        raise ValueError(\"a senha precisa de pelo menos 4 caracteres\")\n    grupos = [string.ascii_uppercase, string.ascii_lowercase,\n              string.digits, \"!@#$%&*?\"]\n    todos = \"\".join(grupos)\n\n    senha = [secrets.choice(g) for g in grupos]          # um de cada\n    senha += [secrets.choice(todos) for _ in range(tamanho - 4)]\n    secrets.SystemRandom().shuffle(senha)\n    return \"\".join(senha)\n\n\nif __name__ == \"__main__\":\n    for _ in range(3):\n        print(gerar_senha(12))"}]}];
+const PAGINA = {"id": "python", "nome": "Python", "nivel": "Iniciante a intermediário", "descricao": "A linguagem com menos cerimônia: variáveis e entrada, textos, laços, listas e dicionários, funções, erros e exceções, arquivos TXT, JSON e CSV, classes e módulos.", "comoRodar": "\n<p>Baixe o Python 3 em python.org. No Windows, marque a opção <strong>Add Python to PATH<\/strong> durante a instalação. Para escrever o código, o VS Code com a extensão Python é uma ótima escolha; o próprio Python vem com um editor simples, o IDLE.<\/p>\n<p>Salve o código como <code>programa.py<\/code> e rode no terminal:<\/p>\n<table class=\"tabela\"><tbody>\n  <tr><td><code>python programa.py<\/code> (Windows) ou <code>python3 programa.py<\/code> (Linux e macOS)<\/td><td>executa<\/td><\/tr>\n  <tr><td><code>python<\/code> sozinho<\/td><td>abre o modo interativo, ótimo para testar uma linha de cada vez<\/td><\/tr>\n<\/tbody><\/table>\n<p>Sem instalar nada: sites como o OnlineGDB, o Replit e o Google Colab rodam Python no navegador.<\/p>"};
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  const ARQUIVO = { c: "programa.c", java: "Main.java", python: "programa.py", pseudo: "algoritmo (Portugol)", texto: "anotações" };
+
+  /* ---------- progresso salvo no navegador ---------- */
+  const CHAVE = "aula-" + PAGINA.id + "-feitos";
+  const NIVEIS = { 1: "Fácil", 2: "Médio", 3: "Desafio" };
+  const nivelDe = (e, i, n) => e.nivel || (i === 0 ? 1 : (i === n - 1 && n >= 3 ? 3 : 2));
+  let feitos = new Set();
+  try { feitos = new Set(JSON.parse(localStorage.getItem(CHAVE) || "[]")); } catch (e) { /* sem armazenamento */ }
+  function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify([...feitos])); } catch (e) {} }
+  const totalEx = AULAS.reduce((s, a) => s + a.exercicios.length, 0);
+  const feitosDaAula = a => a.exercicios.filter((_, i) => feitos.has(a.id + ":" + i)).length;
+
+  /* ---------- utilidades ---------- */
+  const el = (tag, attrs = {}, html) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+    }
+    if (html != null) n.innerHTML = html;
+    return n;
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  function realcar(codigo, lang) {
+    const g = window.Prism && Prism.languages[lang];
+    return g ? Prism.highlight(codigo, g, lang) : esc(codigo);
+  }
+  function avisar(txt) {
+    const a = document.getElementById("aviso");
+    a.textContent = txt; a.classList.add("ver");
+    clearTimeout(avisar.t); avisar.t = setTimeout(() => a.classList.remove("ver"), 1800);
+  }
+  async function copiar(texto) {
+    try { await navigator.clipboard.writeText(texto); avisar("Código copiado"); }
+    catch (e) { avisar("Não deu para copiar. Selecione o código e use Ctrl+C."); }
+  }
+  // envolve tabelas da prosa num contêiner que rola na horizontal
+  function ajustarTabelas(raiz) {
+    raiz.querySelectorAll("table.tabela").forEach(t => {
+      if (t.parentElement.classList.contains("rolar")) return;
+      const w = el("div", { class: "rolar" }); t.replaceWith(w); w.appendChild(t);
+    });
+  }
+
+  function blocoCodigo(codigo, lang, rotulo) {
+    const box = el("div", { class: "codigo" });
+    const topo = el("div", { class: "codigo-topo" });
+    topo.appendChild(el("span", { text: rotulo || ARQUIVO[lang] || "" }));
+    if (lang !== "texto") {
+      const b = el("button", { class: "botao", type: "button", text: "Copiar" });
+      b.addEventListener("click", () => copiar(codigo));
+      topo.appendChild(b);
+    }
+    box.appendChild(topo);
+    const pre = el("pre"); const c = el("code");
+    c.innerHTML = lang === "texto" ? esc(codigo) : realcar(codigo, lang);
+    pre.appendChild(c); box.appendChild(pre);
+    return box;
+  }
+
+  function terminal(ex) {
+    const t = el("div", { class: "terminal", role: "group", "aria-label": "Saída ao executar" });
+    if (ex.terminal && ex.terminal.length) {
+      t.innerHTML = ex.terminal.map(([tipo, txt]) =>
+        tipo === "in" ? `<span class="in" title="digitado pelo usuário">${esc(txt.replace(/\n$/, ""))}</span>\n` : esc(txt)
+      ).join("").replace(/\n+$/, "");
+    } else {
+      t.textContent = (ex.saida || "").replace(/\n+$/, "");
+    }
+    return t;
+  }
+
+  /* ---------- tabela verdade ---------- */
+  function montarVerdade(alvo) {
+    let A = 1, B = 0;
+    alvo.innerHTML = `
+      <div class="entradas" role="group" aria-label="Valores de entrada">
+        <button type="button" class="chave" data-v="A"></button>
+        <button type="button" class="chave" data-v="B"></button>
+      </div>
+      <dl aria-live="polite">
+        <dt>A &amp;&amp; B</dt><dt>A || B</dt><dt>!A</dt>
+        <dd data-r="e"></dd><dd data-r="ou"></dd><dd data-r="nao"></dd>
+      </dl>`;
+    const pinta = (dd, v) => { dd.textContent = v; dd.className = "v" + v; };
+    function atualizar() {
+      alvo.querySelectorAll(".chave").forEach(b => {
+        const v = b.dataset.v === "A" ? A : B;
+        b.textContent = `${b.dataset.v} = ${v}`;
+        b.setAttribute("aria-pressed", v ? "true" : "false");
+      });
+      pinta(alvo.querySelector('[data-r="e"]'), A && B ? 1 : 0);
+      pinta(alvo.querySelector('[data-r="ou"]'), A || B ? 1 : 0);
+      pinta(alvo.querySelector('[data-r="nao"]'), A ? 0 : 1);
+    }
+    alvo.addEventListener("click", e => {
+      const b = e.target.closest(".chave"); if (!b) return;
+      if (b.dataset.v === "A") A = 1 - A; else B = 1 - B;
+      atualizar();
+    });
+    atualizar();
+  }
+
+  /* ---------- teste de mesa ---------- */
+  function montarMesa(tr) {
+    const linhas = tr.codigo.split("\n");
+    const caixa = el("div", { class: "mesa", tabindex: "0", "aria-label": "Teste de mesa interativo. Use as setas para avançar e voltar." });
+    const realce = realcar(tr.codigo, tr.lang).split("\n");
+    caixa.innerHTML = `
+      <div class="mesa-corpo">
+        <div class="mesa-codigo">${linhas.map((_, i) =>
+          `<div class="ln" data-l="${i + 1}"><span class="num">${i + 1}</span><code>${realce[i] || " "}</code></div>`).join("")}</div>
+        <div class="mesa-lado">
+          <p class="mesa-nota" aria-live="polite"></p>
+          <div class="mesa-tab-wrap"><table class="mesa-tab">
+            <thead><tr><th class="passo">passo</th>${tr.vars.map(v => `<th>${esc(v)}</th>`).join("")}</tr></thead>
+            <tbody></tbody></table></div>
+          <div class="mesa-saida"></div>
+        </div>
+      </div>
+      <div class="mesa-controles">
+        <button type="button" class="botao" data-a="ini">Recomeçar</button>
+        <button type="button" class="botao" data-a="ant">Voltar</button>
+        <button type="button" class="botao ativo" data-a="prox">Próximo passo</button>
+        <span class="contador"></span>
+      </div>`;
+    let p = 0;
+    const N = tr.passos.length;
+    const tbody = caixa.querySelector("tbody");
+    const wrap = caixa.querySelector(".mesa-tab-wrap");
+    function desenhar() {
+      caixa.querySelectorAll(".ln").forEach(l => l.classList.toggle("atual", +l.dataset.l === tr.passos[p].l));
+      caixa.querySelector(".mesa-nota").innerHTML = tr.passos[p].n;
+      let saida = "", linhasTab = "";
+      for (let i = 0; i <= p; i++) {
+        const s = tr.passos[i];
+        if (s.o) saida += s.o;
+        const muda = Object.keys(s.v);
+        if (muda.length) {
+          linhasTab += `<tr class="${i === p ? "atual" : ""}"><td class="passo">${i + 1}</td>${tr.vars.map(v =>
+            muda.includes(v) ? `<td class="mudou">${s.v[v]}</td>` : "<td></td>").join("")}</tr>`;
+        }
+      }
+      tbody.innerHTML = linhasTab;
+      wrap.scrollTop = wrap.scrollHeight;
+      caixa.querySelector(".mesa-saida").textContent = saida;
+      caixa.querySelector(".contador").textContent = `Passo ${p + 1} de ${N}`;
+      caixa.querySelector('[data-a="ant"]').disabled = p === 0;
+      caixa.querySelector('[data-a="ini"]').disabled = p === 0;
+      caixa.querySelector('[data-a="prox"]').disabled = p === N - 1;
+    }
+    caixa.addEventListener("click", e => {
+      const b = e.target.closest("button[data-a]"); if (!b) return;
+      if (b.dataset.a === "prox" && p < N - 1) p++;
+      if (b.dataset.a === "ant" && p > 0) p--;
+      if (b.dataset.a === "ini") p = 0;
+      desenhar();
+    });
+    caixa.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight" && p < N - 1) { p++; desenhar(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && p > 0) { p--; desenhar(); e.preventDefault(); }
+    });
+    desenhar();
+    return caixa;
+  }
+
+  /* ---------- trilha lateral ---------- */
+  const fracao = (f, t) => `<span class="fr${t && f === t ? " completo" : ""}" title="exercícios feitos">${f}/${t}</span>`;
+
+  function desenharTrilha(atual) {
+    const lista = document.getElementById("lista-modulos");
+    lista.innerHTML = "";
+    lista.appendChild(el("div", { class: "modulo-nome" }, `<span class="pino pino-${PAGINA.id}"></span>Aulas`));
+    const ol = el("ol");
+    AULAS.forEach((a, i) => {
+      ol.appendChild(el("li", {}, `<a href="#${a.id}"${a.id === atual ? ' aria-current="page"' : ""}>
+        <span class="n">${i + 1}</span><span>${esc(a.titulo)}</span>${fracao(feitosDaAula(a), a.exercicios.length)}</a>`));
+    });
+    lista.appendChild(ol);
+    const tot = AULAS.reduce((s, a) => s + feitosDaAula(a), 0);
+    document.getElementById("prog-txt").textContent = `${tot} de ${totalEx} exercícios feitos`;
+    document.getElementById("prog-barra").style.width = (100 * tot / totalEx) + "%";
+  }
+
+  /* ---------- página inicial ---------- */
+  function paginaInicio() {
+    const c = document.getElementById("conteudo");
+    const porNivel = [1, 2, 3].map(n => AULAS.reduce((s, a) => s + a.exercicios.filter((e, i) => nivelDe(e, i, a.exercicios.length) === n).length, 0));
+    c.innerHTML = `
+      <h1>${esc(PAGINA.nome)}</h1>
+      <p class="resumo">${PAGINA.descricao}</p>
+      <dl class="ficha">
+        <div><dt>Nível</dt><dd>${esc(PAGINA.nivel)}</dd></div>
+        <div><dt>Aulas</dt><dd>${AULAS.length}</dd></div>
+        <div><dt>Exercícios</dt><dd>${totalEx}: ${porNivel[0]} fáceis, ${porNivel[1]} médios, ${porNivel[2]} desafios</dd></div>
+      </dl>
+      <section class="bloco">
+        <h2>O que você vai aprender</h2>
+        <div class="inicio-modulos"><div class="inicio-modulo"><ol id="lista-aulas"></ol></div></div>
+      </section>
+      <section class="bloco prosa">
+        <h2>Como estudar</h2>
+        <ol class="passos">
+          <li>Siga as aulas na ordem: cada uma usa o que veio antes.</li>
+          <li>Leia a ideia com calma. As comparações com o dia a dia estão ali para você ter uma imagem na cabeça antes do código.</li>
+          <li>Copie o exemplo, rode no seu computador e confira a saída. Depois mude alguma coisa e veja o que acontece.</li>
+          <li>Leia a explicação linha por linha do exemplo e as pegadinhas. Elas mostram os erros que quase todo mundo comete.</li>
+          <li>Faça os exercícios do fácil para o desafio. Tente sem abrir nada; se travar por mais de 10 minutos, abra a dica.</li>
+          <li>Só depois de tentar, compare com a solução e marque como feito.</li>
+        </ol>
+      </section>
+      <section class="bloco prosa">
+        <h2>Como rodar os exemplos</h2>
+        ${PAGINA.comoRodar}
+      </section>
+      <p class="selo">Todos os exemplos e soluções em código foram executados antes de serem publicados. As saídas mostradas nas aulas são as reais. O seu progresso fica salvo só neste navegador.</p>`;
+    ajustarTabelas(c);
+    const ol = c.querySelector("#lista-aulas");
+    AULAS.forEach((a, i) => {
+      ol.appendChild(el("li", {}, `<a href="#${a.id}"><span class="n">${i + 1}</span>
+        <span><span class="t">${esc(a.titulo)}</span><span class="r">${esc(a.resumo)}</span></span>
+        ${fracao(feitosDaAula(a), a.exercicios.length)}</a>`));
+    });
+  }
+
+  /* ---------- página da aula ---------- */
+  function paginaAula(a) {
+    const idx = AULAS.indexOf(a);
+    const c = document.getElementById("conteudo");
+    c.innerHTML = "";
+
+    c.appendChild(el("p", { class: "contexto" },
+      `<a href="#inicio">${esc(PAGINA.nome)}</a>, aula ${idx + 1} de ${AULAS.length}`));
+    c.appendChild(el("h1", { text: a.titulo }));
+    c.appendChild(el("p", { class: "resumo", text: a.resumo }));
+
+    // A ideia
+    const ideia = el("section", { class: "bloco prosa" });
+    ideia.appendChild(el("h2", { text: "A ideia" }));
+    const corpo = el("div", {}, a.ideia);
+    ideia.appendChild(corpo);
+    corpo.querySelectorAll('[data-widget="verdade"]').forEach(montarVerdade);
+    if (a.trace) {
+      corpo.appendChild(montarMesa(a.trace));
+    }
+    ajustarTabelas(ideia);
+    c.appendChild(ideia);
+
+    // Exemplos
+    if (a.exemplos.length) {
+      const sec = el("section", { class: "bloco" });
+      sec.appendChild(el("h2", { text: a.exemplos.length > 1 ? "Exemplos" : "Exemplo" }));
+      for (const ex of a.exemplos) {
+        const box = el("div", { class: "exemplo" });
+        box.appendChild(el("h3", { text: ex.titulo }));
+        box.appendChild(blocoCodigo(ex.codigo, ex.lang));
+        if (ex.saida || (ex.terminal && ex.terminal.length)) box.appendChild(terminal(ex));
+        if (ex.nota) box.appendChild(el("p", { class: "nota", text: ex.nota }));
+        if (ex.explica && ex.explica.length) {
+          const exp = el("div", { class: "explica" });
+          exp.appendChild(el("h4", { text: "Entendendo o código" }));
+          const ul = el("ul");
+          ex.explica.forEach(t => ul.appendChild(el("li", {}, t)));
+          exp.appendChild(ul);
+          box.appendChild(exp);
+        }
+        sec.appendChild(box);
+      }
+      c.appendChild(sec);
+    }
+
+    // Pegadinhas
+    const peg = el("section", { class: "bloco" });
+    peg.appendChild(el("h2", { text: "Pegadinhas" }));
+    const ul = el("ul", { class: "pegadinhas" });
+    a.pegadinhas.forEach(p => ul.appendChild(el("li", {}, p)));
+    peg.appendChild(ul);
+    c.appendChild(peg);
+
+    // Para lembrar
+    const lem = el("aside", { class: "bloco lembrar", "aria-label": "Para lembrar" });
+    lem.appendChild(el("h2", { text: "Para lembrar" }));
+    const ul2 = el("ul");
+    a.lembrar.forEach(p => ul2.appendChild(el("li", {}, p)));
+    lem.appendChild(ul2);
+    c.appendChild(lem);
+
+    // Exercícios
+    const exs = el("section", { class: "bloco" });
+    exs.appendChild(el("h2", { text: "Exercícios" }));
+    const lista = el("div", { class: "exercicios" });
+    a.exercicios.forEach((ex, i) => {
+      const chave = a.id + ":" + i;
+      const card = el("article", { class: "exercicio" + (feitos.has(chave) ? " feito" : "") });
+      const idChk = `feito-${a.id}-${i}`;
+      card.innerHTML = `
+        <div class="ex-topo">
+          <h3>${i + 1}. ${esc(ex.titulo)} <span class="nivel nivel-${nivelDe(ex, i, a.exercicios.length)}">${NIVEIS[nivelDe(ex, i, a.exercicios.length)]}</span></h3>
+          <label class="feito-check" for="${idChk}"><input type="checkbox" id="${idChk}"${feitos.has(chave) ? " checked" : ""}> Já fiz</label>
+        </div>
+        <p>${ex.enunciado}</p>`;
+      if (ex.trecho) {
+        const t = el("div", { class: "ex-trecho" });
+        t.appendChild(blocoCodigo(ex.trecho, ex.trechoLang || "c", "trecho para analisar"));
+        card.appendChild(t);
+      }
+      const acoes = el("div", { class: "ex-acoes" });
+      const bDica = el("button", { class: "botao", type: "button", "aria-expanded": "false", text: "Mostrar dica" });
+      const bSol = el("button", { class: "botao", type: "button", "aria-expanded": "false", text: "Mostrar solução" });
+      acoes.append(bDica, bSol);
+      card.appendChild(acoes);
+      const dica = el("div", { class: "revelar dica", hidden: "" }, `<strong>Dica.</strong> ${ex.dica}`);
+      const sol = el("div", { class: "revelar", hidden: "" });
+      sol.appendChild(blocoCodigo(ex.solucao, ex.lang, ex.lang === "texto" ? "resposta" : "solução: " + ARQUIVO[ex.lang]));
+      card.append(dica, sol);
+      const alternar = (btn, painel, rotuloVer, rotuloEsconder) => () => {
+        const abrir = painel.hidden;
+        painel.hidden = !abrir;
+        btn.setAttribute("aria-expanded", abrir ? "true" : "false");
+        btn.textContent = abrir ? rotuloEsconder : rotuloVer;
+      };
+      bDica.addEventListener("click", alternar(bDica, dica, "Mostrar dica", "Esconder dica"));
+      bSol.addEventListener("click", alternar(bSol, sol, "Mostrar solução", "Esconder solução"));
+      card.querySelector("input").addEventListener("change", e => {
+        if (e.target.checked) feitos.add(chave); else feitos.delete(chave);
+        card.classList.toggle("feito", e.target.checked);
+        salvar(); desenharTrilha(a.id);
+      });
+      lista.appendChild(card);
+    });
+    exs.appendChild(lista);
+    c.appendChild(exs);
+
+    // anterior / próxima
+    const nav = el("nav", { class: "navegar", "aria-label": "Outras aulas" });
+    if (idx > 0) {
+      const ant = AULAS[idx - 1];
+      nav.appendChild(el("a", { href: "#" + ant.id }, `<small>Aula anterior</small><strong>${esc(ant.titulo)}</strong>`));
+    }
+    if (idx < AULAS.length - 1) {
+      const prox = AULAS[idx + 1];
+      nav.appendChild(el("a", { href: "#" + prox.id, class: "prox" }, `<small>Próxima aula</small><strong>${esc(prox.titulo)}</strong>`));
+    }
+    c.appendChild(nav);
+  }
+
+  /* ---------- roteamento pelo # ---------- */
+  function rota() {
+    const id = location.hash.slice(1);
+    const aula = AULAS.find(a => a.id === id);
+    if (aula) { paginaAula(aula); document.title = aula.titulo + " | " + PAGINA.nome; }
+    else { paginaInicio(); document.title = PAGINA.nome; }
+    desenharTrilha(aula ? aula.id : null);
+    document.getElementById("trilha").classList.remove("aberta");
+    const bt = document.getElementById("abrir-trilha");
+    bt.setAttribute("aria-expanded", "false");
+    bt.textContent = "Ver a lista";
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("abrir-trilha").addEventListener("click", e => {
+    const t = document.getElementById("trilha");
+    const aberta = t.classList.toggle("aberta");
+    e.currentTarget.setAttribute("aria-expanded", aberta ? "true" : "false");
+    e.currentTarget.textContent = aberta ? "Fechar a lista" : "Ver a lista";
+  });
+  window.addEventListener("hashchange", () => { rota(); document.getElementById("folha").focus({ preventScroll: true }); });
+  rota();
+})();
+</script>
+</body>
+</html>

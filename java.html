@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Caderno quadriculado de dia, lousa à noite.
+   Layout: trilha de aulas à esquerda; a folha da aula à direita, com a linha vermelha de margem do caderno. */
+:root {
+  --papel: #f5f7fb;
+  --grade: #e1e7f0;
+  --tinta: #1c2a4a;
+  --lapis: #556079;
+  --margem: #d24b45;
+  --caneta: #2b56c9;
+  --marca: #ffe27a;
+  --painel: #ffffff;
+  --borda: #cfd7e4;
+  --term-bg: #1b2130;
+  --term-txt: #d9e1ef;
+  --term-in: #ffd66b;
+  --ok: #23855a;
+
+  --k-kw: #a3336d; --k-str: #2c7a4b; --k-num: #b4561a; --k-com: #758099;
+  --k-fn: #2b56c9; --k-cls: #8a6400; --k-op: #4a5570;
+
+  --f-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-codigo: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #1d2925; --grade: #26342f; --tinta: #e4ebe3; --lapis: #a2afa7;
+    --margem: #e5867c; --caneta: #8fb9f3; --marca: #e9d27c; --painel: #24322d;
+    --borda: #3a4b45; --term-bg: #111815; --term-txt: #d6e0da; --term-in: #f0d47a; --ok: #7fd3a5;
+    --k-kw: #f0a6c4; --k-str: #a8db9a; --k-num: #f4b47a; --k-com: #8d9c94;
+    --k-fn: #9dc3f7; --k-cls: #e9d27c; --k-op: #b9c6be;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #1d2925; --grade: #26342f; --tinta: #e4ebe3; --lapis: #a2afa7;
+  --margem: #e5867c; --caneta: #8fb9f3; --marca: #e9d27c; --painel: #24322d;
+  --borda: #3a4b45; --term-bg: #111815; --term-txt: #d6e0da; --term-in: #f0d47a; --ok: #7fd3a5;
+  --k-kw: #f0a6c4; --k-str: #a8db9a; --k-num: #f4b47a; --k-com: #8d9c94;
+  --k-fn: #9dc3f7; --k-cls: #e9d27c; --k-op: #b9c6be;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background-color: var(--papel);
+  background-image:
+    linear-gradient(var(--grade) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--tinta);
+  font: 17px/1.6 var(--f-texto);
+}
+a { color: var(--caneta); }
+:focus-visible { outline: 3px solid var(--caneta); outline-offset: 2px; border-radius: 4px; }
+code, pre { font-family: var(--f-codigo); }
+:not(pre) > code {
+  font-size: .86em; padding: .08em .35em; border-radius: 4px;
+  background: color-mix(in srgb, var(--painel) 70%, var(--grade));
+  border: 1px solid var(--borda);
+  white-space: nowrap;
+}
+h1, h2, h3 { font-family: var(--f-titulo); line-height: 1.15; text-wrap: balance; margin: 0; }
+
+/* ---------- estrutura ---------- */
+.app {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 280px minmax(0, 1fr);
+  gap: 0; min-height: 100vh;
+}
+.trilha {
+  position: sticky; top: 0; align-self: start;
+  height: 100vh; overflow-y: auto;
+  padding: 28px 20px 40px 24px;
+  border-right: 1px solid var(--borda);
+  background: color-mix(in srgb, var(--papel) 88%, transparent);
+}
+.marca-site {
+  display: block; text-decoration: none; color: var(--tinta);
+  font: 800 1.35rem/1.1 var(--f-titulo); margin-bottom: 4px;
+}
+.progresso-geral { font-size: .86rem; color: var(--lapis); margin: 0 0 22px; }
+.barra { height: 6px; border-radius: 3px; background: var(--grade); margin-top: 6px; overflow: hidden; }
+.barra > span { display: block; height: 100%; background: var(--ok); width: 0; transition: width .3s; }
+
+.modulo-nome {
+  font: 600 .95rem var(--f-titulo); margin: 18px 0 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pino { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.pino-logica { background: #8b6fd6; } .pino-c { background: #4a7fc4; }
+.pino-java { background: #d9822b; } .pino-python { background: #3c9a6e; }
+
+.trilha ol { list-style: none; margin: 0; padding: 0; }
+.trilha li a {
+  display: grid; grid-template-columns: 1.6em 1fr auto; gap: 6px; align-items: baseline;
+  padding: 5px 8px; border-radius: 6px; text-decoration: none;
+  color: var(--tinta); font-size: .92rem; line-height: 1.3;
+}
+.trilha li a:hover { background: var(--grade); }
+.trilha li a[aria-current="page"] { background: var(--tinta); color: var(--papel); }
+.trilha .n { color: var(--lapis); font-variant-numeric: tabular-nums; font-size: .82rem; }
+.trilha a[aria-current="page"] .n, .trilha a[aria-current="page"] .fr { color: inherit; opacity: .75; }
+.trilha .fr { font-size: .78rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.trilha .fr.completo { color: var(--ok); font-weight: 700; }
+
+.abrir-trilha { display: none; }
+
+.folha {
+  border-left: 2px solid var(--margem);
+  margin-left: 40px;
+  padding: 40px clamp(20px, 4vw, 56px) 80px;
+  min-width: 0;
+}
+.conteudo { max-width: 760px; }
+
+/* ---------- textos da aula ---------- */
+.contexto { color: var(--lapis); font-size: .95rem; margin: 0 0 8px; }
+.folha h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -.02em; }
+.resumo { font-size: 1.15rem; color: var(--lapis); margin: 12px 0 0; max-width: 60ch; }
+.bloco { margin-top: 48px; }
+.bloco > h2 { font-size: 1.45rem; font-weight: 800; margin-bottom: 14px; }
+.prosa p, .prosa li { max-width: 66ch; }
+.prosa p { margin: 0 0 14px; }
+.prosa ul, .prosa ol { padding-left: 1.3em; margin: 0 0 14px; }
+.prosa li { margin-bottom: 6px; }
+ol.passos { counter-reset: p; list-style: none; padding: 0; }
+ol.passos li { counter-increment: p; position: relative; padding-left: 2.2em; }
+ol.passos li::before {
+  content: counter(p); position: absolute; left: 0; top: .05em;
+  width: 1.55em; height: 1.55em; border-radius: 50%;
+  border: 1.5px solid var(--tinta); display: grid; place-items: center;
+  font: 700 .8rem var(--f-titulo);
+}
+
+.rolar { overflow-x: auto; margin: 6px 0 18px; }
+.tabela { border-collapse: collapse; width: 100%; font-size: .93rem; background: var(--painel); }
+.tabela th, .tabela td { text-align: left; padding: 8px 12px; border: 1px solid var(--borda); vertical-align: top; }
+.tabela th { font-family: var(--f-titulo); font-weight: 600; background: color-mix(in srgb, var(--painel) 80%, var(--grade)); }
+.tabela code { white-space: pre; }
+
+/* ---------- código e terminal ---------- */
+.exemplo { margin: 0 0 32px; }
+.exemplo h3 { font-size: 1.12rem; font-weight: 600; margin: 0 0 10px; }
+.codigo {
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  overflow: hidden;
+}
+.codigo-topo {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 6px 8px 6px 14px; border-bottom: 1px solid var(--borda);
+  font: .8rem var(--f-codigo); color: var(--lapis);
+}
+.codigo pre { margin: 0; padding: 14px 16px; overflow-x: auto; font-size: .85rem; line-height: 1.6; tab-size: 4; }
+.botao {
+  font: 600 .85rem var(--f-texto); color: var(--tinta);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 6px;
+  padding: 5px 12px; cursor: pointer;
+}
+.botao:hover { border-color: var(--tinta); }
+.botao[aria-pressed="true"], .botao.ativo { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.botao:disabled { opacity: .45; cursor: default; }
+
+.terminal {
+  margin-top: 0; background: var(--term-bg); color: var(--term-txt);
+  border-radius: 0 0 10px 10px; padding: 14px 16px 16px;
+  font: .84rem/1.55 var(--f-codigo); white-space: pre; overflow-x: auto;
+  position: relative;
+}
+.terminal::before {
+  content: "Saída ao executar"; display: block; margin-bottom: 8px;
+  font: .76rem var(--f-texto); color: color-mix(in srgb, var(--term-txt) 60%, transparent);
+}
+.terminal .in { color: var(--term-in); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.codigo + .terminal { border-top: 0; }
+.codigo:has(+ .terminal) { border-radius: 10px 10px 0 0; }
+.nota { font-size: .93rem; color: var(--lapis); margin: 10px 0 0; max-width: 66ch; }
+
+/* tokens do Prism */
+.token.comment, .token.prolog { color: var(--k-com); font-style: italic; }
+.token.keyword, .token.boolean, .token.macro, .token.directive-hash, .token.directive { color: var(--k-kw); }
+.token.string, .token.char, .token.template-string { color: var(--k-str); }
+.token.number { color: var(--k-num); }
+.token.function { color: var(--k-fn); }
+.token.class-name, .token.builtin { color: var(--k-cls); }
+.token.operator, .token.punctuation { color: var(--k-op); }
+.token.macro .token.string { color: var(--k-str); }
+
+/* ---------- pegadinhas e lembrar ---------- */
+.pegadinhas { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.pegadinhas li {
+  padding: 12px 16px; background: var(--painel);
+  border: 1px solid var(--borda); border-left: 4px solid var(--margem); border-radius: 0 8px 8px 0;
+  max-width: 70ch;
+}
+.lembrar {
+  background: var(--marca); color: #2a2410; border-radius: 3px;
+  padding: 18px 22px 18px; transform: rotate(-.4deg);
+  box-shadow: 0 1px 0 rgba(0,0,0,.08), 0 8px 18px -12px rgba(0,0,0,.35);
+  max-width: 560px;
+}
+.lembrar h2 { font-size: 1.15rem; margin: 0 0 8px; color: inherit; }
+.lembrar ul { margin: 0; padding-left: 1.2em; }
+.lembrar li { margin-bottom: 4px; }
+.lembrar code { background: rgba(255,255,255,.5); border-color: rgba(0,0,0,.15); color: inherit; }
+
+/* ---------- exercícios ---------- */
+.exercicios { display: grid; gap: 18px; }
+.exercicio {
+  background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  padding: 18px 20px;
+}
+.exercicio.feito { border-color: var(--ok); box-shadow: inset 4px 0 0 var(--ok); }
+.ex-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.exercicio h3 { font-size: 1.1rem; font-weight: 600; }
+.exercicio p { margin: 8px 0 0; max-width: 66ch; }
+.feito-check { display: flex; align-items: center; gap: 6px; font-size: .88rem; color: var(--lapis); white-space: nowrap; cursor: pointer; }
+.feito-check input { width: 18px; height: 18px; accent-color: var(--ok); margin: 0; }
+.ex-trecho { margin-top: 12px; }
+.ex-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.revelar { margin-top: 12px; }
+.revelar[hidden] { display: none; }
+.dica {
+  padding: 10px 14px; border-radius: 6px;
+  background: color-mix(in srgb, var(--marca) 35%, var(--painel));
+  border: 1px dashed color-mix(in srgb, var(--marca) 60%, var(--tinta));
+}
+.dica strong { font-family: var(--f-titulo); }
+
+/* ---------- teste de mesa interativo ---------- */
+.mesa {
+  margin: 8px 0 24px; border: 1.5px solid var(--tinta); border-radius: 12px;
+  background: var(--painel); overflow: hidden;
+}
+.mesa-corpo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+.mesa-codigo { border-right: 1px solid var(--borda); padding: 12px 0; overflow-x: auto; }
+.mesa-codigo .ln {
+  display: grid; grid-template-columns: 2.4em 1fr; font: .84rem/1.75 var(--f-codigo);
+  padding-right: 14px; white-space: pre;
+}
+.mesa-codigo .ln code { background: none; border: 0; padding: 0; font-size: inherit; white-space: pre; border-radius: 0; }
+.mesa-codigo .ln .num { color: var(--lapis); text-align: right; padding-right: 12px; user-select: none; }
+.mesa-codigo .ln.atual { background: color-mix(in srgb, var(--marca) 55%, transparent); }
+.mesa-codigo .ln.atual .num { color: var(--tinta); font-weight: 700; }
+.mesa-lado { padding: 14px 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.mesa-tab { border-collapse: collapse; width: 100%; font: .85rem var(--f-codigo); font-variant-numeric: tabular-nums; }
+.mesa-tab th, .mesa-tab td { border-bottom: 1px solid var(--borda); padding: 4px 8px; text-align: center; }
+.mesa-tab th { font-family: var(--f-codigo); font-weight: 600; border-bottom: 1.5px solid var(--tinta); }
+.mesa-tab td.passo { color: var(--lapis); text-align: left; width: 3.5em; }
+.mesa-tab tr.atual td { background: color-mix(in srgb, var(--marca) 45%, transparent); }
+.mesa-tab td.mudou { font-weight: 700; }
+.mesa-tab-wrap { max-height: 230px; overflow: auto; }
+.mesa-saida { font: .84rem var(--f-codigo); background: var(--term-bg); color: var(--term-txt); padding: 8px 10px; border-radius: 6px; min-height: 2.4em; white-space: pre-wrap; }
+.mesa-saida::before { content: "Saída: "; color: color-mix(in srgb, var(--term-txt) 55%, transparent); }
+.mesa-nota { margin: 0; font-size: .95rem; min-height: 3em; }
+.mesa-controles {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; border-top: 1px solid var(--borda);
+  background: color-mix(in srgb, var(--painel) 85%, var(--grade));
+}
+.mesa-controles .contador { margin-left: auto; font-size: .88rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+
+/* ---------- tabela verdade interativa ---------- */
+.verdade { margin: 8px 0 24px; display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: center;
+  padding: 16px 18px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px; }
+.verdade .entradas { display: flex; gap: 10px; }
+.chave {
+  font: 700 1rem var(--f-codigo); min-width: 4.6em; padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  border: 1.5px solid var(--tinta); background: var(--painel); color: var(--tinta);
+}
+.chave[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.verdade dl { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 22px; margin: 0; }
+.verdade dt { font: .85rem var(--f-codigo); color: var(--lapis); }
+.verdade dd { margin: 0; font: 700 1.2rem var(--f-codigo); }
+.verdade dd.v1 { color: var(--ok); } .verdade dd.v0 { color: var(--margem); }
+
+/* ---------- fluxograma ---------- */
+.fluxo-par { margin: 6px 0 18px; }
+.fluxo { width: 100%; max-width: 330px; height: auto; display: block; }
+.f-forma { fill: var(--painel); stroke: var(--tinta); stroke-width: 1.6; }
+.f-dec { fill: color-mix(in srgb, var(--marca) 45%, var(--painel)); }
+.f-linha { stroke: var(--tinta); stroke-width: 1.6; fill: none; }
+.f-seta { fill: var(--tinta); }
+.f-txt { fill: var(--tinta); font: 13px var(--f-codigo); text-anchor: middle; }
+.f-rot { fill: var(--lapis); font: 12px var(--f-texto); text-anchor: middle; }
+
+/* ---------- início ---------- */
+.inicio-modulos { display: grid; gap: 28px; margin-top: 18px; }
+.inicio-modulo h3 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.inicio-modulo ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+.inicio-modulo li a {
+  display: grid; grid-template-columns: 2em 1fr auto; gap: 8px; align-items: baseline;
+  padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--tinta);
+}
+.inicio-modulo li a:hover { background: var(--painel); }
+.inicio-modulo .n { color: var(--lapis); font-variant-numeric: tabular-nums; }
+.inicio-modulo .t { font-weight: 700; }
+.inicio-modulo .r { display: block; font-weight: 400; color: var(--lapis); font-size: .93rem; }
+.inicio-modulo .fr { font-size: .85rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.inicio-modulo .fr.completo { color: var(--ok); font-weight: 700; }
+.selo { font-size: .93rem; color: var(--lapis); margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--borda); max-width: 66ch; }
+
+/* ---------- navegação entre aulas ---------- */
+.navegar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 56px; }
+.navegar a {
+  display: block; padding: 14px 16px; border: 1px solid var(--borda); border-radius: 10px;
+  background: var(--painel); text-decoration: none; color: var(--tinta);
+}
+.navegar a:hover { border-color: var(--tinta); }
+.navegar small { display: block; color: var(--lapis); font-size: .85rem; }
+.navegar strong { font-family: var(--f-titulo); font-weight: 600; }
+.navegar .prox { text-align: right; grid-column: 2; }
+
+.aviso { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: var(--tinta); color: var(--papel); padding: 8px 16px; border-radius: 8px; font-size: .9rem;
+  opacity: 0; pointer-events: none; transition: opacity .2s; }
+.aviso.ver { opacity: 1; }
+
+.pino-c-basico { background: #4a7fc4; } .pino-c-avancado { background: #2c4f8a; }
+.mesa-tab thead th { position: sticky; top: 0; background: var(--painel); z-index: 1; }
+.trilha .modulo-nome.outros { margin-top: 26px; color: var(--lapis); }
+.outros-cadernos a { grid-template-columns: 1.6em 1fr auto !important; }
+.outros-cadernos .pino { justify-self: center; align-self: center; }
+.contexto a { color: inherit; }
+.ficha { display: flex; flex-wrap: wrap; gap: 10px 36px; margin: 24px 0 0; }
+.ficha dt { font-size: .85rem; color: var(--lapis); }
+.ficha dd { margin: 0; font-weight: 700; }
+.cadernos { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.cartao-caderno {
+  display: grid; grid-template-columns: 2.2em 1fr auto; gap: 12px; align-items: start;
+  padding: 16px 18px; background: var(--painel); border: 1px solid var(--borda); border-radius: 10px;
+  text-decoration: none; color: var(--tinta);
+}
+.cartao-caderno:hover { border-color: var(--tinta); }
+.cc-n { font: 800 1.5rem/1 var(--f-titulo); color: var(--lapis); font-variant-numeric: tabular-nums; }
+.cc-corpo { display: grid; gap: 4px; }
+.cc-nome { font: 600 1.2rem var(--f-titulo); display: flex; align-items: center; gap: 8px; }
+.cc-desc { max-width: 60ch; }
+.cc-meta { font-size: .9rem; color: var(--lapis); }
+.cc-aulas { font-size: .88rem; color: var(--lapis); }
+.cartao-caderno .fr { font-size: .9rem; color: var(--lapis); font-variant-numeric: tabular-nums; }
+.cartao-caderno .fr.completo { color: var(--ok); font-weight: 700; }
+
+.pino-logica { background: #8b6fd6; }
+.explica { margin-top: 14px; padding: 14px 18px; border-radius: 8px; background: var(--painel); border: 1px solid var(--borda); }
+.explica h4 { margin: 0 0 8px; font: 600 1rem var(--f-titulo); }
+.explica ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.explica li { max-width: 68ch; }
+.nivel { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+  font: 600 .74rem var(--f-texto); border: 1px solid currentColor; }
+.nivel-1 { color: var(--ok); } .nivel-2 { color: var(--caneta); } .nivel-3 { color: var(--margem); }
+.prosa h3 { font-size: 1.15rem; font-weight: 600; margin: 26px 0 10px; }
+
+/* ---------- telas menores ---------- */
+@media (max-width: 920px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .trilha {
+    position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--borda);
+    padding: 14px 16px; background: var(--papel);
+  }
+  .trilha .progresso-geral { margin-bottom: 8px; }
+  .abrir-trilha { display: inline-block; }
+  .trilha:not(.aberta) .lista-modulos { display: none; }
+  .folha { margin-left: 14px; padding: 28px 16px 64px 18px; }
+  .mesa-corpo { grid-template-columns: minmax(0, 1fr); }
+  .mesa-codigo { border-right: 0; border-bottom: 1px solid var(--borda); }
+}
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .navegar { grid-template-columns: 1fr; }
+  .navegar .prox { grid-column: 1; }
+  .ex-topo { flex-direction: column; gap: 8px; }
+  .lembrar { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="trilha" id="trilha" aria-label="Aulas">
+    <a class="marca-site" href="#inicio">Java</a>
+    <p class="progresso-geral"><span id="prog-txt"></span><span class="barra" aria-hidden="true"><span id="prog-barra"></span></span></p>
+    <button class="botao abrir-trilha" id="abrir-trilha" aria-expanded="false" aria-controls="lista-modulos">Ver a lista</button>
+    <div class="lista-modulos" id="lista-modulos"></div>
+  </nav>
+  <main class="folha" id="folha" tabindex="-1">
+    <div class="conteudo" id="conteudo"></div>
+  </main>
+</div>
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script>
+const AULAS = [{"id": "java-fundamentos", "modulo": "java", "titulo": "Primeiros passos em Java", "resumo": "Estrutura de um programa, tipos, String e leitura com Scanner.", "ideia": "\n<p>Se você já viu C, Java vai parecer familiar: tipos, <code>if<\/code>, <code>for<\/code> e <code>while<\/code> são quase iguais. A grande diferença é que <strong>tudo em Java mora dentro de uma classe<\/strong>, até o <code>main<\/code>.<\/p>\n<table class=\"tabela\">\n  <thead><tr><th>Em C<\/th><th>Em Java<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>printf(\"%d\\n\", x);<\/code><\/td><td><code>System.out.println(x);<\/code> ou <code>System.out.printf(\"%d%n\", x);<\/code><\/td><\/tr>\n    <tr><td><code>scanf(\"%d\", &amp;x);<\/code><\/td><td><code>x = sc.nextInt();<\/code><\/td><\/tr>\n    <tr><td><code>char nome[50]<\/code><\/td><td><code>String nome<\/code><\/td><\/tr>\n    <tr><td><code>int ok = 1;<\/code><\/td><td><code>boolean ok = true;<\/code><\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p><code>String<\/code> começa com letra maiúscula porque não é um tipo primitivo: é uma classe, e por isso tem métodos como <code>length()<\/code>, <code>toUpperCase()<\/code> e <code>equals()<\/code>.<\/p>\n", "exemplos": [{"lang": "java", "titulo": "Lendo e mostrando dados", "entrada": "Carla\n21", "codigo": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n\n        System.out.print(\"Nome: \");\n        String nome = sc.nextLine();\n\n        System.out.print(\"Idade: \");\n        int idade = sc.nextInt();\n\n        boolean maior = idade >= 18;\n        double altura = 1.68;\n\n        System.out.println(\"Olá, \" + nome + \"!\");\n        System.out.println(\"Maior de idade: \" + maior);\n        System.out.printf(\"Altura: %.2f m%n\", altura);\n        System.out.println(\"Seu nome tem \" + nome.length() + \" letras\");\n        System.out.println(\"Em maiúsculas: \" + nome.toUpperCase());\n\n        sc.close();\n    }\n}", "nota": "O nome do arquivo precisa ser igual ao da classe pública: este código vai em Main.java.", "saida": "Nome: Idade: Olá, Carla!\nMaior de idade: true\nAltura: 1.68 m\nSeu nome tem 5 letras\nEm maiúsculas: CARLA\n", "terminal": [["out", "Nome: "], ["in", "Carla\n"], ["out", "Idade: "], ["in", "21\n"], ["out", "Olá, Carla!\nMaior de idade: true\nAltura: 1.68 m\nSeu nome tem 5 letras\nEm maiúsculas: CARLA\n"]]}], "pegadinhas": ["Compare textos com <code>a.equals(b)<\/code>, nunca com <code>a == b<\/code>. O <code>==<\/code> compara se são o mesmo objeto, não se têm o mesmo conteúdo.", "Depois de <code>nextInt()<\/code>, o Enter fica no buffer. Se o próximo for <code>nextLine()<\/code>, ele lê uma linha vazia. Chame um <code>sc.nextLine();<\/code> extra para descartar.", "Com o computador em português, <code>nextDouble()<\/code> espera vírgula: digite 1,75 e não 1.75. Ou crie o Scanner com <code>.useLocale(Locale.US)<\/code>.", "Java diferencia maiúsculas: <code>string<\/code> e <code>String<\/code> são coisas diferentes, e só a segunda existe."], "lembrar": ["Tudo dentro de uma classe. O programa começa em public static void main.", "Texto se compara com equals."], "exercicios": [{"titulo": "Salário líquido", "enunciado": "Leia o nome, as horas trabalhadas e o valor da hora. Mostre o salário bruto, o desconto de 11% e o líquido.", "dica": "bruto = horas * valorHora; desconto = bruto * 0.11; liquido = bruto - desconto. Use printf com %.2f.", "lang": "java", "teste": "Davi\n160\n25.5", "solucao": "import java.util.Locale;\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in).useLocale(Locale.US);\n\n        System.out.print(\"Nome: \");\n        String nome = sc.nextLine();\n        System.out.print(\"Horas: \");\n        int horas = sc.nextInt();\n        System.out.print(\"Valor da hora: \");\n        double valorHora = sc.nextDouble();\n\n        double bruto = horas * valorHora;\n        double desconto = bruto * 0.11;\n        double liquido = bruto - desconto;\n\n        System.out.printf(\"%n%s%n\", nome);\n        System.out.printf(\"Bruto:    R$ %9.2f%n\", bruto);\n        System.out.printf(\"Desconto: R$ %9.2f%n\", desconto);\n        System.out.printf(\"Líquido:  R$ %9.2f%n\", liquido);\n        sc.close();\n    }\n}"}, {"titulo": "Celsius para Fahrenheit e Kelvin", "enunciado": "Leia uma temperatura em Celsius e mostre em Fahrenheit (F = C × 9/5 + 32) e Kelvin (K = C + 273.15).", "dica": "Escreva 9.0 / 5 e não 9 / 5. Entre inteiros, 9 / 5 dá 1.", "lang": "java", "teste": "36.5", "solucao": "import java.util.Locale;\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in).useLocale(Locale.US);\n        System.out.print(\"Celsius: \");\n        double c = sc.nextDouble();\n\n        double f = c * 9.0 / 5 + 32;\n        double k = c + 273.15;\n\n        System.out.printf(\"%.1f °C = %.1f °F = %.2f K%n\", c, f, k);\n        sc.close();\n    }\n}"}, {"titulo": "Palíndromo", "enunciado": "Leia uma palavra e diga se ela é um palíndromo, ou seja, se é igual de trás para frente, como \"arara\" e \"Radar\".", "dica": "new StringBuilder(palavra).reverse().toString() inverte. Converta para minúsculas antes e compare com equals.", "lang": "java", "teste": "Radar", "solucao": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Palavra: \");\n        String palavra = sc.next().toLowerCase();\n\n        String invertida = new StringBuilder(palavra).reverse().toString();\n\n        if (palavra.equals(invertida)) {\n            System.out.println(palavra + \" é palíndromo\");\n        } else {\n            System.out.println(palavra + \" não é palíndromo\");\n        }\n        sc.close();\n    }\n}"}]}, {"id": "java-decisoes-lacos", "titulo": "Decisões e laços", "resumo": "if, else, switch, for, while e do-while em Java, com os cuidados próprios da linguagem.", "ideia": "\n<p>Decisões e laços são o que dão \"inteligência\" ao programa: escolher caminhos e repetir tarefas. Em Java, eles funcionam com uma regra importante: <strong>as condições precisam ser do tipo boolean<\/strong>, ou seja, <code>true<\/code> ou <code>false<\/code>. Não dá para usar um número no lugar.<\/p>\n<h3>Decisões<\/h3>\n<ul>\n  <li><code>if (condição) { … }<\/code>: executa só se a condição for verdadeira.<\/li>\n  <li><code>if … else<\/code>: dois caminhos; exatamente um executa.<\/li>\n  <li><code>if … else if … else<\/code>: vários caminhos; o primeiro verdadeiro vence.<\/li>\n  <li><code>switch<\/code>: compara um valor com várias opções fixas. Funciona com <code>int<\/code>, <code>char<\/code>, <code>String<\/code> e enums.<\/li>\n  <li>Operador ternário: <code>condição ? valorSeVerdadeiro : valorSeFalso<\/code>. Útil para escolher entre dois valores numa linha só.<\/li>\n<\/ul>\n<h3>Operadores lógicos<\/h3>\n<p><code>&amp;&amp;<\/code> (e), <code>||<\/code> (ou) e <code>!<\/code> (não). Eles param de avaliar assim que o resultado está definido: em <code>a != null &amp;&amp; a.length() &gt; 0<\/code>, se <code>a<\/code> é null, a segunda parte nem é executada. Isso evita erros.<\/p>\n<h3>Laços<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Laço<\/th><th>Use quando<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>for (int i = 0; i &lt; n; i++)<\/code><\/td><td>sabe quantas vezes vai repetir<\/td><\/tr>\n    <tr><td><code>for (Tipo x : colecao)<\/code><\/td><td>quer passar por cada elemento de um array ou lista (for-each)<\/td><\/tr>\n    <tr><td><code>while (condição)<\/code><\/td><td>repete enquanto algo for verdadeiro; pode não executar nenhuma vez<\/td><\/tr>\n    <tr><td><code>do { … } while (condição);<\/code><\/td><td>executa pelo menos uma vez<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>Dentro de laços: <code>break<\/code> sai do laço na hora; <code>continue<\/code> pula para a próxima volta.<\/p>\n<h3>Switch moderno<\/h3>\n<p>Desde o Java 14 existe uma forma mais curta de <code>switch<\/code>, com setas. Ela não precisa de <code>break<\/code> e pode devolver um valor. Se o seu curso usa uma versão antiga do Java, use a forma clássica, com <code>case X:<\/code> e <code>break<\/code>.<\/p>\n", "exemplos": [{"lang": "java", "titulo": "Classificação, switch e ternário", "codigo": "public class Main {\n    public static void main(String[] args) {\n        double imc = 27.3;\n\n        String faixa;\n        if (imc < 18.5) {\n            faixa = \"abaixo do peso\";\n        } else if (imc < 25) {\n            faixa = \"normal\";\n        } else if (imc < 30) {\n            faixa = \"sobrepeso\";\n        } else {\n            faixa = \"obesidade\";\n        }\n        System.out.println(\"IMC \" + imc + \": \" + faixa);\n\n        // switch clássico\n        int mes = 2;\n        switch (mes) {\n            case 12:\n            case 1:\n            case 2:\n                System.out.println(\"Verão\");\n                break;\n            case 6:\n            case 7:\n            case 8:\n                System.out.println(\"Inverno\");\n                break;\n            default:\n                System.out.println(\"Outra estação\");\n        }\n\n        // switch moderno (Java 14+): devolve um valor, sem break\n        String dia = \"sab\";\n        String tipo = switch (dia) {\n            case \"sab\", \"dom\" -> \"fim de semana\";\n            default -> \"dia útil\";\n        };\n        System.out.println(dia + \" é \" + tipo);\n\n        // ternário\n        int idade = 16;\n        System.out.println(idade >= 18 ? \"Pode dirigir\" : \"Ainda não pode dirigir\");\n    }\n}", "explica": ["A variável <code>faixa<\/code> é declarada antes do <code>if<\/code> e recebe valor em todos os caminhos. O compilador Java confere isso: se algum caminho deixasse a variável sem valor, o código não compilaria.", "No switch clássico, vários <code>case<\/code> seguidos sem <code>break<\/code> compartilham o mesmo código: 12, 1 e 2 são verão.", "No switch moderno, <code>case \"sab\", \"dom\" -&gt;<\/code> junta opções com vírgula, e o resultado vai direto para a variável <code>tipo<\/code>.", "O ternário <code>idade &gt;= 18 ? A : B<\/code> vale A se a condição for verdadeira e B se for falsa."], "saida": "IMC 27.3: sobrepeso\nVerão\nsab é fim de semana\nAinda não pode dirigir\n"}, {"lang": "java", "titulo": "Os laços, com break e continue", "codigo": "public class Main {\n    public static void main(String[] args) {\n        // for: soma dos múltiplos de 3 até 30\n        int soma = 0;\n        for (int i = 3; i <= 30; i += 3) {\n            soma += i;\n        }\n        System.out.println(\"Soma dos múltiplos de 3: \" + soma);\n\n        // while: quantas vezes dá para dividir por 2\n        int n = 1000, divisoes = 0;\n        while (n > 1) {\n            n /= 2;\n            divisoes++;\n        }\n        System.out.println(\"1000 dividido por 2 até chegar a 1: \" + divisoes + \" vezes\");\n\n        // continue pula os pares; break para no primeiro múltiplo de 7\n        for (int i = 1; i <= 20; i++) {\n            if (i % 2 == 0) continue;\n            if (i % 7 == 0) {\n                System.out.println(\"\\nParou no \" + i);\n                break;\n            }\n            System.out.print(i + \" \");\n        }\n\n        // for-each\n        String[] frutas = {\"maçã\", \"banana\", \"uva\"};\n        for (String f : frutas) {\n            System.out.println(f.toUpperCase());\n        }\n    }\n}", "saida": "Soma dos múltiplos de 3: 165\n1000 dividido por 2 até chegar a 1: 9 vezes\n1 3 5 \nParou no 7\nMAÇÃ\nBANANA\nUVA\n"}], "pegadinhas": ["<code>if (x = 5)<\/code> não compila em Java, porque o resultado não é boolean. Bom: o compilador pega esse erro clássico. Use <code>==<\/code>.", "Comparar Strings com <code>==<\/code> no if. Use <code>.equals()<\/code>. (No <code>switch<\/code> com String, o Java já usa equals internamente.)", "Esquecer o <code>break<\/code> no switch clássico faz a execução continuar no próximo case.", "Ponto e vírgula logo depois do for ou do while: <code>for (...);<\/code> cria um laço vazio, e o bloco seguinte executa uma vez só.", "Declarar a variável do for dentro dele (<code>for (int i …)<\/code>) e tentar usá-la depois do laço: ela só existe ali dentro."], "lembrar": ["Condições em Java são sempre boolean.", "for para contar, for-each para percorrer, while para condição, do-while para pelo menos uma vez.", "break sai do laço; continue pula para a próxima volta."], "exercicios": [{"nivel": 1, "titulo": "Par ou ímpar, positivo ou negativo", "enunciado": "Leia um inteiro e diga se ele é par ou ímpar e se é positivo, negativo ou zero.", "dica": "Duas decisões independentes. Para a primeira, use o resto: n % 2 == 0.", "lang": "java", "teste": "-8", "solucao": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Número: \");\n        int n = sc.nextInt();\n\n        String paridade = (n % 2 == 0) ? \"par\" : \"ímpar\";\n        String sinal;\n        if (n > 0) sinal = \"positivo\";\n        else if (n < 0) sinal = \"negativo\";\n        else sinal = \"zero\";\n\n        System.out.println(n + \" é \" + paridade + \" e \" + sinal);\n        sc.close();\n    }\n}"}, {"nivel": 2, "titulo": "Jogo de adivinhação", "enunciado": "Sorteie um número de 1 a 100 com java.util.Random e peça palpites até o usuário acertar, dizendo \"maior\" ou \"menor\". No fim, mostre o número de tentativas.", "dica": "new Random().nextInt(100) + 1 sorteia de 1 a 100. Use do-while.", "lang": "java", "teste": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n61\n62\n63\n64\n65\n66\n67\n68\n69\n70\n71\n72\n73\n74\n75\n76\n77\n78\n79\n80\n81\n82\n83\n84\n85\n86\n87\n88\n89\n90\n91\n92\n93\n94\n95\n96\n97\n98\n99\n100", "solucao": "import java.util.Random;\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int secreto = new Random().nextInt(100) + 1;\n        int palpite, tentativas = 0;\n\n        do {\n            System.out.print(\"Palpite: \");\n            palpite = sc.nextInt();\n            tentativas++;\n            if (palpite < secreto) System.out.println(\"É maior\");\n            else if (palpite > secreto) System.out.println(\"É menor\");\n        } while (palpite != secreto);\n\n        System.out.println(\"Acertou em \" + tentativas + \" tentativas!\");\n        sc.close();\n    }\n}"}, {"nivel": 2, "titulo": "Calculadora com switch", "enunciado": "Leia dois números e um operador (+, -, * ou /) e mostre o resultado. Trate divisão por zero e operador inválido.", "dica": "Leia o operador como String com sc.next() e use switch com case \"+\" etc.", "lang": "java", "teste": "9 / 0", "solucao": "import java.util.Locale;\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in).useLocale(Locale.US);\n        System.out.print(\"Conta (ex: 8 * 3): \");\n        double a = sc.nextDouble();\n        String op = sc.next();\n        double b = sc.nextDouble();\n\n        switch (op) {\n            case \"+\": System.out.println(a + b); break;\n            case \"-\": System.out.println(a - b); break;\n            case \"*\": System.out.println(a * b); break;\n            case \"/\":\n                if (b == 0) System.out.println(\"Não dá para dividir por zero\");\n                else System.out.println(a / b);\n                break;\n            default:\n                System.out.println(\"Operador inválido: \" + op);\n        }\n        sc.close();\n    }\n}"}, {"nivel": 3, "titulo": "Números perfeitos", "enunciado": "Um número é perfeito se é igual à soma dos seus divisores menores que ele (6 = 1 + 2 + 3). Mostre todos os números perfeitos de 1 a 10000.", "dica": "Dois laços: o de fora passa por cada número; o de dentro soma os divisores dele.", "lang": "java", "solucao": "public class Main {\n    public static void main(String[] args) {\n        for (int n = 2; n <= 10000; n++) {\n            int soma = 1;   // 1 divide todos\n            for (int d = 2; d * d <= n; d++) {\n                if (n % d == 0) {\n                    soma += d;\n                    if (d != n / d) soma += n / d;   // o divisor \"par\"\n                }\n            }\n            if (soma == n) System.out.println(n);\n        }\n    }\n}"}]}, {"id": "java-strings", "titulo": "Trabalhando com textos (String)", "resumo": "Os métodos mais usados da classe String, comparação correta e StringBuilder.", "ideia": "\n<p>Em Java, texto é um objeto da classe <code>String<\/code>. Por ser um objeto, ele vem com <strong>métodos<\/strong>: ações que você chama com um ponto, como <code>nome.length()<\/code>. Esta aula reúne os que você vai usar quase todo dia.<\/p>\n<h3>Strings são imutáveis<\/h3>\n<p>Nenhum método altera a String original. <code>nome.toUpperCase()<\/code> <strong>devolve uma String nova<\/strong>, em maiúsculas, e deixa <code>nome<\/code> como estava. Para guardar o resultado, atribua: <code>nome = nome.toUpperCase();<\/code>.<\/p>\n<h3>Métodos essenciais<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Método<\/th><th>Exemplo com s = \"Programação\"<\/th><th>Resultado<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>length()<\/code><\/td><td><code>s.length()<\/code><\/td><td>11<\/td><\/tr>\n    <tr><td><code>charAt(i)<\/code><\/td><td><code>s.charAt(0)<\/code><\/td><td>'P'<\/td><\/tr>\n    <tr><td><code>substring(ini, fim)<\/code><\/td><td><code>s.substring(0, 3)<\/code><\/td><td>\"Pro\" (o fim não entra)<\/td><\/tr>\n    <tr><td><code>indexOf(texto)<\/code><\/td><td><code>s.indexOf(\"gra\")<\/code><\/td><td>3 (ou -1 se não achar)<\/td><\/tr>\n    <tr><td><code>contains(texto)<\/code><\/td><td><code>s.contains(\"ama\")<\/code><\/td><td>true<\/td><\/tr>\n    <tr><td><code>toUpperCase()<\/code>, <code>toLowerCase()<\/code><\/td><td><code>s.toLowerCase()<\/code><\/td><td>\"programação\"<\/td><\/tr>\n    <tr><td><code>trim()<\/code><\/td><td><code>\"  oi  \".trim()<\/code><\/td><td>\"oi\"<\/td><\/tr>\n    <tr><td><code>replace(a, b)<\/code><\/td><td><code>s.replace(\"a\", \"4\")<\/code><\/td><td>\"Progr4m4ção\"<\/td><\/tr>\n    <tr><td><code>split(sep)<\/code><\/td><td><code>\"a,b,c\".split(\",\")<\/code><\/td><td>array {\"a\", \"b\", \"c\"}<\/td><\/tr>\n    <tr><td><code>equals(t)<\/code>, <code>equalsIgnoreCase(t)<\/code><\/td><td><code>s.equalsIgnoreCase(\"PROGRAMAÇÃO\")<\/code><\/td><td>true<\/td><\/tr>\n    <tr><td><code>compareTo(t)<\/code><\/td><td><code>\"Ana\".compareTo(\"Bia\")<\/code><\/td><td>negativo (Ana vem antes)<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>Juntando textos<\/h3>\n<p>O <code>+<\/code> junta textos: <code>\"Olá, \" + nome<\/code>. Para formatar números, use <code>String.format(\"%.2f\", valor)<\/code>. Para montar um texto grande pedaço por pedaço (por exemplo, dentro de um laço), use <code>StringBuilder<\/code>: ele é feito para ser alterado e é muito mais rápido que somar Strings repetidamente.<\/p>\n", "exemplos": [{"lang": "java", "titulo": "Os métodos na prática", "codigo": "public class Main {\n    public static void main(String[] args) {\n        String email = \"  Maria.Silva@Escola.edu.br  \";\n\n        email = email.trim().toLowerCase();       // encadeando métodos\n        System.out.println(\"Limpo: \" + email);\n\n        int arroba = email.indexOf(\"@\");\n        String usuario = email.substring(0, arroba);\n        String dominio = email.substring(arroba + 1);\n        System.out.println(\"Usuário: \" + usuario + \" | Domínio: \" + dominio);\n\n        System.out.println(\"É de escola? \" + dominio.endsWith(\".edu.br\"));\n\n        String[] partes = usuario.split(\"\\\\.\");   // ponto precisa de \\\\ no split\n        System.out.println(\"Primeiro nome: \" + partes[0]);\n\n        // Comparar corretamente\n        String a = \"java\";\n        String b = new String(\"java\");\n        System.out.println(\"a == b: \" + (a == b));            // false!\n        System.out.println(\"a.equals(b): \" + a.equals(b));    // true\n\n        // StringBuilder para montar texto em laço\n        StringBuilder sb = new StringBuilder();\n        for (int i = 1; i <= 5; i++) {\n            sb.append(i);\n            if (i < 5) sb.append(\" - \");\n        }\n        System.out.println(sb.toString());\n        System.out.println(sb.reverse());\n    }\n}", "explica": ["<code>email.trim().toLowerCase()<\/code>: cada método devolve uma String nova, e o próximo método é chamado sobre ela. O resultado final é guardado de volta em <code>email<\/code>.", "<code>substring(0, arroba)<\/code> pega do início até antes do @. <code>substring(arroba + 1)<\/code>, com um só argumento, vai do caractere depois do @ até o fim.", "No <code>split<\/code>, o separador é uma expressão regular, em que o ponto significa \"qualquer caractere\". Por isso é preciso escrever <code>\"\\\\.\"<\/code> para dizer \"um ponto de verdade\".", "<code>a == b<\/code> deu false porque <code>new String<\/code> criou outro objeto, embora com o mesmo conteúdo. <code>equals<\/code> compara o conteúdo."], "saida": "Limpo: maria.silva@escola.edu.br\nUsuário: maria.silva | Domínio: escola.edu.br\nÉ de escola? true\nPrimeiro nome: maria\na == b: false\na.equals(b): true\n1 - 2 - 3 - 4 - 5\n5 - 4 - 3 - 2 - 1\n"}], "pegadinhas": ["Comparar com <code>==<\/code>. Às vezes até funciona, por coincidência, e isso torna o erro ainda mais traiçoeiro. Sempre <code>equals<\/code>.", "Chamar <code>s.toUpperCase();<\/code> sozinho e esperar que s mude. Strings são imutáveis: guarde o resultado.", "<code>charAt(s.length())<\/code> dá <code>StringIndexOutOfBoundsException<\/code>. O último índice é <code>length() - 1<\/code>.", "Chamar um método numa variável null: <code>String s = null; s.length();<\/code> dá <code>NullPointerException<\/code>. Para comparar com um texto fixo sem esse risco, escreva <code>\"sim\".equals(resposta)<\/code>."], "lembrar": ["Strings são imutáveis: métodos devolvem uma String nova.", "Comparar: equals. Ignorando maiúsculas: equalsIgnoreCase.", "Texto montado em laço: StringBuilder."], "exercicios": [{"nivel": 1, "titulo": "Contar vogais", "enunciado": "Leia uma frase e conte quantas vogais ela tem, incluindo as acentuadas.", "dica": "Percorra com charAt. Para testar se um caractere é vogal, use \"aeiouáéíóúâêôãõà\".indexOf(c) >= 0.", "lang": "java", "teste": "Programação Orientada a Objetos", "solucao": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Frase: \");\n        String frase = sc.nextLine().toLowerCase();\n\n        String vogais = \"aeiouáéíóúâêôãõà\";\n        int total = 0;\n        for (int i = 0; i < frase.length(); i++) {\n            if (vogais.indexOf(frase.charAt(i)) >= 0) total++;\n        }\n        System.out.println(\"Vogais: \" + total);\n        sc.close();\n    }\n}"}, {"nivel": 2, "titulo": "Formatar nome", "enunciado": "Leia um nome em qualquer formato (\"mARIA   dA silva\") e mostre-o com a primeira letra de cada palavra maiúscula e o resto minúsculo, com um espaço só entre as palavras.", "dica": "trim(), depois split(\"\\\\s+\") separa por um ou mais espaços. Para cada palavra: primeira letra com toUpperCase e o resto com toLowerCase.", "lang": "java", "teste": "mARIA   dA silva", "solucao": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Nome: \");\n        String[] palavras = sc.nextLine().trim().split(\"\\\\s+\");\n\n        StringBuilder sb = new StringBuilder();\n        for (String p : palavras) {\n            if (sb.length() > 0) sb.append(\" \");\n            sb.append(p.substring(0, 1).toUpperCase());\n            sb.append(p.substring(1).toLowerCase());\n        }\n        System.out.println(sb);\n        sc.close();\n    }\n}"}, {"nivel": 3, "titulo": "Validar CPF (formato)", "enunciado": "Leia um CPF no formato 000.000.000-00 e diga se o formato está certo: 14 caracteres, pontos nas posições 3 e 7, hífen na 11 e dígitos em todas as outras.", "dica": "Confira length() == 14. Depois percorra: nas posições especiais, compare com '.' ou '-'; nas outras, use Character.isDigit.", "lang": "java", "teste": "123.456.789-09", "solucao": "import java.util.Scanner;\n\npublic class Main {\n\n    static boolean formatoValido(String cpf) {\n        if (cpf.length() != 14) return false;\n        for (int i = 0; i < 14; i++) {\n            char c = cpf.charAt(i);\n            if (i == 3 || i == 7) {\n                if (c != '.') return false;\n            } else if (i == 11) {\n                if (c != '-') return false;\n            } else if (!Character.isDigit(c)) {\n                return false;\n            }\n        }\n        return true;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"CPF: \");\n        String cpf = sc.nextLine().trim();\n        System.out.println(formatoValido(cpf) ? \"Formato válido\" : \"Formato inválido\");\n        sc.close();\n    }\n}"}]}, {"id": "java-metodos-arrays", "modulo": "java", "titulo": "Métodos e arrays", "resumo": "Organizar o código em métodos e guardar vários valores num array.", "ideia": "\n<p>Em Java, função se chama <strong>método<\/strong>. Por enquanto, todos os seus métodos levam <code>public static<\/code> na frente: isso permite chamá-los direto do <code>main<\/code>, sem criar objetos. Na próxima aula você vai ver quando tirar o <code>static<\/code>.<\/p>\n<p>Um <strong>array<\/strong> é uma fileira de caixas do mesmo tipo, numeradas a partir de 0. Diferente de C, o array em Java sabe o próprio tamanho: <code>notas.length<\/code>.<\/p>\n<p>Para percorrer, há duas formas:<\/p>\n<ul>\n  <li><code>for (int i = 0; i &lt; v.length; i++)<\/code> quando você precisa da posição <code>i<\/code>.<\/li>\n  <li><code>for (int x : v)<\/code>, o for-each, quando só precisa de cada valor. Lê-se \"para cada x em v\".<\/li>\n<\/ul>\n", "exemplos": [{"lang": "java", "titulo": "Métodos que trabalham com arrays", "codigo": "public class Main {\n\n    static double media(double[] valores) {\n        double soma = 0;\n        for (double v : valores) {\n            soma += v;\n        }\n        return soma / valores.length;\n    }\n\n    static String situacao(double media) {\n        if (media >= 7) return \"Aprovado\";\n        if (media >= 5) return \"Recuperação\";\n        return \"Reprovado\";\n    }\n\n    static int posicaoDoMaior(double[] valores) {\n        int pos = 0;\n        for (int i = 1; i < valores.length; i++) {\n            if (valores[i] > valores[pos]) pos = i;\n        }\n        return pos;\n    }\n\n    public static void main(String[] args) {\n        double[] notas = {6.5, 8.0, 4.5, 9.5, 7.0};\n\n        double m = media(notas);\n        System.out.printf(\"Média: %.2f (%s)%n\", m, situacao(m));\n\n        int p = posicaoDoMaior(notas);\n        System.out.println(\"Maior nota: \" + notas[p] + \" na prova \" + (p + 1));\n\n        String[] dias = new String[3];   // array vazio de tamanho 3\n        dias[0] = \"seg\";\n        dias[1] = \"ter\";\n        dias[2] = \"qua\";\n        System.out.println(String.join(\", \", dias));\n    }\n}", "saida": "Média: 7.10 (Aprovado)\nMaior nota: 9.5 na prova 4\nseg, ter, qua\n"}], "pegadinhas": ["Acessar <code>v[v.length]<\/code> dá <code>ArrayIndexOutOfBoundsException<\/code>. O último índice é <code>v.length - 1<\/code>.", "<code>System.out.println(v)<\/code> mostra algo como <code>[I@1b6d3586<\/code>, não os valores. Use <code>Arrays.toString(v)<\/code>.", "O tamanho do array é fixo depois de criado. Para uma lista que cresce, use <code>ArrayList<\/code>."], "lembrar": ["Índices vão de 0 a length - 1.", "Método pequeno, nome claro, uma tarefa."], "exercicios": [{"titulo": "Tabuada em método", "enunciado": "Crie static void tabuada(int n) que mostra a tabuada de n de 1 a 10. Chame para 3 e 7.", "dica": "Um for de 1 a 10 com System.out.printf(\"%d x %2d = %3d%n\", n, i, n * i).", "lang": "java", "solucao": "public class Main {\n\n    static void tabuada(int n) {\n        System.out.println(\"Tabuada do \" + n);\n        for (int i = 1; i <= 10; i++) {\n            System.out.printf(\"%d x %2d = %3d%n\", n, i, n * i);\n        }\n        System.out.println();\n    }\n\n    public static void main(String[] args) {\n        tabuada(3);\n        tabuada(7);\n    }\n}"}, {"titulo": "Primos até 100", "enunciado": "Crie static boolean ehPrimo(int n). No main, mostre todos os primos de 2 a 100 na mesma linha.", "dica": "Igual à versão em C, mas devolvendo true e false.", "lang": "java", "solucao": "public class Main {\n\n    static boolean ehPrimo(int n) {\n        if (n < 2) return false;\n        for (int i = 2; i * i <= n; i++) {\n            if (n % i == 0) return false;\n        }\n        return true;\n    }\n\n    public static void main(String[] args) {\n        for (int n = 2; n <= 100; n++) {\n            if (ehPrimo(n)) System.out.print(n + \" \");\n        }\n        System.out.println();\n    }\n}"}, {"titulo": "Contar acima da média", "enunciado": "Dado o array {12, 7, 19, 3, 15, 8}, calcule a média e conte quantos valores estão acima dela.", "dica": "Dois laços: o primeiro soma tudo para a média, o segundo conta. Não dá para contar antes de saber a média.", "lang": "java", "solucao": "public class Main {\n    public static void main(String[] args) {\n        int[] v = {12, 7, 19, 3, 15, 8};\n\n        int soma = 0;\n        for (int x : v) soma += x;\n        double media = (double) soma / v.length;\n\n        int acima = 0;\n        for (int x : v) {\n            if (x > media) acima++;\n        }\n        System.out.printf(\"Média %.2f, %d valores acima%n\", media, acima);\n    }\n}"}]}, {"id": "java-classes", "modulo": "java", "titulo": "Classes e objetos", "resumo": "Criar seus próprios tipos com dados e comportamento juntos.", "ideia": "\n<p>Uma <strong>classe<\/strong> é a planta de uma casa. Um <strong>objeto<\/strong> é uma casa construída a partir dela. Com uma planta você constrói várias casas, cada uma com sua cor e seus moradores.<\/p>\n<ul>\n  <li><strong>Atributos<\/strong> são os dados que cada objeto guarda, como <code>saldo<\/code> e <code>titular<\/code>.<\/li>\n  <li><strong>Métodos<\/strong> são o que o objeto sabe fazer, como <code>depositar()<\/code>.<\/li>\n  <li>O <strong>construtor<\/strong> roda uma vez, no <code>new<\/code>, e prepara o objeto.<\/li>\n  <li><code>this<\/code> quer dizer \"o objeto atual\". <code>this.saldo<\/code> é o saldo desta conta.<\/li>\n<\/ul>\n<p>Atributos ficam <code>private<\/code>: ninguém de fora mexe direto no saldo. Para alterar, só pelos métodos, que podem verificar se a operação faz sentido. Isso se chama <strong>encapsulamento<\/strong>.<\/p>\n", "exemplos": [{"lang": "java", "titulo": "Uma conta bancária", "codigo": "public class Main {\n    public static void main(String[] args) {\n        ContaBancaria c1 = new ContaBancaria(\"Ana\", 1001);\n        ContaBancaria c2 = new ContaBancaria(\"Bruno\", 1002);\n\n        c1.depositar(1500);\n        c1.depositar(-50);              // ignorado: valor inválido\n        boolean ok = c1.sacar(200);\n        System.out.println(\"Saque de 200: \" + (ok ? \"feito\" : \"recusado\"));\n\n        ok = c2.sacar(100);             // c2 está com saldo 0\n        System.out.println(\"Saque de 100: \" + (ok ? \"feito\" : \"recusado\"));\n\n        c1.extrato();\n        c2.extrato();\n    }\n}\n\nclass ContaBancaria {\n    private String titular;\n    private int numero;\n    private double saldo;\n\n    public ContaBancaria(String titular, int numero) {\n        this.titular = titular;\n        this.numero = numero;\n        this.saldo = 0;\n    }\n\n    public void depositar(double valor) {\n        if (valor > 0) saldo += valor;\n    }\n\n    public boolean sacar(double valor) {\n        if (valor > 0 && valor <= saldo) {\n            saldo -= valor;\n            return true;\n        }\n        return false;\n    }\n\n    public double getSaldo() {\n        return saldo;\n    }\n\n    public void extrato() {\n        System.out.printf(\"Conta %d | %s | R$ %.2f%n\", numero, titular, saldo);\n    }\n}", "nota": "Aqui as duas classes estão no mesmo arquivo para facilitar. Num projeto, ContaBancaria iria para ContaBancaria.java.", "saida": "Saque de 200: feito\nSaque de 100: recusado\nConta 1001 | Ana | R$ 1300.00\nConta 1002 | Bruno | R$ 0.00\n"}], "pegadinhas": ["Esquecer o <code>this<\/code> quando o parâmetro tem o mesmo nome do atributo: <code>titular = titular;<\/code> atribui o parâmetro a ele mesmo e o atributo fica null.", "Declarar <code>ContaBancaria c;<\/code> não cria a conta. Sem <code>new<\/code>, chamar um método dá <code>NullPointerException<\/code>.", "Os métodos de objeto não levam <code>static<\/code>. Com static, o método pertence à classe e não enxerga os atributos de cada objeto."], "lembrar": ["Classe é o molde, objeto é a peça feita com new.", "Atributos private, acesso por métodos que validam."], "exercicios": [{"titulo": "Produto com estoque", "enunciado": "Crie a classe Produto com nome, preço e estoque. O método boolean vender(int qtd) só vende se qtd for positiva e houver estoque suficiente.", "dica": "Valide as duas coisas: qtd &gt; 0 e qtd &lt;= estoque. Sem a primeira, vender(-5) aumentaria o estoque.", "lang": "java", "solucao": "public class Main {\n    public static void main(String[] args) {\n        Produto p = new Produto(\"Caderno\", 18.90, 10);\n        System.out.println(p.vender(3));    // true\n        System.out.println(p.vender(-5));   // false\n        System.out.println(p.vender(20));   // false\n        System.out.println(\"Restam \" + p.getEstoque());\n    }\n}\n\nclass Produto {\n    private String nome;\n    private double preco;\n    private int estoque;\n\n    public Produto(String nome, double preco, int estoque) {\n        this.nome = nome;\n        this.preco = preco;\n        this.estoque = estoque;\n    }\n\n    public boolean vender(int qtd) {\n        if (qtd > 0 && qtd <= estoque) {\n            estoque -= qtd;\n            return true;\n        }\n        return false;\n    }\n\n    public String getNome()  { return nome; }\n    public double getPreco() { return preco; }\n    public int getEstoque()  { return estoque; }\n}"}, {"titulo": "Retângulo", "enunciado": "Crie Retangulo com largura e altura e os métodos area(), perimetro() e ehQuadrado().", "dica": "Cada método é uma linha só com return.", "lang": "java", "solucao": "public class Main {\n    public static void main(String[] args) {\n        Retangulo r = new Retangulo(4, 3);\n        System.out.println(\"Área: \" + r.area());\n        System.out.println(\"Perímetro: \" + r.perimetro());\n        System.out.println(\"Quadrado? \" + r.ehQuadrado());\n    }\n}\n\nclass Retangulo {\n    private double largura, altura;\n\n    public Retangulo(double largura, double altura) {\n        this.largura = largura;\n        this.altura = altura;\n    }\n\n    public double area()       { return largura * altura; }\n    public double perimetro()  { return 2 * (largura + altura); }\n    public boolean ehQuadrado() { return largura == altura; }\n}"}, {"titulo": "O produto mais caro", "enunciado": "Monte um array com 4 objetos Produto e escreva um método estático que devolve o mais caro.", "dica": "Comece supondo que o primeiro é o mais caro e compare com os outros usando getPreco().", "lang": "java", "solucao": "public class Main {\n\n    static Produto maisCaro(Produto[] produtos) {\n        Produto maior = produtos[0];\n        for (Produto p : produtos) {\n            if (p.getPreco() > maior.getPreco()) maior = p;\n        }\n        return maior;\n    }\n\n    public static void main(String[] args) {\n        Produto[] loja = {\n            new Produto(\"Caneta\", 3.50),\n            new Produto(\"Mochila\", 129.90),\n            new Produto(\"Caderno\", 18.90),\n            new Produto(\"Estojo\", 24.00)\n        };\n        Produto p = maisCaro(loja);\n        System.out.printf(\"Mais caro: %s (R$ %.2f)%n\", p.getNome(), p.getPreco());\n    }\n}\n\nclass Produto {\n    private String nome;\n    private double preco;\n\n    public Produto(String nome, double preco) {\n        this.nome = nome;\n        this.preco = preco;\n    }\n\n    public String getNome()  { return nome; }\n    public double getPreco() { return preco; }\n}"}]}, {"id": "java-heranca", "titulo": "Herança e polimorfismo", "resumo": "Criar classes a partir de outras, reaproveitando código, e tratar objetos diferentes de forma uniforme.", "ideia": "\n<p>Num sistema de uma escola há alunos e professores. Os dois têm nome, CPF e e-mail; o aluno tem matrícula e o professor tem salário. Escrever nome, CPF e e-mail duas vezes é repetição. Com <strong>herança<\/strong>, você cria uma classe <code>Pessoa<\/code> com o que é comum, e <code>Aluno<\/code> e <code>Professor<\/code> <strong>herdam<\/strong> tudo dela, acrescentando só o que é específico.<\/p>\n<p>A pergunta para saber se herança faz sentido é: \"<em>X é um tipo de Y?<\/em>\". Aluno é um tipo de Pessoa: sim. Carro é um tipo de Motor: não (carro <em>tem<\/em> um motor, e isso é um atributo, não herança).<\/p>\n<h3>As palavras-chave<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Código<\/th><th>Significa<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>class Aluno extends Pessoa<\/code><\/td><td>Aluno herda atributos e métodos de Pessoa<\/td><\/tr>\n    <tr><td><code>super(nome)<\/code><\/td><td>no construtor, chama o construtor da classe mãe. Tem que ser a primeira linha.<\/td><\/tr>\n    <tr><td><code>@Override<\/code><\/td><td>indica que o método substitui um método da classe mãe. O compilador confere se o nome e os parâmetros batem.<\/td><\/tr>\n    <tr><td><code>protected<\/code><\/td><td>visível na própria classe e nas filhas (e no mesmo pacote)<\/td><\/tr>\n    <tr><td><code>abstract class<\/code><\/td><td>classe que serve só de modelo: não dá para fazer <code>new<\/code> dela<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>Polimorfismo<\/h3>\n<p>Uma variável do tipo da classe mãe pode guardar um objeto de qualquer classe filha: <code>Pessoa p = new Aluno(...)<\/code>. Quando você chama <code>p.apresentar()<\/code>, roda a versão do <strong>objeto real<\/strong>, a do Aluno. \"Polimorfismo\" quer dizer \"muitas formas\": o mesmo comando, <code>apresentar()<\/code>, faz coisas diferentes conforme o objeto.<\/p>\n<p>Na prática, isso permite colocar alunos e professores na mesma lista e tratar todos do mesmo jeito, sem um <code>if<\/code> para cada tipo.<\/p>\n<h3>toString<\/h3>\n<p>Toda classe em Java herda, no fim das contas, de <code>Object<\/code>. Um dos métodos herdados é <code>toString()<\/code>, usado quando você imprime o objeto. Sobrescrevê-lo faz <code>System.out.println(obj)<\/code> mostrar algo legível em vez de <code>Aluno@1b6d3586<\/code>.<\/p>\n", "exemplos": [{"lang": "java", "titulo": "Pessoa, Aluno e Professor", "codigo": "public class Main {\n    public static void main(String[] args) {\n        Pessoa[] pessoas = {\n            new Aluno(\"Ana\", 2025001),\n            new Professor(\"Carlos\", 8500),\n            new Aluno(\"Bruno\", 2025002)\n        };\n\n        for (Pessoa p : pessoas) {\n            p.apresentar();          // cada um do seu jeito\n        }\n\n        System.out.println(pessoas[1]);   // usa o toString\n\n        if (pessoas[0] instanceof Aluno a) {\n            System.out.println(\"Matrícula da primeira: \" + a.getMatricula());\n        }\n    }\n}\n\nabstract class Pessoa {\n    protected String nome;\n\n    public Pessoa(String nome) {\n        this.nome = nome;\n    }\n\n    public abstract void apresentar();   // cada filha é obrigada a escrever o seu\n\n    @Override\n    public String toString() {\n        return getClass().getSimpleName() + \"(\" + nome + \")\";\n    }\n}\n\nclass Aluno extends Pessoa {\n    private int matricula;\n\n    public Aluno(String nome, int matricula) {\n        super(nome);                     // inicializa a parte de Pessoa\n        this.matricula = matricula;\n    }\n\n    public int getMatricula() { return matricula; }\n\n    @Override\n    public void apresentar() {\n        System.out.println(\"Sou \" + nome + \", aluno de matrícula \" + matricula);\n    }\n}\n\nclass Professor extends Pessoa {\n    private double salario;\n\n    public Professor(String nome, double salario) {\n        super(nome);\n        this.salario = salario;\n    }\n\n    @Override\n    public void apresentar() {\n        System.out.println(\"Sou o professor \" + nome);\n    }\n}", "explica": ["<code>Pessoa<\/code> é <code>abstract<\/code>: não existe \"uma pessoa genérica\" no sistema, só alunos e professores. O método abstrato <code>apresentar()<\/code> obriga cada filha a ter a sua versão.", "O array é do tipo <code>Pessoa[]<\/code>, mas guarda alunos e professores. No laço, <code>p.apresentar()<\/code> chama a versão certa de cada objeto: isso é polimorfismo.", "<code>super(nome)<\/code> chama o construtor de Pessoa, que guarda o nome. Só depois o construtor do Aluno cuida da matrícula.", "<code>nome<\/code> é <code>protected<\/code>, por isso Aluno e Professor podem usá-lo diretamente.", "<code>instanceof Aluno a<\/code> testa se o objeto é um Aluno e, se for, já cria a variável <code>a<\/code> do tipo Aluno (Java 16+). Só assim dá para chamar <code>getMatricula()<\/code>, que Pessoa não tem."], "nota": "Aqui as classes estão num arquivo só para caber no exemplo. Num projeto, cada uma iria para o seu próprio arquivo .java.", "saida": "Sou Ana, aluno de matrícula 2025001\nSou o professor Carlos\nSou Bruno, aluno de matrícula 2025002\nProfessor(Carlos)\nMatrícula da primeira: 2025001\n"}], "pegadinhas": ["Esquecer o <code>super(...)<\/code> quando a classe mãe não tem construtor sem parâmetros. O erro é <em>constructor Pessoa in class Pessoa cannot be applied<\/em>.", "Errar o nome ou os parâmetros ao sobrescrever (<code>apresenta()<\/code> em vez de <code>apresentar()<\/code>). Sem <code>@Override<\/code>, isso vira um método novo, e o polimorfismo não acontece. Com <code>@Override<\/code>, o compilador avisa.", "Usar herança só para reaproveitar código, quando a relação não é \"é um tipo de\". Isso cria hierarquias confusas. Prefira ter um objeto como atributo.", "Java não tem herança múltipla de classes: uma classe só pode ter um <code>extends<\/code>."], "lembrar": ["extends herda; super chama a mãe; @Override substitui um método.", "Polimorfismo: variável do tipo mãe, comportamento do objeto real.", "Pergunta-chave: X é um tipo de Y?"], "exercicios": [{"nivel": 1, "titulo": "Animais", "enunciado": "Crie a classe Animal com nome e o método emitirSom(). Crie Cachorro e Gato, que sobrescrevem emitirSom(). Ponha 3 animais num array de Animal e chame emitirSom() em todos.", "dica": "Animal pode ser abstract, com emitirSom() abstract. Cada filha usa super(nome) no construtor.", "lang": "java", "solucao": "public class Main {\n    public static void main(String[] args) {\n        Animal[] bichos = { new Cachorro(\"Rex\"), new Gato(\"Mimi\"), new Cachorro(\"Bob\") };\n        for (Animal a : bichos) a.emitirSom();\n    }\n}\n\nabstract class Animal {\n    protected String nome;\n    public Animal(String nome) { this.nome = nome; }\n    public abstract void emitirSom();\n}\n\nclass Cachorro extends Animal {\n    public Cachorro(String nome) { super(nome); }\n    @Override\n    public void emitirSom() { System.out.println(nome + \": Au au!\"); }\n}\n\nclass Gato extends Animal {\n    public Gato(String nome) { super(nome); }\n    @Override\n    public void emitirSom() { System.out.println(nome + \": Miau!\"); }\n}"}, {"nivel": 2, "titulo": "Folha de pagamento", "enunciado": "Crie Funcionario (nome, salarioBase) com o método double salario(). Gerente herda de Funcionario e ganha um bônus de 20% sobre o salário base. Monte uma lista com funcionários e gerentes e mostre o total da folha.", "dica": "Gerente sobrescreve salario() e pode reaproveitar a versão da mãe com super.salario() * 1.2.", "lang": "java", "solucao": "public class Main {\n    public static void main(String[] args) {\n        Funcionario[] equipe = {\n            new Funcionario(\"Ana\", 3000),\n            new Gerente(\"Bia\", 6000),\n            new Funcionario(\"Caio\", 3500)\n        };\n        double total = 0;\n        for (Funcionario f : equipe) {\n            System.out.printf(\"%-5s R$ %.2f%n\", f.getNome(), f.salario());\n            total += f.salario();\n        }\n        System.out.printf(\"Total: R$ %.2f%n\", total);\n    }\n}\n\nclass Funcionario {\n    private String nome;\n    protected double salarioBase;\n\n    public Funcionario(String nome, double salarioBase) {\n        this.nome = nome;\n        this.salarioBase = salarioBase;\n    }\n    public String getNome() { return nome; }\n    public double salario() { return salarioBase; }\n}\n\nclass Gerente extends Funcionario {\n    public Gerente(String nome, double salarioBase) { super(nome, salarioBase); }\n\n    @Override\n    public double salario() { return super.salario() * 1.2; }\n}"}, {"nivel": 3, "titulo": "Formas geométricas", "enunciado": "Crie a classe abstrata Forma com os métodos abstratos area() e perimetro(), e as classes Retangulo, Circulo e Triangulo (equilátero, pelo lado). Mostre todas ordenadas pela área, da maior para a menor.", "dica": "Para ordenar um array de objetos: Arrays.sort(formas, (a, b) -> Double.compare(b.area(), a.area())).", "lang": "java", "solucao": "import java.util.Arrays;\n\npublic class Main {\n    public static void main(String[] args) {\n        Forma[] formas = { new Retangulo(3, 4), new Circulo(2), new Triangulo(5) };\n        Arrays.sort(formas, (a, b) -> Double.compare(b.area(), a.area()));\n        for (Forma f : formas) System.out.println(f);\n    }\n}\n\nabstract class Forma {\n    public abstract double area();\n    public abstract double perimetro();\n\n    @Override\n    public String toString() {\n        return String.format(\"%-10s área %6.2f  perímetro %6.2f\",\n                getClass().getSimpleName(), area(), perimetro());\n    }\n}\n\nclass Retangulo extends Forma {\n    private final double l, a;\n    Retangulo(double l, double a) { this.l = l; this.a = a; }\n    public double area() { return l * a; }\n    public double perimetro() { return 2 * (l + a); }\n}\n\nclass Circulo extends Forma {\n    private final double r;\n    Circulo(double r) { this.r = r; }\n    public double area() { return Math.PI * r * r; }\n    public double perimetro() { return 2 * Math.PI * r; }\n}\n\nclass Triangulo extends Forma {\n    private final double lado;\n    Triangulo(double lado) { this.lado = lado; }\n    public double area() { return Math.sqrt(3) / 4 * lado * lado; }\n    public double perimetro() { return 3 * lado; }\n}"}]}, {"id": "java-arraylist", "titulo": "ArrayList e coleções", "resumo": "Listas que crescem sozinhas, e um primeiro contato com HashMap.", "ideia": "\n<p>Um array tem tamanho fixo: se você criou com 10 posições, são 10 para sempre. Na vida real, quase nunca sabemos quantos itens teremos: alunos se matriculam, produtos entram no carrinho. Para isso existe a <strong>ArrayList<\/strong>, uma lista que cresce e diminui sozinha.<\/p>\n<h3>Criando<\/h3>\n<p><code>ArrayList&lt;String&gt; nomes = new ArrayList&lt;&gt;();<\/code><\/p>\n<p>O tipo entre <code>&lt; &gt;<\/code> diz o que a lista guarda. Ela só aceita objetos, não tipos primitivos: para números, use as classes \"embrulho\" <code>Integer<\/code>, <code>Double<\/code>, <code>Boolean<\/code>, <code>Character<\/code>. O Java converte entre <code>int<\/code> e <code>Integer<\/code> automaticamente.<\/p>\n<h3>Métodos principais<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Método<\/th><th>Faz<\/th><th>Equivalente no array<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>add(x)<\/code><\/td><td>adiciona no fim<\/td><td>(não existe)<\/td><\/tr>\n    <tr><td><code>add(i, x)<\/code><\/td><td>insere na posição i, empurrando os outros<\/td><td>(não existe)<\/td><\/tr>\n    <tr><td><code>get(i)<\/code><\/td><td>lê a posição i<\/td><td><code>v[i]<\/code><\/td><\/tr>\n    <tr><td><code>set(i, x)<\/code><\/td><td>troca o valor da posição i<\/td><td><code>v[i] = x<\/code><\/td><\/tr>\n    <tr><td><code>remove(i)<\/code> / <code>remove(obj)<\/code><\/td><td>remove pela posição ou pelo valor<\/td><td>(não existe)<\/td><\/tr>\n    <tr><td><code>size()<\/code><\/td><td>quantidade de elementos<\/td><td><code>v.length<\/code><\/td><\/tr>\n    <tr><td><code>contains(x)<\/code>, <code>indexOf(x)<\/code><\/td><td>procura<\/td><td>(laço manual)<\/td><\/tr>\n    <tr><td><code>isEmpty()<\/code>, <code>clear()<\/code><\/td><td>está vazia? / esvazia<\/td><td><\/td><\/tr>\n  <\/tbody>\n<\/table>\n<p>A classe <code>Collections<\/code> traz utilidades: <code>Collections.sort(lista)<\/code>, <code>Collections.max(lista)<\/code>, <code>Collections.shuffle(lista)<\/code>.<\/p>\n<h3>HashMap: buscar por chave<\/h3>\n<p>Quando você quer achar algo pelo nome, e não pela posição, use um <code>HashMap<\/code>. Ele guarda pares <strong>chave → valor<\/strong>, como uma agenda: a chave é o nome, o valor é o telefone. <code>put(chave, valor)<\/code> guarda, <code>get(chave)<\/code> busca, <code>containsKey(chave)<\/code> testa se existe.<\/p>\n", "exemplos": [{"lang": "java", "titulo": "Lista de compras e contagem de palavras", "codigo": "import java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.HashMap;\nimport java.util.Map;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<String> compras = new ArrayList<>();\n        compras.add(\"arroz\");\n        compras.add(\"feijão\");\n        compras.add(\"café\");\n        compras.add(1, \"macarrão\");          // insere na posição 1\n        System.out.println(compras + \" (\" + compras.size() + \" itens)\");\n\n        compras.remove(\"feijão\");\n        compras.set(0, \"arroz integral\");\n        Collections.sort(compras);\n        System.out.println(compras);\n\n        for (int i = 0; i < compras.size(); i++) {\n            System.out.println((i + 1) + \". \" + compras.get(i));\n        }\n\n        // Lista de números: Integer, não int\n        ArrayList<Integer> notas = new ArrayList<>();\n        notas.add(7);\n        notas.add(10);\n        notas.add(4);\n        int soma = 0;\n        for (int n : notas) soma += n;\n        System.out.println(\"Maior: \" + Collections.max(notas) + \", soma: \" + soma);\n\n        // HashMap: contar quantas vezes cada palavra aparece\n        String frase = \"o rato roeu a roupa do rei de roma e o rato fugiu\";\n        Map<String, Integer> contagem = new HashMap<>();\n        for (String palavra : frase.split(\" \")) {\n            contagem.put(palavra, contagem.getOrDefault(palavra, 0) + 1);\n        }\n        System.out.println(\"\\\"rato\\\" aparece \" + contagem.get(\"rato\") + \" vezes\");\n        System.out.println(\"\\\"gato\\\" aparece? \" + contagem.containsKey(\"gato\"));\n    }\n}", "explica": ["<code>System.out.println(compras)<\/code> mostra a lista inteira entre colchetes. Com arrays isso não funciona; com listas, sim.", "<code>add(1, \"macarrão\")<\/code> insere na posição 1 e empurra os seguintes uma casa para a frente. A lista se reorganiza sozinha.", "<code>ArrayList&lt;Integer&gt;<\/code>: no <code>add(7)<\/code>, o Java transforma o <code>int<\/code> 7 em <code>Integer<\/code> automaticamente. No for-each, faz o caminho inverso.", "<code>getOrDefault(palavra, 0)<\/code> devolve a contagem atual, ou 0 se a palavra ainda não estiver no mapa. Somamos 1 e guardamos de volta com <code>put<\/code>."], "saida": "[arroz, macarrão, feijão, café] (4 itens)\n[arroz integral, café, macarrão]\n1. arroz integral\n2. café\n3. macarrão\nMaior: 10, soma: 21\n\"rato\" aparece 2 vezes\n\"gato\" aparece? false\n"}], "pegadinhas": ["<code>ArrayList&lt;int&gt;<\/code> não compila. Use <code>ArrayList&lt;Integer&gt;<\/code>.", "Remover elementos dentro de um for-each sobre a mesma lista gera <code>ConcurrentModificationException<\/code>. Use <code>lista.removeIf(x -&gt; condição)<\/code> ou um laço com índice, de trás para frente.", "Com <code>ArrayList&lt;Integer&gt;<\/code>, <code>remove(2)<\/code> remove a <strong>posição<\/strong> 2, não o valor 2. Para remover o valor, use <code>remove(Integer.valueOf(2))<\/code>.", "<code>get(i)<\/code> fora do intervalo dá <code>IndexOutOfBoundsException<\/code>, assim como nos arrays."], "lembrar": ["Tamanho variável: ArrayList. Busca por nome: HashMap.", "Lista de números: Integer, Double.", "add, get, set, remove, size."], "exercicios": [{"nivel": 1, "titulo": "Notas até digitar -1", "enunciado": "Leia notas até o usuário digitar -1, guardando numa ArrayList. Mostre quantas foram, a média, a maior e a menor.", "dica": "Collections.max e Collections.min resolvem maior e menor. Cuidado com a lista vazia.", "lang": "java", "teste": "8\n5.5\n9\n7\n-1", "solucao": "import java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.Locale;\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in).useLocale(Locale.US);\n        ArrayList<Double> notas = new ArrayList<>();\n\n        System.out.print(\"Nota (-1 para sair): \");\n        double n = sc.nextDouble();\n        while (n != -1) {\n            notas.add(n);\n            System.out.print(\"Nota (-1 para sair): \");\n            n = sc.nextDouble();\n        }\n\n        if (notas.isEmpty()) {\n            System.out.println(\"Nenhuma nota.\");\n        } else {\n            double soma = 0;\n            for (double x : notas) soma += x;\n            System.out.printf(\"%n%d notas, média %.2f, maior %.1f, menor %.1f%n\",\n                    notas.size(), soma / notas.size(),\n                    Collections.max(notas), Collections.min(notas));\n        }\n        sc.close();\n    }\n}"}, {"nivel": 2, "titulo": "Remover os reprovados", "enunciado": "Crie uma ArrayList com as notas {4.5, 8.0, 6.0, 3.0, 9.5, 5.0}. Remova todas as menores que 6 e mostre a lista que sobrou.", "dica": "notas.removeIf(n -> n < 6) faz isso numa linha. Tente também a versão com laço de trás para frente.", "lang": "java", "solucao": "import java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        ArrayList<Double> notas = new ArrayList<>(List.of(4.5, 8.0, 6.0, 3.0, 9.5, 5.0));\n\n        // Jeito 1: removeIf\n        ArrayList<Double> copia = new ArrayList<>(notas);\n        copia.removeIf(n -> n < 6);\n        System.out.println(copia);\n\n        // Jeito 2: laço de trás para frente\n        for (int i = notas.size() - 1; i >= 0; i--) {\n            if (notas.get(i) < 6) notas.remove(i);\n        }\n        System.out.println(notas);\n    }\n}\n\n/* Por que de trás para frente? Se você remove a posição 0\n   andando para a frente, todos os elementos andam uma casa\n   e o laço pula o elemento seguinte. */"}, {"nivel": 3, "titulo": "Estoque com HashMap", "enunciado": "Crie um estoque como HashMap<String, Integer> (produto → quantidade). Faça um menu: 1) entrada de produto, 2) saída (sem deixar ficar negativo), 3) listar em ordem alfabética, 0) sair.", "dica": "Para listar em ordem, use um TreeMap: new TreeMap<>(estoque) já vem ordenado pela chave.", "lang": "java", "teste": "1\ncaneta\n50\n1\nlapis\n20\n2\ncaneta\n70\n2\ncaneta\n30\n3\n0", "solucao": "import java.util.HashMap;\nimport java.util.Map;\nimport java.util.Scanner;\nimport java.util.TreeMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        Map<String, Integer> estoque = new HashMap<>();\n        int op;\n\n        do {\n            System.out.print(\"\\n1 Entrada | 2 Saída | 3 Listar | 0 Sair: \");\n            op = sc.nextInt();\n            if (op == 1 || op == 2) {\n                System.out.print(\"Produto: \");\n                String produto = sc.next();\n                System.out.print(\"Quantidade: \");\n                int qtd = sc.nextInt();\n                int atual = estoque.getOrDefault(produto, 0);\n\n                if (op == 1) {\n                    estoque.put(produto, atual + qtd);\n                } else if (qtd > atual) {\n                    System.out.println(\"Só há \" + atual + \" em estoque.\");\n                } else {\n                    estoque.put(produto, atual - qtd);\n                }\n            } else if (op == 3) {\n                for (Map.Entry<String, Integer> e : new TreeMap<>(estoque).entrySet()) {\n                    System.out.println(e.getKey() + \": \" + e.getValue());\n                }\n            }\n        } while (op != 0);\n        sc.close();\n    }\n}"}]}, {"id": "java-excecoes", "titulo": "Tratamento de erros (exceções)", "resumo": "try, catch e finally: como um programa reage a erros sem fechar de repente.", "ideia": "\n<p>Programas encontram problemas: o usuário digita \"abc\" onde se esperava um número, o arquivo não existe, alguém divide por zero. Em Java, esses problemas viram <strong>exceções<\/strong>: objetos que representam o erro. Se ninguém trata uma exceção, o programa para e mostra uma mensagem longa em vermelho, o <em>stack trace<\/em>.<\/p>\n<h3>Lendo um stack trace<\/h3>\n<p>Não se assuste com o tamanho. Olhe só duas coisas: a <strong>primeira linha<\/strong>, que diz o tipo do erro e a mensagem (por exemplo, <code>java.lang.ArithmeticException: / by zero<\/code>), e a primeira linha que cita <strong>o seu arquivo<\/strong> com um número, como <code>Main.java:12<\/code>. É ali que o erro aconteceu.<\/p>\n<h3>try / catch / finally<\/h3>\n<ul>\n  <li><code>try { … }<\/code>: o código que pode dar erro.<\/li>\n  <li><code>catch (TipoDeErro e) { … }<\/code>: o que fazer se aquele erro acontecer. Pode haver vários catch, um por tipo.<\/li>\n  <li><code>finally { … }<\/code>: roda sempre, com ou sem erro. Usado para fechar recursos.<\/li>\n<\/ul>\n<h3>Exceções comuns<\/h3>\n<table class=\"tabela\">\n  <thead><tr><th>Exceção<\/th><th>Quando acontece<\/th><\/tr><\/thead>\n  <tbody>\n    <tr><td><code>ArithmeticException<\/code><\/td><td>divisão de inteiro por zero<\/td><\/tr>\n    <tr><td><code>NumberFormatException<\/code><\/td><td><code>Integer.parseInt(\"abc\")<\/code><\/td><\/tr>\n    <tr><td><code>InputMismatchException<\/code><\/td><td><code>sc.nextInt()<\/code> quando o usuário digita texto<\/td><\/tr>\n    <tr><td><code>ArrayIndexOutOfBoundsException<\/code><\/td><td>índice fora do array<\/td><\/tr>\n    <tr><td><code>NullPointerException<\/code><\/td><td>chamar um método numa variável que vale null<\/td><\/tr>\n    <tr><td><code>IllegalArgumentException<\/code><\/td><td>um método recebeu um argumento inválido (você mesmo pode lançar)<\/td><\/tr>\n  <\/tbody>\n<\/table>\n<h3>Lançando suas próprias exceções<\/h3>\n<p>Com <code>throw new IllegalArgumentException(\"mensagem\")<\/code>, um método avisa que recebeu algo inválido, em vez de continuar com dados errados. Quem chamou decide como reagir.<\/p>\n<p>Algumas exceções, como as de leitura de arquivo (<code>IOException<\/code>), são <strong>verificadas<\/strong>: o compilador obriga você a tratá-las com try/catch ou a declarar <code>throws<\/code> no método.<\/p>\n", "exemplos": [{"lang": "java", "titulo": "Lendo um número com segurança", "entrada": "abc\n-5\n42", "codigo": "import java.util.Scanner;\n\npublic class Main {\n\n    static int lerIdade(Scanner sc) {\n        while (true) {\n            System.out.print(\"Idade: \");\n            String linha = sc.nextLine();\n            try {\n                int idade = Integer.parseInt(linha.trim());\n                if (idade < 0) {\n                    throw new IllegalArgumentException(\"idade não pode ser negativa\");\n                }\n                return idade;\n            } catch (NumberFormatException e) {\n                System.out.println(\"\\\"\" + linha + \"\\\" não é um número inteiro. Tente de novo.\");\n            } catch (IllegalArgumentException e) {\n                System.out.println(\"Valor inválido: \" + e.getMessage());\n            }\n        }\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int idade = lerIdade(sc);\n        System.out.println(\"Idade registrada: \" + idade);\n\n        int[] v = {1, 2, 3};\n        try {\n            System.out.println(v[5]);\n        } catch (ArrayIndexOutOfBoundsException e) {\n            System.out.println(\"Erro: \" + e.getMessage());\n        } finally {\n            System.out.println(\"O finally roda sempre.\");\n        }\n        sc.close();\n    }\n}", "explica": ["Lemos a linha inteira como texto e convertemos com <code>Integer.parseInt<\/code>. Se o texto não for um número, a conversão lança <code>NumberFormatException<\/code>, que é capturada pelo primeiro catch.", "<code>throw new IllegalArgumentException(...)<\/code> lança um erro de propósito quando a idade é negativa. Ele é pego pelo segundo catch, e <code>e.getMessage()<\/code> devolve a mensagem que escrevemos.", "<code>while (true)<\/code> repete até um <code>return<\/code> sair do método, ou seja, até a idade ser válida.", "O bloco <code>finally<\/code> executa depois do try ou do catch, aconteça o que acontecer."], "saida": "Idade: \"abc\" não é um número inteiro. Tente de novo.\nIdade: Valor inválido: idade não pode ser negativa\nIdade: Idade registrada: 42\nErro: Index 5 out of bounds for length 3\nO finally roda sempre.\n", "terminal": [["out", "Idade: "], ["in", "abc\n"], ["out", "\"abc\" não é um número inteiro. Tente de novo.\nIdade: "], ["in", "-5\n"], ["out", "Valor inválido: idade não pode ser negativa\nIdade: "], ["in", "42\n"], ["out", "Idade registrada: 42\nErro: Index 5 out of bounds for length 3\nO finally roda sempre.\n"]]}], "pegadinhas": ["<code>catch (Exception e) { }<\/code> vazio. O erro some sem deixar rastro, e você perde horas procurando. No mínimo, mostre <code>e.getMessage()<\/code>.", "Usar exceções no lugar de um <code>if<\/code> simples. Se dá para testar antes (<code>if (b != 0)<\/code>), teste.", "A ordem dos catch importa: o mais específico vem antes do mais genérico. <code>catch (Exception e)<\/code> primeiro captura tudo, e os seguintes nem compilam.", "Depois de um <code>nextInt()<\/code> que falhou, o texto inválido continua no Scanner. Se você tentar ler de novo com nextInt, falha de novo. Por isso o exemplo lê linhas inteiras."], "lembrar": ["try: o que pode falhar. catch: como reagir. finally: sempre roda.", "Stack trace: leia a primeira linha e a linha do seu arquivo.", "throw new IllegalArgumentException(\"…\") para recusar valores inválidos."], "exercicios": [{"nivel": 1, "titulo": "Divisão protegida", "enunciado": "Leia dois inteiros como texto e mostre a divisão inteira do primeiro pelo segundo. Trate texto inválido e divisão por zero com mensagens claras.", "dica": "Dois catch: NumberFormatException e ArithmeticException.", "lang": "java", "teste": "10\n0", "solucao": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        try {\n            System.out.print(\"Dividendo: \");\n            int a = Integer.parseInt(sc.nextLine().trim());\n            System.out.print(\"Divisor: \");\n            int b = Integer.parseInt(sc.nextLine().trim());\n            System.out.println(\"Resultado: \" + (a / b));\n        } catch (NumberFormatException e) {\n            System.out.println(\"Digite apenas números inteiros.\");\n        } catch (ArithmeticException e) {\n            System.out.println(\"Não é possível dividir por zero.\");\n        }\n        sc.close();\n    }\n}"}, {"nivel": 2, "titulo": "Conta que recusa saques inválidos", "enunciado": "Crie a classe Conta com o método sacar(double valor), que lança IllegalArgumentException se o valor for negativo ou zero e IllegalStateException se não houver saldo. No main, tente três saques e trate cada erro.", "dica": "Dentro de sacar, teste as condições e use throw. No main, cada saque fica no seu try/catch.", "lang": "java", "solucao": "public class Main {\n    public static void main(String[] args) {\n        Conta c = new Conta(100);\n        double[] saques = {30, -10, 500};\n\n        for (double valor : saques) {\n            try {\n                c.sacar(valor);\n                System.out.println(\"Saque de \" + valor + \" ok. Saldo: \" + c.getSaldo());\n            } catch (IllegalArgumentException | IllegalStateException e) {\n                System.out.println(\"Saque de \" + valor + \" recusado: \" + e.getMessage());\n            }\n        }\n    }\n}\n\nclass Conta {\n    private double saldo;\n\n    public Conta(double saldoInicial) { saldo = saldoInicial; }\n\n    public double getSaldo() { return saldo; }\n\n    public void sacar(double valor) {\n        if (valor <= 0) throw new IllegalArgumentException(\"valor deve ser positivo\");\n        if (valor > saldo) throw new IllegalStateException(\"saldo insuficiente\");\n        saldo -= valor;\n    }\n}"}, {"nivel": 3, "titulo": "Somar os números de um texto", "enunciado": "Dado o texto \"10, 20, abc, 30, , 5.5, 40\", some apenas os inteiros válidos e mostre quais partes foram ignoradas.", "dica": "split(\",\"), depois trim() em cada parte, e tente Integer.parseInt dentro de um try. No catch, guarde a parte numa lista de ignoradas.", "lang": "java", "solucao": "import java.util.ArrayList;\n\npublic class Main {\n    public static void main(String[] args) {\n        String texto = \"10, 20, abc, 30, , 5.5, 40\";\n        int soma = 0;\n        ArrayList<String> ignoradas = new ArrayList<>();\n\n        for (String parte : texto.split(\",\")) {\n            String p = parte.trim();\n            try {\n                soma += Integer.parseInt(p);\n            } catch (NumberFormatException e) {\n                ignoradas.add(\"\\\"\" + p + \"\\\"\");\n            }\n        }\n        System.out.println(\"Soma: \" + soma);\n        System.out.println(\"Ignoradas: \" + ignoradas);\n    }\n}"}]}];
+const PAGINA = {"id": "java", "nome": "Java", "nivel": "Iniciante a intermediário", "descricao": "Do primeiro programa à orientação a objetos: tipos e Scanner, decisões e laços, textos, métodos e arrays, classes, herança e polimorfismo, ArrayList e tratamento de erros.", "comoRodar": "\n<p>Você precisa do <strong>JDK<\/strong> (Java Development Kit), versão 17 ou mais nova. Baixe o \"Temurin\" no site adoptium.net. Para escrever o código, as opções mais comuns são IntelliJ IDEA Community, VS Code (com o pacote de extensões Java) e Eclipse; todas têm um botão de executar.<\/p>\n<p>No terminal, salve o código como <code>Main.java<\/code> (o nome do arquivo precisa ser igual ao da classe pública) e rode:<\/p>\n<table class=\"tabela\"><tbody>\n  <tr><td><code>java Main.java<\/code><\/td><td>compila e executa de uma vez (Java 11 ou mais novo)<\/td><\/tr>\n  <tr><td><code>javac Main.java<\/code> e depois <code>java Main<\/code><\/td><td>o jeito clássico, em dois passos<\/td><\/tr>\n<\/tbody><\/table>\n<p>Sem instalar nada: sites como o OnlineGDB também rodam Java no navegador.<\/p>\n<p>Atenção: se o seu computador estiver configurado em português, o <code>Scanner<\/code> espera números decimais com vírgula (1,75). Alguns exemplos usam <code>.useLocale(Locale.US)<\/code> para aceitar ponto.<\/p>"};
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  const ARQUIVO = { c: "programa.c", java: "Main.java", python: "programa.py", pseudo: "algoritmo (Portugol)", texto: "anotações" };
+
+  /* ---------- progresso salvo no navegador ---------- */
+  const CHAVE = "aula-" + PAGINA.id + "-feitos";
+  const NIVEIS = { 1: "Fácil", 2: "Médio", 3: "Desafio" };
+  const nivelDe = (e, i, n) => e.nivel || (i === 0 ? 1 : (i === n - 1 && n >= 3 ? 3 : 2));
+  let feitos = new Set();
+  try { feitos = new Set(JSON.parse(localStorage.getItem(CHAVE) || "[]")); } catch (e) { /* sem armazenamento */ }
+  function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify([...feitos])); } catch (e) {} }
+  const totalEx = AULAS.reduce((s, a) => s + a.exercicios.length, 0);
+  const feitosDaAula = a => a.exercicios.filter((_, i) => feitos.has(a.id + ":" + i)).length;
+
+  /* ---------- utilidades ---------- */
+  const el = (tag, attrs = {}, html) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v);
+    }
+    if (html != null) n.innerHTML = html;
+    return n;
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  function realcar(codigo, lang) {
+    const g = window.Prism && Prism.languages[lang];
+    return g ? Prism.highlight(codigo, g, lang) : esc(codigo);
+  }
+  function avisar(txt) {
+    const a = document.getElementById("aviso");
+    a.textContent = txt; a.classList.add("ver");
+    clearTimeout(avisar.t); avisar.t = setTimeout(() => a.classList.remove("ver"), 1800);
+  }
+  async function copiar(texto) {
+    try { await navigator.clipboard.writeText(texto); avisar("Código copiado"); }
+    catch (e) { avisar("Não deu para copiar. Selecione o código e use Ctrl+C."); }
+  }
+  // envolve tabelas da prosa num contêiner que rola na horizontal
+  function ajustarTabelas(raiz) {
+    raiz.querySelectorAll("table.tabela").forEach(t => {
+      if (t.parentElement.classList.contains("rolar")) return;
+      const w = el("div", { class: "rolar" }); t.replaceWith(w); w.appendChild(t);
+    });
+  }
+
+  function blocoCodigo(codigo, lang, rotulo) {
+    const box = el("div", { class: "codigo" });
+    const topo = el("div", { class: "codigo-topo" });
+    topo.appendChild(el("span", { text: rotulo || ARQUIVO[lang] || "" }));
+    if (lang !== "texto") {
+      const b = el("button", { class: "botao", type: "button", text: "Copiar" });
+      b.addEventListener("click", () => copiar(codigo));
+      topo.appendChild(b);
+    }
+    box.appendChild(topo);
+    const pre = el("pre"); const c = el("code");
+    c.innerHTML = lang === "texto" ? esc(codigo) : realcar(codigo, lang);
+    pre.appendChild(c); box.appendChild(pre);
+    return box;
+  }
+
+  function terminal(ex) {
+    const t = el("div", { class: "terminal", role: "group", "aria-label": "Saída ao executar" });
+    if (ex.terminal && ex.terminal.length) {
+      t.innerHTML = ex.terminal.map(([tipo, txt]) =>
+        tipo === "in" ? `<span class="in" title="digitado pelo usuário">${esc(txt.replace(/\n$/, ""))}</span>\n` : esc(txt)
+      ).join("").replace(/\n+$/, "");
+    } else {
+      t.textContent = (ex.saida || "").replace(/\n+$/, "");
+    }
+    return t;
+  }
+
+  /* ---------- tabela verdade ---------- */
+  function montarVerdade(alvo) {
+    let A = 1, B = 0;
+    alvo.innerHTML = `
+      <div class="entradas" role="group" aria-label="Valores de entrada">
+        <button type="button" class="chave" data-v="A"></button>
+        <button type="button" class="chave" data-v="B"></button>
+      </div>
+      <dl aria-live="polite">
+        <dt>A &amp;&amp; B</dt><dt>A || B</dt><dt>!A</dt>
+        <dd data-r="e"></dd><dd data-r="ou"></dd><dd data-r="nao"></dd>
+      </dl>`;
+    const pinta = (dd, v) => { dd.textContent = v; dd.className = "v" + v; };
+    function atualizar() {
+      alvo.querySelectorAll(".chave").forEach(b => {
+        const v = b.dataset.v === "A" ? A : B;
+        b.textContent = `${b.dataset.v} = ${v}`;
+        b.setAttribute("aria-pressed", v ? "true" : "false");
+      });
+      pinta(alvo.querySelector('[data-r="e"]'), A && B ? 1 : 0);
+      pinta(alvo.querySelector('[data-r="ou"]'), A || B ? 1 : 0);
+      pinta(alvo.querySelector('[data-r="nao"]'), A ? 0 : 1);
+    }
+    alvo.addEventListener("click", e => {
+      const b = e.target.closest(".chave"); if (!b) return;
+      if (b.dataset.v === "A") A = 1 - A; else B = 1 - B;
+      atualizar();
+    });
+    atualizar();
+  }
+
+  /* ---------- teste de mesa ---------- */
+  function montarMesa(tr) {
+    const linhas = tr.codigo.split("\n");
+    const caixa = el("div", { class: "mesa", tabindex: "0", "aria-label": "Teste de mesa interativo. Use as setas para avançar e voltar." });
+    const realce = realcar(tr.codigo, tr.lang).split("\n");
+    caixa.innerHTML = `
+      <div class="mesa-corpo">
+        <div class="mesa-codigo">${linhas.map((_, i) =>
+          `<div class="ln" data-l="${i + 1}"><span class="num">${i + 1}</span><code>${realce[i] || " "}</code></div>`).join("")}</div>
+        <div class="mesa-lado">
+          <p class="mesa-nota" aria-live="polite"></p>
+          <div class="mesa-tab-wrap"><table class="mesa-tab">
+            <thead><tr><th class="passo">passo</th>${tr.vars.map(v => `<th>${esc(v)}</th>`).join("")}</tr></thead>
+            <tbody></tbody></table></div>
+          <div class="mesa-saida"></div>
+        </div>
+      </div>
+      <div class="mesa-controles">
+        <button type="button" class="botao" data-a="ini">Recomeçar</button>
+        <button type="button" class="botao" data-a="ant">Voltar</button>
+        <button type="button" class="botao ativo" data-a="prox">Próximo passo</button>
+        <span class="contador"></span>
+      </div>`;
+    let p = 0;
+    const N = tr.passos.length;
+    const tbody = caixa.querySelector("tbody");
+    const wrap = caixa.querySelector(".mesa-tab-wrap");
+    function desenhar() {
+      caixa.querySelectorAll(".ln").forEach(l => l.classList.toggle("atual", +l.dataset.l === tr.passos[p].l));
+      caixa.querySelector(".mesa-nota").innerHTML = tr.passos[p].n;
+      let saida = "", linhasTab = "";
+      for (let i = 0; i <= p; i++) {
+        const s = tr.passos[i];
+        if (s.o) saida += s.o;
+        const muda = Object.keys(s.v);
+        if (muda.length) {
+          linhasTab += `<tr class="${i === p ? "atual" : ""}"><td class="passo">${i + 1}</td>${tr.vars.map(v =>
+            muda.includes(v) ? `<td class="mudou">${s.v[v]}</td>` : "<td></td>").join("")}</tr>`;
+        }
+      }
+      tbody.innerHTML = linhasTab;
+      wrap.scrollTop = wrap.scrollHeight;
+      caixa.querySelector(".mesa-saida").textContent = saida;
+      caixa.querySelector(".contador").textContent = `Passo ${p + 1} de ${N}`;
+      caixa.querySelector('[data-a="ant"]').disabled = p === 0;
+      caixa.querySelector('[data-a="ini"]').disabled = p === 0;
+      caixa.querySelector('[data-a="prox"]').disabled = p === N - 1;
+    }
+    caixa.addEventListener("click", e => {
+      const b = e.target.closest("button[data-a]"); if (!b) return;
+      if (b.dataset.a === "prox" && p < N - 1) p++;
+      if (b.dataset.a === "ant" && p > 0) p--;
+      if (b.dataset.a === "ini") p = 0;
+      desenhar();
+    });
+    caixa.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight" && p < N - 1) { p++; desenhar(); e.preventDefault(); }
+      if (e.key === "ArrowLeft" && p > 0) { p--; desenhar(); e.preventDefault(); }
+    });
+    desenhar();
+    return caixa;
+  }
+
+  /* ---------- trilha lateral ---------- */
+  const fracao = (f, t) => `<span class="fr${t && f === t ? " completo" : ""}" title="exercícios feitos">${f}/${t}</span>`;
+
+  function desenharTrilha(atual) {
+    const lista = document.getElementById("lista-modulos");
+    lista.innerHTML = "";
+    lista.appendChild(el("div", { class: "modulo-nome" }, `<span class="pino pino-${PAGINA.id}"></span>Aulas`));
+    const ol = el("ol");
+    AULAS.forEach((a, i) => {
+      ol.appendChild(el("li", {}, `<a href="#${a.id}"${a.id === atual ? ' aria-current="page"' : ""}>
+        <span class="n">${i + 1}</span><span>${esc(a.titulo)}</span>${fracao(feitosDaAula(a), a.exercicios.length)}</a>`));
+    });
+    lista.appendChild(ol);
+    const tot = AULAS.reduce((s, a) => s + feitosDaAula(a), 0);
+    document.getElementById("prog-txt").textContent = `${tot} de ${totalEx} exercícios feitos`;
+    document.getElementById("prog-barra").style.width = (100 * tot / totalEx) + "%";
+  }
+
+  /* ---------- página inicial ---------- */
+  function paginaInicio() {
+    const c = document.getElementById("conteudo");
+    const porNivel = [1, 2, 3].map(n => AULAS.reduce((s, a) => s + a.exercicios.filter((e, i) => nivelDe(e, i, a.exercicios.length) === n).length, 0));
+    c.innerHTML = `
+      <h1>${esc(PAGINA.nome)}</h1>
+      <p class="resumo">${PAGINA.descricao}</p>
+      <dl class="ficha">
+        <div><dt>Nível</dt><dd>${esc(PAGINA.nivel)}</dd></div>
+        <div><dt>Aulas</dt><dd>${AULAS.length}</dd></div>
+        <div><dt>Exercícios</dt><dd>${totalEx}: ${porNivel[0]} fáceis, ${porNivel[1]} médios, ${porNivel[2]} desafios</dd></div>
+      </dl>
+      <section class="bloco">
+        <h2>O que você vai aprender</h2>
+        <div class="inicio-modulos"><div class="inicio-modulo"><ol id="lista-aulas"></ol></div></div>
+      </section>
+      <section class="bloco prosa">
+        <h2>Como estudar</h2>
+        <ol class="passos">
+          <li>Siga as aulas na ordem: cada uma usa o que veio antes.</li>
+          <li>Leia a ideia com calma. As comparações com o dia a dia estão ali para você ter uma imagem na cabeça antes do código.</li>
+          <li>Copie o exemplo, rode no seu computador e confira a saída. Depois mude alguma coisa e veja o que acontece.</li>
+          <li>Leia a explicação linha por linha do exemplo e as pegadinhas. Elas mostram os erros que quase todo mundo comete.</li>
+          <li>Faça os exercícios do fácil para o desafio. Tente sem abrir nada; se travar por mais de 10 minutos, abra a dica.</li>
+          <li>Só depois de tentar, compare com a solução e marque como feito.</li>
+        </ol>
+      </section>
+      <section class="bloco prosa">
+        <h2>Como rodar os exemplos</h2>
+        ${PAGINA.comoRodar}
+      </section>
+      <p class="selo">Todos os exemplos e soluções em código foram executados antes de serem publicados. As saídas mostradas nas aulas são as reais. O seu progresso fica salvo só neste navegador.</p>`;
+    ajustarTabelas(c);
+    const ol = c.querySelector("#lista-aulas");
+    AULAS.forEach((a, i) => {
+      ol.appendChild(el("li", {}, `<a href="#${a.id}"><span class="n">${i + 1}</span>
+        <span><span class="t">${esc(a.titulo)}</span><span class="r">${esc(a.resumo)}</span></span>
+        ${fracao(feitosDaAula(a), a.exercicios.length)}</a>`));
+    });
+  }
+
+  /* ---------- página da aula ---------- */
+  function paginaAula(a) {
+    const idx = AULAS.indexOf(a);
+    const c = document.getElementById("conteudo");
+    c.innerHTML = "";
+
+    c.appendChild(el("p", { class: "contexto" },
+      `<a href="#inicio">${esc(PAGINA.nome)}</a>, aula ${idx + 1} de ${AULAS.length}`));
+    c.appendChild(el("h1", { text: a.titulo }));
+    c.appendChild(el("p", { class: "resumo", text: a.resumo }));
+
+    // A ideia
+    const ideia = el("section", { class: "bloco prosa" });
+    ideia.appendChild(el("h2", { text: "A ideia" }));
+    const corpo = el("div", {}, a.ideia);
+    ideia.appendChild(corpo);
+    corpo.querySelectorAll('[data-widget="verdade"]').forEach(montarVerdade);
+    if (a.trace) {
+      corpo.appendChild(montarMesa(a.trace));
+    }
+    ajustarTabelas(ideia);
+    c.appendChild(ideia);
+
+    // Exemplos
+    if (a.exemplos.length) {
+      const sec = el("section", { class: "bloco" });
+      sec.appendChild(el("h2", { text: a.exemplos.length > 1 ? "Exemplos" : "Exemplo" }));
+      for (const ex of a.exemplos) {
+        const box = el("div", { class: "exemplo" });
+        box.appendChild(el("h3", { text: ex.titulo }));
+        box.appendChild(blocoCodigo(ex.codigo, ex.lang));
+        if (ex.saida || (ex.terminal && ex.terminal.length)) box.appendChild(terminal(ex));
+        if (ex.nota) box.appendChild(el("p", { class: "nota", text: ex.nota }));
+        if (ex.explica && ex.explica.length) {
+          const exp = el("div", { class: "explica" });
+          exp.appendChild(el("h4", { text: "Entendendo o código" }));
+          const ul = el("ul");
+          ex.explica.forEach(t => ul.appendChild(el("li", {}, t)));
+          exp.appendChild(ul);
+          box.appendChild(exp);
+        }
+        sec.appendChild(box);
+      }
+      c.appendChild(sec);
+    }
+
+    // Pegadinhas
+    const peg = el("section", { class: "bloco" });
+    peg.appendChild(el("h2", { text: "Pegadinhas" }));
+    const ul = el("ul", { class: "pegadinhas" });
+    a.pegadinhas.forEach(p => ul.appendChild(el("li", {}, p)));
+    peg.appendChild(ul);
+    c.appendChild(peg);
+
+    // Para lembrar
+    const lem = el("aside", { class: "bloco lembrar", "aria-label": "Para lembrar" });
+    lem.appendChild(el("h2", { text: "Para lembrar" }));
+    const ul2 = el("ul");
+    a.lembrar.forEach(p => ul2.appendChild(el("li", {}, p)));
+    lem.appendChild(ul2);
+    c.appendChild(lem);
+
+    // Exercícios
+    const exs = el("section", { class: "bloco" });
+    exs.appendChild(el("h2", { text: "Exercícios" }));
+    const lista = el("div", { class: "exercicios" });
+    a.exercicios.forEach((ex, i) => {
+      const chave = a.id + ":" + i;
+      const card = el("article", { class: "exercicio" + (feitos.has(chave) ? " feito" : "") });
+      const idChk = `feito-${a.id}-${i}`;
+      card.innerHTML = `
+        <div class="ex-topo">
+          <h3>${i + 1}. ${esc(ex.titulo)} <span class="nivel nivel-${nivelDe(ex, i, a.exercicios.length)}">${NIVEIS[nivelDe(ex, i, a.exercicios.length)]}</span></h3>
+          <label class="feito-check" for="${idChk}"><input type="checkbox" id="${idChk}"${feitos.has(chave) ? " checked" : ""}> Já fiz</label>
+        </div>
+        <p>${ex.enunciado}</p>`;
+      if (ex.trecho) {
+        const t = el("div", { class: "ex-trecho" });
+        t.appendChild(blocoCodigo(ex.trecho, ex.trechoLang || "c", "trecho para analisar"));
+        card.appendChild(t);
+      }
+      const acoes = el("div", { class: "ex-acoes" });
+      const bDica = el("button", { class: "botao", type: "button", "aria-expanded": "false", text: "Mostrar dica" });
+      const bSol = el("button", { class: "botao", type: "button", "aria-expanded": "false", text: "Mostrar solução" });
+      acoes.append(bDica, bSol);
+      card.appendChild(acoes);
+      const dica = el("div", { class: "revelar dica", hidden: "" }, `<strong>Dica.</strong> ${ex.dica}`);
+      const sol = el("div", { class: "revelar", hidden: "" });
+      sol.appendChild(blocoCodigo(ex.solucao, ex.lang, ex.lang === "texto" ? "resposta" : "solução: " + ARQUIVO[ex.lang]));
+      card.append(dica, sol);
+      const alternar = (btn, painel, rotuloVer, rotuloEsconder) => () => {
+        const abrir = painel.hidden;
+        painel.hidden = !abrir;
+        btn.setAttribute("aria-expanded", abrir ? "true" : "false");
+        btn.textContent = abrir ? rotuloEsconder : rotuloVer;
+      };
+      bDica.addEventListener("click", alternar(bDica, dica, "Mostrar dica", "Esconder dica"));
+      bSol.addEventListener("click", alternar(bSol, sol, "Mostrar solução", "Esconder solução"));
+      card.querySelector("input").addEventListener("change", e => {
+        if (e.target.checked) feitos.add(chave); else feitos.delete(chave);
+        card.classList.toggle("feito", e.target.checked);
+        salvar(); desenharTrilha(a.id);
+      });
+      lista.appendChild(card);
+    });
+    exs.appendChild(lista);
+    c.appendChild(exs);
+
+    // anterior / próxima
+    const nav = el("nav", { class: "navegar", "aria-label": "Outras aulas" });
+    if (idx > 0) {
+      const ant = AULAS[idx - 1];
+      nav.appendChild(el("a", { href: "#" + ant.id }, `<small>Aula anterior</small><strong>${esc(ant.titulo)}</strong>`));
+    }
+    if (idx < AULAS.length - 1) {
+      const prox = AULAS[idx + 1];
+      nav.appendChild(el("a", { href: "#" + prox.id, class: "prox" }, `<small>Próxima aula</small><strong>${esc(prox.titulo)}</strong>`));
+    }
+    c.appendChild(nav);
+  }
+
+  /* ---------- roteamento pelo # ---------- */
+  function rota() {
+    const id = location.hash.slice(1);
+    const aula = AULAS.find(a => a.id === id);
+    if (aula) { paginaAula(aula); document.title = aula.titulo + " | " + PAGINA.nome; }
+    else { paginaInicio(); document.title = PAGINA.nome; }
+    desenharTrilha(aula ? aula.id : null);
+    document.getElementById("trilha").classList.remove("aberta");
+    const bt = document.getElementById("abrir-trilha");
+    bt.setAttribute("aria-expanded", "false");
+    bt.textContent = "Ver a lista";
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("abrir-trilha").addEventListener("click", e => {
+    const t = document.getElementById("trilha");
+    const aberta = t.classList.toggle("aberta");
+    e.currentTarget.setAttribute("aria-expanded", aberta ? "true" : "false");
+    e.currentTarget.textContent = aberta ? "Fechar a lista" : "Ver a lista";
+  });
+  window.addEventListener("hashchange", () => { rota(); document.getElementById("folha").focus({ preventScroll: true }); });
+  rota();
+})();
+</script>
+</body>
+</html>
